@@ -16,42 +16,34 @@ namespace MusicPlayer
         public static Random RDM = new Random();
         public static Point WindowSize = new Point(500, 300);
         public static string MusicPath = @"D:\Eigene Dateien\Medien\Musik";
-        public static string ContentFoulderPath = @"C:\Users\One\Documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayerContent";
+        public static Rectangle ScreenRect
+        {
+            get
+            {
+                return new Rectangle(0, 0, WindowSize.X, WindowSize.Y);
+            }
+        }
         public static float OutputVolume = 0;
         public static float TargetVolume = 0.215f;
-        public static int SongTime;
         public static GameTime currentTime;
         public static bool isMusicPlaying = true;
         public static int Timer = 0;
+        
+        public static float GetAverageVolume(float[] samples)
+        {
+            if (samples != null)
+            {
+                float average = 0;
 
-        public static float GetAverageFrequency(int x, int y, VisualizationData visData)
-        {
-            float average = 0;
-            for (int i = x; i < y; i++)
-            {
-                average += visData.Frequencies[i];
+                for (int i = 0; i < samples.Length; i++)
+                    average += Math.Abs(samples[i]);
+
+                average /= samples.Length;
+
+                return average;
             }
-            average /= y - x + 1;
-            return average;
-        }
-        public static float GetAverageVolume(VisualizationData visData)
-        {
-            float average = 0;
-            for (int i = 0; i < 255; i++)
-            {
-                average += Math.Abs(visData.Samples[i]);
-            }
-            average /= 256;
-            return average;
-        }
-        public static string GetFileName(string FilePath)
-        {
-            string NameWithDataExtension = FilePath.Split('\\').Last();
-            string[] SplittedNameWithDataExtension = NameWithDataExtension.Split('.');
-            string NameWithoutDataExtensions = "";
-            for (int i = 0; i < SplittedNameWithDataExtension.Length - 1; i++)
-                NameWithoutDataExtensions.Insert(NameWithoutDataExtensions.Length, SplittedNameWithDataExtension[i]);
-            return NameWithoutDataExtensions;
+            else
+                return 0;
         }
 
         public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
