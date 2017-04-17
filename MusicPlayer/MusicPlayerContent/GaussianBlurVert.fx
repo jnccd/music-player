@@ -23,7 +23,7 @@ const float BlurWeights[15] = {
 	0.1397,
 	0.1844,
 	0.2178,
-	0.2303,
+	0.2599,
 	0.2178,
 	0.1844,
 	0.1397,
@@ -40,8 +40,9 @@ float4 PixelShaderFunction(float2 texCoord : TEXCOORD0) : COLOR0
 
 	for (int i = 0; i < 15; i++)
 	{
-		color += tex2D(samp2D, texCoord + float2(0, i - 7) * InvertedTexSize) * BlurWeights[i] / 1.8f;
+		color += tex2D(samp2D, texCoord + float2(0, i - 7) * InvertedTexSize) * BlurWeights[i];
 	}
+	color.rgb /= 1.8f;
 
 	return color;
 }

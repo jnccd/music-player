@@ -38,17 +38,17 @@ namespace MusicPlayer
             {
                 int vkCode = Marshal.ReadInt32(lParam);
                 // --------------------------- My code ---------------------------
-                //Console.WriteLine((Keys)vkCode);
 
-                if (Assets.InputCooldown < 0)
-                {
-                    // Key Events
-                    if ((Keys)vkCode == Keys.MediaNextTrack)
-                        Assets.GetNewSong();
+                // Key Events
+                if ((Keys)vkCode == Keys.MediaPlayPause)
+                    Assets.PlayPause();
 
-                    if ((Keys)vkCode == Keys.MediaPreviousTrack)
-                        Assets.GetPreviousSong();
-                }
+                if ((Keys)vkCode == Keys.MediaNextTrack)
+                    Assets.GetNextSong();
+
+                if ((Keys)vkCode == Keys.MediaPreviousTrack)
+                    Assets.GetPreviousSong();
+
                 // --------------------------- My code ---------------------------
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
