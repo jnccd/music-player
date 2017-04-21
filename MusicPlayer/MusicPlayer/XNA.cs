@@ -14,16 +14,18 @@ using System.Threading.Tasks;
 using System.Threading;
 using NAudio.Wave;
 using NAudio.Dsp;
+using System.IO;
+using MusicPlayerwNAudio;
 
 namespace MusicPlayer
 {
-    enum Visualizations
+    public enum Visualizations
     {
         line,
         fftline,
         barchart
     }
-    enum BackGroundModes
+    public enum BackGroundModes
     {
         None,
         Blur,
@@ -46,8 +48,8 @@ namespace MusicPlayer
 
         // Visualization
         float barWidth = Values.WindowSize.X / 260f;
-        Visualizations VisSetting = Visualizations.line;
-        BackGroundModes BgModes = BackGroundModes.None;
+        public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
+        public static BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
         public static Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
         public static Color secondaryColor = Color.FromNonPremultiplied(35, 125, 255, 255);
         GaussianDiagram GD = new GaussianDiagram();
@@ -69,6 +71,15 @@ namespace MusicPlayer
             //graphics.SynchronizeWithVerticalRetrace = false;
             //IsFixedTimeStep = false;
             IsMouseVisible = true;
+
+            gameWindowForm.FormClosing += (object o, FormClosingEventArgs e) => {
+                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+                Assets.DisposeNAudioData();
+
+                config.Default.Background = (int)XNA.BgModes;
+                config.Default.Vis = (int)XNA.VisSetting;
+                config.Default.Save();
+            };
         }
         protected override void Initialize()
         {
@@ -135,7 +146,6 @@ namespace MusicPlayer
         {
             Control.Update();
             FPSCounter.Update(gameTime);
-            UpdateGD();
             //gameWindowForm.SendToBack();
             ComputeControls();
             Values.Timer++;
@@ -144,27 +154,26 @@ namespace MusicPlayer
             // Stuff
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
-                if (Assets.FFToutput != null)
-                    Values.OutputVolume += (GD.GetAverage() - Values.OutputVolume) / 60;
+                UpdateGD();
 
-                if (Values.OutputVolume > 1f)
-                    Values.OutputVolume = 1f;
+                //Values.OutputVolume += ((Assets.device.AudioMeterInformation.MasterPeakValue / Values.TargetVolume) - Values.OutputVolume) / 1;
+                Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer) * 2;
 
-                if (Values.OutputVolume < 0)
-                    Values.OutputVolume = 0;
-
-                //Values.OutputVolume = 0;
+                if (Values.OutputVolume < 0.0001f)
+                    Values.OutputVolume = 0.0001f;
 
                 Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume * 0.6f;
 
-                if (Assets.Channel32.Position / Assets.Channel32.WaveFormat.AverageBytesPerSecond > (Assets.Channel32.TotalTime.TotalSeconds))
+                if (Assets.Channel32.Position / Assets.Channel32.WaveFormat.AverageBytesPerSecond > Assets.Channel32.TotalTime.TotalSeconds - 1)
                     Assets.GetNewPlaylistSong();
 
                 Assets.UpdateWaveBuffer();
                 Assets.UpdateFFTbuffer();
             }
             Values.currentTime = gameTime;
-            
+
+            GD.Smoothen();
+
             base.Update(gameTime);
         }
         void ComputeControls()
@@ -186,9 +195,10 @@ namespace MusicPlayer
                             Assets.Channel32.TotalTime.TotalSeconds *
                             Assets.Channel32.WaveFormat.AverageBytesPerSecond);
                 else
-                    gameWindowForm.Location = new System.Drawing.Point(gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X,
-                                                                           gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y);
+                    config.Default.WindowPos = new System.Drawing.Point(gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X,
+                                                                        gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y);
             }
+            gameWindowForm.Location = config.Default.WindowPos;
 
             // Pause [Space]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Space) || Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.MediaPlayPause))
@@ -202,6 +212,11 @@ namespace MusicPlayer
                     MediaPlayer.Resume();
                     Values.isMusicPlaying = true;
                 }
+
+            // Set Location to (0, 0) [0]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.D0) ||
+                Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.NumPad0))
+                gameWindowForm.Location = new System.Drawing.Point(0, 0);
 
             // Swap Visualisations [V]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.V))
@@ -229,16 +244,20 @@ namespace MusicPlayer
             if (Values.TargetVolume < 0)
                 Values.TargetVolume = 0;
 
-            // Show Music File in Explorer [E] {WIP}
-            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.E))
-            {
-                Console.WriteLine(Assets.currentlyPlayingSongName.Split('\\').Last());
-                MediaLibrary ML = new MediaLibrary();
-            }
-
             // Close [Esc]
             if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive)
                 Exit();
+
+            // Show Music File in Explorer [E] {WIP}
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.E))
+            {
+                if (!File.Exists(Assets.currentlyPlayingSongPath))
+                    return;
+                else
+                {
+                    Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
+                }
+            }
         }
         void UpdateGD()
         {
