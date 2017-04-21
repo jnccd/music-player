@@ -14,6 +14,7 @@ namespace MusicPlayer
     public static class Values
     {
         public static Random RDM = new Random();
+
         public static Point WindowSize = new Point(500, 300);
         public static string MusicPath = @"D:\Eigene Dateien\Medien\Musik";
         public static Rectangle ScreenRect
@@ -24,7 +25,18 @@ namespace MusicPlayer
             }
         }
         public static float OutputVolume = 0;
-        public static float TargetVolume = 0.215f;
+        public static float TargetVolume
+        {
+            get
+            {
+                return MusicPlayerwNAudio.config.Default.Volume;
+            }
+
+            set
+            {
+                MusicPlayerwNAudio.config.Default.Volume = value;
+            }
+        }
         public static GameTime currentTime;
         public static bool isMusicPlaying = true;
         public static int Timer = 0;

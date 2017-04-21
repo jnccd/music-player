@@ -47,6 +47,13 @@ namespace MusicPlayer
                 return PlayerHistory[PlayerHistoryIndex].Split('\\').Last();
             }
         }
+        public static string currentlyPlayingSongPath
+        {
+            get
+            {
+                return PlayerHistory[PlayerHistoryIndex];
+            }
+        }
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
         public static int PlayerHistoryIndex = 0;
@@ -230,7 +237,7 @@ namespace MusicPlayer
             for (int i = 0; i < FFToutput.Length; i++)
             {
                 //FFToutput[i] = (float)(tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y) * 100000;
-                FFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 250);
+                FFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 100);
                 //FFToutput[i] = -(float)Math.Log10((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y)) * 10;
             }
         }
