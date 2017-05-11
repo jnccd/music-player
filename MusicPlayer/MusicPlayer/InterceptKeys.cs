@@ -39,15 +39,18 @@ namespace MusicPlayer
                 int vkCode = Marshal.ReadInt32(lParam);
                 // --------------------------- My code ---------------------------
 
-                // Key Events
-                if ((Keys)vkCode == Keys.MediaPlayPause)
-                    Assets.PlayPause();
+                if (Values.Timer > Assets.SongChangedTickTime + 30)
+                {
+                    // Key Events
+                    if ((Keys)vkCode == Keys.MediaPlayPause)
+                        Assets.PlayPause();
 
-                if ((Keys)vkCode == Keys.MediaNextTrack)
-                    Assets.GetNextSong();
+                    if ((Keys)vkCode == Keys.MediaNextTrack)
+                        Assets.GetNextSong(false);
 
-                if ((Keys)vkCode == Keys.MediaPreviousTrack)
-                    Assets.GetPreviousSong();
+                    if ((Keys)vkCode == Keys.MediaPreviousTrack)
+                        Assets.GetPreviousSong();
+                }
 
                 // --------------------------- My code ---------------------------
             }

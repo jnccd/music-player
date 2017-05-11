@@ -22,7 +22,8 @@ namespace MusicPlayer
     public enum Visualizations
     {
         line,
-        fftline,
+        fft,
+        rawfft,
         barchart
     }
     public enum BackGroundModes
@@ -30,10 +31,14 @@ namespace MusicPlayer
         None,
         Blur,
         bg1,
-        bg2,
-        bg3,
-        bg4,
-        bg5
+        bg2
+    }
+    public enum SelectedControl
+    {
+        VolumeSlider,
+        DurationBar,
+        DragWindow,
+        None
     }
 
     public class XNA : Game
@@ -47,7 +52,6 @@ namespace MusicPlayer
         RenderTarget2D AudioVisTarget;
 
         // Visualization
-        float barWidth = Values.WindowSize.X / 260f;
         public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
         public static BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
         public static Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
@@ -57,6 +61,7 @@ namespace MusicPlayer
         // Stuff
         System.Drawing.Point MouseClickedPos = new System.Drawing.Point();
         System.Drawing.Point WindowLocation = new System.Drawing.Point();
+        SelectedControl selectedControl = SelectedControl.None;
         int SongsFoundMessageAlpha = 555;
 
         public XNA()
@@ -73,12 +78,7 @@ namespace MusicPlayer
             IsMouseVisible = true;
 
             gameWindowForm.FormClosing += (object o, FormClosingEventArgs e) => {
-                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
-                Assets.DisposeNAudioData();
-
-                config.Default.Background = (int)XNA.BgModes;
-                config.Default.Vis = (int)XNA.VisSetting;
-                config.Default.Save();
+                
             };
         }
         protected override void Initialize()
@@ -89,8 +89,7 @@ namespace MusicPlayer
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Assets.Load(Content, GraphicsDevice);
-
-            MediaPlayer.IsVisualizationEnabled = true;
+            
             gameWindowForm.Location = new System.Drawing.Point(0, 0);
             
             BlurredTex = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
@@ -144,6 +143,12 @@ namespace MusicPlayer
 
         protected override void Update(GameTime gameTime)
         {
+            if (Values.Timer % 100 == 0)
+            {
+                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+                InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
+            }
+
             Control.Update();
             FPSCounter.Update(gameTime);
             //gameWindowForm.SendToBack();
@@ -155,68 +160,90 @@ namespace MusicPlayer
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
                 UpdateGD();
-
-                //Values.OutputVolume += ((Assets.device.AudioMeterInformation.MasterPeakValue / Values.TargetVolume) - Values.OutputVolume) / 1;
-                Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer) * 2;
+                
+                Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer);
 
                 if (Values.OutputVolume < 0.0001f)
                     Values.OutputVolume = 0.0001f;
 
-                Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume * 0.6f;
+                if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length)
+                    Assets.GetNextSong(false);
+                
+                //Assets.UpdateWaveBuffer();
+                Assets.UpdateWaveBufferWithEntireSongWB();
+                if (VisSetting != Visualizations.line)
+                    Assets.UpdateFFTbuffer();
 
-                if (Assets.Channel32.Position / Assets.Channel32.WaveFormat.AverageBytesPerSecond > Assets.Channel32.TotalTime.TotalSeconds - 1)
-                    Assets.GetNewPlaylistSong();
-
-                Assets.UpdateWaveBuffer();
-                Assets.UpdateFFTbuffer();
+                GD.Smoothen();
             }
-            Values.currentTime = gameTime;
 
-            GD.Smoothen();
+            if (Assets.Channel32 != null)
+            {
+                Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume * 0.6f;
+                if (Assets.Channel32.Volume < Values.TargetVolume / 2f)
+                    Assets.Channel32.Volume = Values.TargetVolume / 2f;
+            }
 
             base.Update(gameTime);
         }
         void ComputeControls()
         {
             // Mouse Controls
-            if (Control.WasLMBJustPressed())
+            if (gameWindowForm.Focused && Control.WasLMBJustPressed())
             {
                 MouseClickedPos = new System.Drawing.Point(Control.CurMS.X, Control.CurMS.Y);
                 WindowLocation = gameWindowForm.Location;
-            }
-            if (Control.CurMS.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && gameWindowForm.Focused && Control.GetMouseRect().Intersects(new Rectangle(0, 0, Values.WindowSize.X, Values.WindowSize.Y)))
-            {
-                if (Control.GetMouseRect().Intersects(new Rectangle(Values.WindowSize.X - 25 - 75, 20, 110, 16)))
-                    Values.TargetVolume = (Control.GetMouseVector().X - (Values.WindowSize.X - 100)) / 150f;
-                else if (Control.CurMS.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && 
-                    Control.GetMouseRect().Intersects(new Rectangle(25, Values.WindowSize.Y - 40, Values.WindowSize.X - 50, 23)))
-                    Assets.Channel32.Position =
-                            (long)(((Control.GetMouseVector().X - 25) / (Values.WindowSize.X - 50)) *
-                            Assets.Channel32.TotalTime.TotalSeconds *
-                            Assets.Channel32.WaveFormat.AverageBytesPerSecond);
+
+                if (Control.GetMouseRect().Intersects(new Rectangle(25, Values.WindowSize.Y - 40, Values.WindowSize.X - 50, 23)))
+                    selectedControl = SelectedControl.DurationBar;
+                else if (Control.GetMouseRect().Intersects(new Rectangle(Values.WindowSize.X - 25 - 75, 20, 110, 16)))
+                    selectedControl = SelectedControl.VolumeSlider;
                 else
+                    selectedControl = SelectedControl.DragWindow;
+            }
+            if (Control.WasLMBJustReleased())
+            {
+                if (selectedControl == SelectedControl.DurationBar)
+                    Assets.output.Play();
+                selectedControl = SelectedControl.None;
+            }
+
+            switch (selectedControl)
+            {
+                case SelectedControl.VolumeSlider:
+                    float value = (Control.GetMouseVector().X - (Values.WindowSize.X - 100)) / 150f;
+                    if (value < 0) value = 0;
+                    if (value > 0.5f) value = 0.5f;
+                    Values.TargetVolume = value;
+                    break;
+
+                case SelectedControl.DurationBar:
+                    Assets.Channel32.Position =
+                           (long)(((Control.GetMouseVector().X - 25) / (Values.WindowSize.X - 50)) *
+                           Assets.Channel32.TotalTime.TotalSeconds *
+                           Assets.Channel32.WaveFormat.AverageBytesPerSecond);
+
+                    if (Control.CurMS.X == Control.LastMS.X)
+                        Assets.output.Pause();
+                    else
+                        Assets.output.Play();
+                    break;
+
+                case SelectedControl.DragWindow:
                     config.Default.WindowPos = new System.Drawing.Point(gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X,
                                                                         gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y);
+                    break;
             }
             gameWindowForm.Location = config.Default.WindowPos;
 
             // Pause [Space]
-            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Space) || Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.MediaPlayPause))
-                if (MediaPlayer.State == MediaState.Playing)
-                {
-                    MediaPlayer.Pause();
-                    Values.isMusicPlaying = false;
-                }
-                else
-                {
-                    MediaPlayer.Resume();
-                    Values.isMusicPlaying = true;
-                }
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Space))
+                Assets.PlayPause();
 
             // Set Location to (0, 0) [0]
-            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.D0) ||
-                Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.NumPad0))
-                gameWindowForm.Location = new System.Drawing.Point(0, 0);
+            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D0) ||
+                Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad0))
+                config.Default.WindowPos = new System.Drawing.Point(0, 0);
 
             // Swap Visualisations [V]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.V))
@@ -244,11 +271,17 @@ namespace MusicPlayer
             if (Values.TargetVolume < 0)
                 Values.TargetVolume = 0;
 
+            // Next / Previous Song [Left/Right]
+            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Left) || Control.ScrollWheelWentDown())
+                Assets.GetPreviousSong();
+            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Right) || Control.ScrollWheelWentUp())
+                Assets.GetNextSong(false);
+
             // Close [Esc]
             if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive)
                 Exit();
 
-            // Show Music File in Explorer [E] {WIP}
+            // Show Music File in Explorer [E]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.E))
             {
                 if (!File.Exists(Assets.currentlyPlayingSongPath))
@@ -271,7 +304,10 @@ namespace MusicPlayer
                     double index = Math.Pow(ReadLength, i / (double)Values.WindowSize.X);
                     values[i - 70] = Assets.GetMaxHeight(Assets.FFToutput, (int)lastindex, (int)index);
                 }
-                GD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y / 1.25f)), 175, true, 6);
+                GD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y / 1.25f)), 175, true, 3);
+
+                GD.ApplyAllOutputData(i => i *= Values.TargetVolume * 2);
+                GD.ApplyAllInputData(i => i *= Values.TargetVolume * 2);
             }
         }
 
@@ -307,12 +343,6 @@ namespace MusicPlayer
                 spriteBatch.Draw(Assets.bg1, Vector2.Zero, Color.White);
             if (BgModes == BackGroundModes.bg2)
                 spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
-            if (BgModes == BackGroundModes.bg3)
-                spriteBatch.Draw(Assets.bg3, Vector2.Zero, Color.White);
-            if (BgModes == BackGroundModes.bg4)
-                spriteBatch.Draw(Assets.bg4, Vector2.Zero, Color.White);
-            if (BgModes == BackGroundModes.bg5)
-                spriteBatch.Draw(Assets.bg5, Vector2.Zero, Color.White);
             spriteBatch.End();
             #endregion
 
@@ -323,32 +353,16 @@ namespace MusicPlayer
             if (VisSetting == Visualizations.barchart)
             {
                 spriteBatch.Begin();
-                for (int i = 0; i < 16; i++)
-                {
-                    //float Heigth = Math.Abs(Values.GetAverageFrequency(i * 15, (i + 1) * 15, VisData));
-                    float Heigth = 0.5f;
-                    float Width = (int)(barWidth * 16);
-                    spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width * 0.9f + Width * 1.7f) + (int)(Values.WindowSize.X - barWidth * 256) / 2 + 5,
-                                                                 (int)(Values.WindowSize.Y / 1.2f) + 5,
-                                                                 -(int)(Width * 0.6f),
-                                                                 -(int)(Heigth * 255) - 8),
-                                     Color.Black * 0.6f);
-
-                    spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width * 0.9f + Width * 1.7f) + (int)(Values.WindowSize.X - barWidth * 256) / 2,
-                                                                 (int)(Values.WindowSize.Y / 1.2f),
-                                                                 -(int)(Width * 0.6f),
-                                                                 -(int)(Heigth * 255) - 8),
-                                     Color.Lerp(primaryColor, secondaryColor, i / 16f));
-                }
+                GD.DrawAsBars(spriteBatch);
                 spriteBatch.End();
             }
             #endregion
-            #region FFT Line Graph
-            // FFT Line Graph
-            if (VisSetting == Visualizations.fftline && Assets.Channel32 != null)
+            #region FFT Graph
+            // FFT Graph
+            if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
             {
                 spriteBatch.Begin();
-                float Length = Assets.FFToutput.Length;
+                //float Length = Assets.FFToutput.Length;
 
                 #region first try [INACTIVE]
                 // Shadow
@@ -384,7 +398,7 @@ namespace MusicPlayer
                                     2, Color.Lerp(primaryColor, secondaryColor, i / Length), spriteBatch);
                 }*/
                 #endregion
-                #region second try [INACTIVE]
+                #region second try
 
                 #region Schatten zur Seite [INACTIVE]
                 /*int StartIndex = (int)(Math.Pow(ReadLength, 70 / (double)Values.WindowSize.X));
@@ -489,10 +503,18 @@ namespace MusicPlayer
                 spriteBatch.End();
             }
             #endregion
-            #region Line graph
-            // Line Graph
-            if (VisSetting == Visualizations.line && Assets.Channel32 != null)
+            #region Raw FFT Graph
+            if (VisSetting == Visualizations.rawfft && Assets.Channel32 != null && Assets.FFToutput != null)
             {
+                spriteBatch.Begin();
+                GD.DrawInputData(spriteBatch);
+                spriteBatch.End();
+            }
+            #endregion
+            #region Line graph
+                // Line Graph
+                if (VisSetting == Visualizations.line && Assets.Channel32 != null)
+                {
                 spriteBatch.Begin();
 
                 float Height = Values.WindowSize.Y / 1.96f;
@@ -546,14 +568,12 @@ namespace MusicPlayer
             try {
                 spriteBatch.DrawString(Assets.Title, 
                     (Title.Length <= 37 ? Title : Title.Substring(0, 37)), new Vector2(29, 17), Color.Black * 0.6f);
-            }
-            catch { }
+            } catch { Debug.WriteLine("Cant write: " + Title); }
             try
             {
                 spriteBatch.DrawString(Assets.Title,
                     (Title.Length <= 37 ? Title : Title.Substring(0, 37)), new Vector2(24, 12), Color.White);
-            }
-            catch { }
+            } catch { }
             if (SongsFoundMessageAlpha > 0)
             {
                 spriteBatch.DrawString(Assets.Title, "Found " + Assets.Playlist.Count + " Songs!", new Vector2(24 + 5, 45 + 5), Color.Black * 0.6f * (SongsFoundMessageAlpha / 255f));
@@ -585,14 +605,14 @@ namespace MusicPlayer
         {
             GraphicsDevice.SetRenderTarget(BlurredTex);
             GraphicsDevice.Clear(Color.Transparent);
-            spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, null, null, Assets.gaussianBlurVert);
+            spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, Assets.gaussianBlurVert);
             spriteBatch.Draw(TempBlur, Vector2.Zero, Color.White);
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
         void DrawBlurredTex()
         {
-            spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, null, null, Assets.gaussianBlurHorz);
+            spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, Assets.gaussianBlurHorz);
             spriteBatch.Draw(BlurredTex, new Vector2(-50), Color.White);
             spriteBatch.End();
         }

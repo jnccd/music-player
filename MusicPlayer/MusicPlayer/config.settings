@@ -14,5 +14,11 @@
     <Setting Name="Vis" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="MusicPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Eigene Dateien\Medien\Musik</Value>
+    </Setting>
+    <Setting Name="MultiThreading" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

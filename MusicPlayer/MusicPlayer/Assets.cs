@@ -18,6 +18,9 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using NAudio.CoreAudioApi;
 using NAudio.Dsp;
+using System.Runtime.InteropServices;
+using MusicPlayerwNAudio;
+using System.Threading.Tasks;
 
 namespace MusicPlayer
 {
@@ -30,9 +33,6 @@ namespace MusicPlayer
         public static Texture2D bg;
         public static Texture2D bg1;
         public static Texture2D bg2;
-        public static Texture2D bg3;
-        public static Texture2D bg4;
-        public static Texture2D bg5;
         public static Texture2D Volume;
 
         public static Effect gaussianBlurHorz;
@@ -57,12 +57,16 @@ namespace MusicPlayer
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
         public static int PlayerHistoryIndex = 0;
+        public static int SongChangedTickTime = -10000;
+        public static int SongStartTime;
+        public static Task T = null;
 
         // NAudio
         public static WaveChannel32 Channel32;
         public static WaveChannel32 Channel32Reader;
         public static DirectSoundOut output;
         public static Mp3FileReader mp3;
+        public static Mp3FileReader mp3Reader;
         public static MMDevice device;
         public static MMDeviceEnumerator enumerator;
         //public const int bufferLength = 8192;
@@ -71,9 +75,17 @@ namespace MusicPlayer
         public const int bufferLength = 65536;
         //public const int bufferLength = 131072; 
         //public const int bufferLength = 262144;
+        public static List<float> EntireSongWaveBuffer;
         public static byte[] buffer;
         public static float[] WaveBuffer;
         public static float[] FFToutput;
+        public static float[] VanillaFFToutput;
+
+        // Console Control
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         // Data Management
         public static void Load(ContentManager Content, GraphicsDevice GD)
@@ -94,9 +106,6 @@ namespace MusicPlayer
             Volume = Content.Load<Texture2D>("volume");
             bg1 = Content.Load<Texture2D>("bg1");
             bg2 = Content.Load<Texture2D>("bg2");
-            bg3 = Content.Load<Texture2D>("bg3");
-            bg4 = Content.Load<Texture2D>("bg4");
-            bg5 = Content.Load<Texture2D>("bg5");
 
 
             Console.WriteLine("Loading Fonts...");
@@ -115,13 +124,18 @@ namespace MusicPlayer
             Stream.Dispose();
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => { RefreshBGtex(GD); });
 
-
-            /*FolderBrowserDialog open = new FolderBrowserDialog();
-            open.Description = "Select your music folder";
-            if (open.ShowDialog() != DialogResult.OK) Process.GetCurrentProcess().Kill();*/
+            
             Console.WriteLine("Loading Songs...");
-            //FindAllMp3FilesInDir(open.SelectedPath);
-            FindAllMp3FilesInDir(Values.MusicPath);
+            if (Directory.Exists(config.Default.MusicPath))
+                FindAllMp3FilesInDir(config.Default.MusicPath);
+            else
+            {
+                FolderBrowserDialog open = new FolderBrowserDialog();
+                open.Description = "Select your music folder";
+                if (open.ShowDialog() != DialogResult.OK) Process.GetCurrentProcess().Kill();
+                config.Default.MusicPath = open.SelectedPath;
+                FindAllMp3FilesInDir(open.SelectedPath);
+            }
             Console.WriteLine("Found " + Playlist.Count.ToString() + " Songs!");
 
 
@@ -130,6 +144,7 @@ namespace MusicPlayer
             device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
 
 
+            Console.WriteLine("Starting first Song...");
             if (Playlist.Count > 0)
             {
                 if (Program.args.Length > 0)
@@ -137,12 +152,15 @@ namespace MusicPlayer
                 else
                 {
                     int PlaylistIndex = Values.RDM.Next(Playlist.Count);
-                    GetNextSong();
+                    GetNextSong(true);
                     PlayerHistory.Add(Playlist[PlaylistIndex]);
                 }
             }
             else
                 Console.WriteLine("Playlist empty!");
+
+            Console.WriteLine("Loading GUI...");
+            ShowWindow(GetConsoleWindow(), 2);
         }
         public static void FindAllMp3FilesInDir(string StartDir)
         {
@@ -200,9 +218,6 @@ namespace MusicPlayer
 
             if (Channel32 != null && Channel32Reader != null && Channel32Reader.CanRead)
             {
-                // I have two WaveChannel32 objects, one to play the song and another 
-                // that reads the data from the current position in realtime
-                // It's not the most efficient method but Im gonna improve that later
                 Channel32Reader.Position = Channel32.Position;
 
                 while (true)
@@ -224,21 +239,62 @@ namespace MusicPlayer
         {
             Complex[] tempbuffer = new Complex[WaveBuffer.Length];
 
-            for (int i = 0; i < tempbuffer.Length; i++)
+            lock (WaveBuffer)
             {
-                tempbuffer[i].X = (float)(WaveBuffer[i] * FastFourierTransform.HammingWindow(i, tempbuffer.Length));
-                tempbuffer[i].Y = 0;
+                for (int i = 0; i < tempbuffer.Length; i++)
+                {
+                    tempbuffer[i].X = (float)(WaveBuffer[i] * FastFourierTransform.HammingWindow(i, tempbuffer.Length));
+                    tempbuffer[i].Y = 0;
+                }
             }
 
             FastFourierTransform.FFT(true, (int)Math.Log(tempbuffer.Length, 2.0), tempbuffer);
-
-            // EVERYTHING
-            FFToutput = new float[tempbuffer.Length / 4 - 1];
+            
+            FFToutput = new float[tempbuffer.Length / 2 - 1];
+            VanillaFFToutput = new float[tempbuffer.Length / 2 - 1];
             for (int i = 0; i < FFToutput.Length; i++)
             {
-                //FFToutput[i] = (float)(tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y) * 100000;
-                FFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 100);
-                //FFToutput[i] = -(float)Math.Log10((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y)) * 10;
+                VanillaFFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 10);
+                FFToutput[i] = (float)(VanillaFFToutput[i] * Math.Sqrt(i + 1));
+            }
+        }
+        public static void UpdateEntireSongBuffers()
+        {
+            try {
+                lock (Channel32Reader)
+                {
+                    byte[] buffer = new byte[16384];
+                    Channel32Reader.Position = 0;
+                    EntireSongWaveBuffer = new List<float>();
+
+                    while (Channel32Reader.Position < Channel32Reader.Length)
+                    {
+                        int read = Channel32Reader.Read(buffer, 0, 16384);
+
+                        for (int i = 0; i < read / 4; i++)
+                            if (EntireSongWaveBuffer.Count < 67108864)
+                                EntireSongWaveBuffer.Add(BitConverter.ToSingle(buffer, i * 4));
+                    }
+                }
+            } catch {
+                DisposeNAudioData();
+                Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
+                Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count);
+                PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
+                PlayerHistoryIndex = PlayerHistory.Count - 1;
+                GetNextSong(true);
+            }
+        }
+        public static void UpdateWaveBufferWithEntireSongWB()
+        {
+            lock (EntireSongWaveBuffer)
+            {
+                WaveBuffer = new float[bufferLength / 4];
+                if (EntireSongWaveBuffer.Count > bufferLength && Channel32.Position > bufferLength && Channel32.Position / 4 < 67108864)
+                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)(Channel32.Position / 4 - bufferLength / 4), bufferLength / 4).ToArray();
+                else
+                    for (int i = 0; i < bufferLength / 4; i++)
+                        WaveBuffer[i] = 0;
             }
         }
         public static float GetAverageHeight(float[] array, int from, int to)
@@ -293,30 +349,47 @@ namespace MusicPlayer
         }
         public static void PlayNewSong(string Path)
         {
-            Path = Path.Trim('"');
-            PlayerHistory.Add(Path);
-            PlayerHistoryIndex = PlayerHistory.Count - 1;
+            if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
+                config.Default.MultiThreading && T != null && T.IsCompleted)
+            {
+                Path = Path.Trim('"');
+                PlayerHistory.Add(Path);
+                PlayerHistoryIndex = PlayerHistory.Count - 1;
 
-            if (!Playlist.Contains(Path))
-                Playlist.Add(Path);
+                if (!Playlist.Contains(Path))
+                    Playlist.Add(Path);
 
-            PlaySongByPath(Path);
+                PlaySongByPath(Path);
+
+                SongChangedTickTime = Values.Timer;
+            }
         }
-        public static void GetNextSong()
+        public static void GetNextSong(bool forced)
         {
-            PlayerHistoryIndex++;
-            if (PlayerHistoryIndex > PlayerHistory.Count - 1)
-                GetNewPlaylistSong();
-            else
-                PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+            if (forced || Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
+                config.Default.MultiThreading && T != null && T.IsCompleted)
+            {
+                PlayerHistoryIndex++;
+                if (PlayerHistoryIndex > PlayerHistory.Count - 1)
+                    GetNewPlaylistSong();
+                else
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+
+                SongChangedTickTime = Values.Timer;
+            }
         }
         public static void GetPreviousSong()
         {
-            if (PlayerHistoryIndex > 0)
+            if (Values.Timer > SongChangedTickTime + 30)
             {
-                PlayerHistoryIndex--;
+                if (PlayerHistoryIndex > 0)
+                {
+                    PlayerHistoryIndex--;
 
-                PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                }
+
+                SongChangedTickTime = Values.Timer;
             }
         }
         private static void PlaySongByPath(string PathString)
@@ -327,15 +400,25 @@ namespace MusicPlayer
                 PathString = PathString.Trim(new char[] { '"', ' '});
 
             mp3 = new Mp3FileReader(PathString);
+            mp3Reader = new Mp3FileReader(PathString);
             Channel32 = new WaveChannel32(mp3);
-            Channel32Reader = new WaveChannel32(mp3);
+            Channel32Reader = new WaveChannel32(mp3Reader);
 
             var meter = new MeteringSampleProvider(mp3.ToSampleProvider());
-            meter.StreamVolume += (s, e) => Console.WriteLine("{0} - {1}", e.MaxSampleValues[0], e.MaxSampleValues[1]);
+            meter.StreamVolume += (s, e) => Debug.WriteLine("{0} - {1}", e.MaxSampleValues[0], e.MaxSampleValues[1]);
 
             output = new DirectSoundOut();
             output.Init(Channel32);
+
+            if (config.Default.MultiThreading)
+                T = Task.Factory.StartNew(UpdateEntireSongBuffers);
+            else
+                UpdateEntireSongBuffers();
+
             output.Play();
+            Channel32.Volume = 0;
+            SongStartTime = Values.Timer;
+            Channel32.Position = 1;
         }
 
         // Draw Methods
