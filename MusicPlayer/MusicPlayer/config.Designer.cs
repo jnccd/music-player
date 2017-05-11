@@ -70,5 +70,29 @@ namespace MusicPlayerwNAudio {
                 this["Vis"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\Eigene Dateien\\Medien\\Musik")]
+        public string MusicPath {
+            get {
+                return ((string)(this["MusicPath"]));
+            }
+            set {
+                this["MusicPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MultiThreading {
+            get {
+                return ((bool)(this["MultiThreading"]));
+            }
+            set {
+                this["MultiThreading"] = value;
+            }
+        }
     }
 }

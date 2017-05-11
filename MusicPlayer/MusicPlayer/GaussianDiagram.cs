@@ -38,8 +38,8 @@ namespace MusicPlayer
 
             for (int x = 0; x < values.Length; x++)
             {
-                int Min = x - 15;   if (Min < 0) Min = 0;
-                int Max = x + 15;   if (Max > values.Length) Max = values.Length;
+                int Min = x - (int)(theta * 2.5f);   if (Min < 0) Min = 0;
+                int Max = x + (int)(theta * 2.5f);   if (Max > values.Length) Max = values.Length;
 
                 NullGaussian = ComputeGaussian(0);
                 float input = values[x];
@@ -63,6 +63,16 @@ namespace MusicPlayer
                     Diagram[i] = Height;
         }
 
+        public void ApplyAllOutputData(Action<float> A)
+        {
+            for (int i = 0; i < Diagram.Length; i++)
+                A(Diagram[i]);
+        }
+        public void ApplyAllInputData(Action<float> A)
+        {
+            for (int i = 0; i < values.Length; i++)
+                A(values[i]);
+        }
         public float GetAverage()
         {
             if (Diagram != null)
@@ -72,6 +82,39 @@ namespace MusicPlayer
                     Avg += Diagram[i];
                 Avg /= Diagram.Length * Height;
                 return Avg;
+            }
+            else
+                return 0;
+        }
+        public float GetAverage(int From, int To)
+        {
+            if (From < 0) From = 0;
+            if (To > Diagram.Length - 1) To = Diagram.Length - 1;
+
+            if (Diagram != null)
+            {
+                float Avg = 0;
+                for (int i = From; i < To; i++)
+                    Avg += Diagram[i];
+                Avg /= Diagram.Length * Height;
+                return Avg;
+            }
+            else
+                return 0;
+        }
+        public float GetMaximum(int From, int To)
+        {
+            if (From < 0) From = 0;
+            if (To > Diagram.Length - 1) To = Diagram.Length - 1;
+
+            if (Diagram != null)
+            {
+                float Max = 0;
+                for (int i = From; i < To; i++)
+                    if (Diagram[i] > Max)
+                        Max = Diagram[i];
+
+                return Max;
             }
             else
                 return 0;
@@ -148,6 +191,32 @@ namespace MusicPlayer
                 }
             }
         }
+        public void DrawAsBars(SpriteBatch spriteBatch)
+        {
+            if (Diagram != null)
+            {
+                float Width = Diagram.Length / 45;
+
+
+                for (int i = 0; i < 49; i++)
+                {
+                    float Heigth = GetMaximum((Diagram.Length / 46) * i, (Diagram.Length / 46) * (i + 1));
+
+                    if (WithShadow)
+                    {
+                        spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width + P.X) + 5, P.Y + 5,
+                                                                    -(int)(Width * 0.7f),
+                                                                    -(int)(Heigth + 10)),
+                                     Color.Black * 0.6f);
+                    }
+
+                    spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width + P.X), P.Y,
+                                                                 -(int)(Width * 0.7f),
+                                                                 -(int)(Heigth + 10)),
+                                     Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / 45f));
+                }
+            }
+        }
         public void DrawInputData(SpriteBatch spriteBatch)
         {
             if (Diagram != null)
@@ -158,7 +227,10 @@ namespace MusicPlayer
                     {
                         float value = values[i];
 
-                        Assets.DrawLine(new Vector2(i + P.X + 5, P.Y - (int)value * 100 + 5),
+                        if (value > 1)
+                            value = 1;
+
+                        Assets.DrawLine(new Vector2(i + P.X + 5, P.Y - (int)(value * Height) + 5),
                                         new Vector2(i + P.X + 5, P.Y + 15),
                                         1, Color.Black * 0.6f, spriteBatch);
                     }
@@ -168,7 +240,10 @@ namespace MusicPlayer
                 {
                     float value = values[i];
 
-                    Assets.DrawLine(new Vector2(i + P.X, P.Y - (int)value * 100),
+                    if (value > 1)
+                        value = 1;
+
+                    Assets.DrawLine(new Vector2(i + P.X, P.Y - (int)(value * Height)),
                                     new Vector2(i + P.X, P.Y + 10),
                                     1, Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / values.Length), spriteBatch);
                 }
