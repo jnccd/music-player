@@ -22,6 +22,7 @@ namespace MusicPlayer
     public enum Visualizations
     {
         line,
+        dynamicline,
         fft,
         rawfft,
         barchart
@@ -169,10 +170,8 @@ namespace MusicPlayer
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length)
                     Assets.GetNextSong(false);
                 
-                //Assets.UpdateWaveBuffer();
                 Assets.UpdateWaveBufferWithEntireSongWB();
-                if (VisSetting != Visualizations.line)
-                    Assets.UpdateFFTbuffer();
+                Assets.UpdateFFTbuffer();
 
                 GD.Smoothen();
             }
@@ -348,12 +347,72 @@ namespace MusicPlayer
 
             DrawBlurredTex();
 
-            #region FFT Bars
-            // FFT Bars
-            if (VisSetting == Visualizations.barchart)
+            #region Line graph
+            // Line Graph
+            if (VisSetting == Visualizations.line && Assets.Channel32 != null)
             {
                 spriteBatch.Begin();
-                GD.DrawAsBars(spriteBatch);
+
+                float Height = Values.WindowSize.Y / 1.96f;
+                int StepLength = Assets.WaveBuffer.Length / 512;
+
+                // Shadow
+                for (int i = 1; i < 512; i++)
+                {
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
+
+                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
+
+                                    2, Color.Black * 0.6f, spriteBatch);
+                }
+
+                for (int i = 1; i < 512; i++)
+                {
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
+
+                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
+
+                                    2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
+                }
+                spriteBatch.End();
+            }
+            #endregion
+            #region Dynamic Line graph
+            // Line Graph
+            if (VisSetting == Visualizations.dynamicline && Assets.Channel32 != null)
+            {
+                spriteBatch.Begin();
+
+                float Height = Values.WindowSize.Y / 1.96f;
+                int StepLength = Assets.WaveBuffer.Length / 512;
+                int MostUsedFrequency = Array.IndexOf(Assets.RawFFToutput, Assets.RawFFToutput.Max());
+
+                // Shadow
+                for (int i = 1; i < 512; i++)
+                {
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
+
+                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
+
+                                    2, Color.Black * 0.6f, spriteBatch);
+                }
+
+                for (int i = 1; i < 512; i++)
+                {
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
+
+                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
+
+                                    2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
+                }
                 spriteBatch.End();
             }
             #endregion
@@ -511,37 +570,12 @@ namespace MusicPlayer
                 spriteBatch.End();
             }
             #endregion
-            #region Line graph
-                // Line Graph
-                if (VisSetting == Visualizations.line && Assets.Channel32 != null)
-                {
+            #region FFT Bars
+            // FFT Bars
+            if (VisSetting == Visualizations.barchart)
+            {
                 spriteBatch.Begin();
-
-                float Height = Values.WindowSize.Y / 1.96f;
-                int StepLength = Assets.WaveBuffer.Length / 512;
-
-                // Shadow
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
-
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
-
-                                    2, Color.Black * 0.6f, spriteBatch);
-                }
-
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
-
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
-
-                                    2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
-                }
+                GD.DrawAsBars(spriteBatch);
                 spriteBatch.End();
             }
             #endregion

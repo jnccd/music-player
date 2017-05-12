@@ -196,24 +196,28 @@ namespace MusicPlayer
             if (Diagram != null)
             {
                 float Width = Diagram.Length / 45;
-
-
-                for (int i = 0; i < 49; i++)
+                
+                if (WithShadow)
                 {
-                    float Heigth = GetMaximum((Diagram.Length / 46) * i, (Diagram.Length / 46) * (i + 1));
-
-                    if (WithShadow)
+                    for (int i = 0; i < 48; i++)
                     {
-                        spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width + P.X) + 5, P.Y + 5,
-                                                                    -(int)(Width * 0.7f),
-                                                                    -(int)(Heigth + 10)),
-                                     Color.Black * 0.6f);
-                    }
+                        int H = (int)GetMaximum((int)(i * Width), (int)((i + 1) * Width));
 
-                    spriteBatch.Draw(Assets.White, new Rectangle((int)(i * Width + P.X), P.Y,
-                                                                 -(int)(Width * 0.7f),
-                                                                 -(int)(Heigth + 10)),
-                                     Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / 45f));
+                        for (int j = 0; j < (int)(Width / 1.2f); j++)
+                            Assets.DrawLine(new Vector2(i * Width + j + P.X + 5, P.Y - H + 5),
+                                            new Vector2(i * Width + j + P.X + 5, P.Y + (int)(Width / 1.2f) + 5),
+                                            1, Color.Black * 0.6f, spriteBatch);
+                    }
+                }
+
+                for (int i = 0; i < 48; i++)
+                {
+                    int H = (int)GetMaximum((int)(i * Width), (int)((i + 1) * Width));
+
+                    for (int j = 0; j < (int)(Width / 1.2f); j++)
+                        Assets.DrawLine(new Vector2(i * Width + j + P.X, P.Y - H),
+                                        new Vector2(i * Width + j + P.X, P.Y + (int)(Width / 1.2f)),
+                                        1, Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / values.Length), spriteBatch);
                 }
             }
         }
