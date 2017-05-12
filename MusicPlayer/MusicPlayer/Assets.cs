@@ -59,7 +59,10 @@ namespace MusicPlayer
         public static int PlayerHistoryIndex = 0;
         public static int SongChangedTickTime = -10000;
         public static int SongStartTime;
+
+        // MultiThreading
         public static Task T = null;
+        public static bool AbortAbort = false;
 
         // NAudio
         public static WaveChannel32 Channel32;
@@ -79,7 +82,7 @@ namespace MusicPlayer
         public static byte[] buffer;
         public static float[] WaveBuffer;
         public static float[] FFToutput;
-        public static float[] VanillaFFToutput;
+        public static float[] RawFFToutput;
 
         // Console Control
         [DllImport("kernel32.dll")]
@@ -200,7 +203,10 @@ namespace MusicPlayer
             }
             if (Channel32Reader != null)
             {
-                Channel32Reader.Dispose();
+                try
+                {
+                    Channel32Reader.Dispose();
+                } catch { Debug.WriteLine("Couldn't dispose the reader"); }
                 Channel32Reader = null;
             }
             if (mp3 != null)
@@ -251,11 +257,11 @@ namespace MusicPlayer
             FastFourierTransform.FFT(true, (int)Math.Log(tempbuffer.Length, 2.0), tempbuffer);
             
             FFToutput = new float[tempbuffer.Length / 2 - 1];
-            VanillaFFToutput = new float[tempbuffer.Length / 2 - 1];
+            RawFFToutput = new float[tempbuffer.Length / 2 - 1];
             for (int i = 0; i < FFToutput.Length; i++)
             {
-                VanillaFFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 10);
-                FFToutput[i] = (float)(VanillaFFToutput[i] * Math.Sqrt(i + 1));
+                RawFFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 10);
+                FFToutput[i] = (float)(RawFFToutput[i] * Math.Sqrt(i + 1));
             }
         }
         public static void UpdateEntireSongBuffers()
@@ -269,17 +275,30 @@ namespace MusicPlayer
 
                     while (Channel32Reader.Position < Channel32Reader.Length)
                     {
+                        if (AbortAbort)
+                            break;
+
                         int read = Channel32Reader.Read(buffer, 0, 16384);
 
+                        if (AbortAbort)
+                            break;
+
                         for (int i = 0; i < read / 4; i++)
+                        {
                             if (EntireSongWaveBuffer.Count < 67108864)
                                 EntireSongWaveBuffer.Add(BitConverter.ToSingle(buffer, i * 4));
+
+                            if (AbortAbort)
+                                break;
+                        }
                     }
+
+                    AbortAbort = false;
                 }
             } catch {
-                DisposeNAudioData();
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count);
+                DisposeNAudioData();
                 PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
                 GetNextSong(true);
@@ -350,7 +369,7 @@ namespace MusicPlayer
         public static void PlayNewSong(string Path)
         {
             if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
-                config.Default.MultiThreading && T != null && T.IsCompleted)
+                config.Default.MultiThreading)
             {
                 Path = Path.Trim('"');
                 PlayerHistory.Add(Path);
@@ -367,7 +386,7 @@ namespace MusicPlayer
         public static void GetNextSong(bool forced)
         {
             if (forced || Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
-                config.Default.MultiThreading && T != null && T.IsCompleted)
+                config.Default.MultiThreading)
             {
                 PlayerHistoryIndex++;
                 if (PlayerHistoryIndex > PlayerHistory.Count - 1)
@@ -394,6 +413,12 @@ namespace MusicPlayer
         }
         private static void PlaySongByPath(string PathString)
         {
+            if (T != null && T.Status == TaskStatus.Running)
+            {
+                AbortAbort = true;
+                T.Wait();
+            }
+
             DisposeNAudioData();
 
             if (PathString.Contains("\""))
