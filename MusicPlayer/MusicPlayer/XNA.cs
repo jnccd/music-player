@@ -117,6 +117,7 @@ namespace MusicPlayer
                         {
                             Path = "";
                             Console.Clear();
+                            Console.Write("Play Song: ");
                         }
 
                         if (e.Key == ConsoleKey.Enter)
@@ -250,6 +251,9 @@ namespace MusicPlayer
                 VisSetting++;
                 if ((int)VisSetting > Enum.GetNames(typeof(Visualizations)).Length - 1)
                     VisSetting = 0;
+
+                if (VisSetting == Visualizations.dynamicline)
+                    VisSetting = Visualizations.fft;
             }
 
             // Swap Backgrounds [B]
@@ -289,6 +293,19 @@ namespace MusicPlayer
                 {
                     Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
                 }
+            }
+
+            // Reset Music Source Folder [S]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
+            {
+                config.Default.MusicPath = "";
+                ProcessStartInfo Info = new ProcessStartInfo();
+                Info.Arguments = "/C ping 127.0.0.1 -n 2 && cls && \"" + Application.ExecutablePath + "\"";
+                Info.WindowStyle = ProcessWindowStyle.Hidden;
+                Info.CreateNoWindow = true;
+                Info.FileName = "cmd.exe";
+                Process.Start(Info);
+                Application.Exit();
             }
         }
         void UpdateGD()
@@ -389,15 +406,22 @@ namespace MusicPlayer
 
                 float Height = Values.WindowSize.Y / 1.96f;
                 int StepLength = Assets.WaveBuffer.Length / 512;
-                int MostUsedFrequency = Array.IndexOf(Assets.RawFFToutput, Assets.RawFFToutput.Max());
+                float MostUsedFrequency = Array.IndexOf(Assets.RawFFToutput, Assets.RawFFToutput.Max());
+                float MostUsedWaveLength = 10000;
+                if (MostUsedFrequency != 0)
+                    MostUsedWaveLength = 1 / MostUsedFrequency;
+                float[] MostUsedFrequencyMultiplications = new float[100];
+                for (int i = 1; i <= 100; i++)
+                    MostUsedFrequencyMultiplications[i - 1] = MostUsedFrequency * i;
+                Debug.WriteLine(MostUsedFrequency + " ::: " + StepLength);
 
                 // Shadow
                 for (int i = 1; i < 512; i++)
                 {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512) + 5,
                                     Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
 
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                    new Vector2(i * Values.WindowSize.X / (512) + 5,
                                     Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
 
                                     2, Color.Black * 0.6f, spriteBatch);
@@ -405,10 +429,10 @@ namespace MusicPlayer
 
                 for (int i = 1; i < 512; i++)
                 {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512),
                                     Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
 
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                    new Vector2(i * Values.WindowSize.X / (512),
                                     Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
 
                                     2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);

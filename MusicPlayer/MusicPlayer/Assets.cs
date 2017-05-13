@@ -309,7 +309,7 @@ namespace MusicPlayer
             lock (EntireSongWaveBuffer)
             {
                 WaveBuffer = new float[bufferLength / 4];
-                if (EntireSongWaveBuffer.Count > bufferLength && Channel32.Position > bufferLength && Channel32.Position / 4 < 67108864)
+                if (Channel32 != null && EntireSongWaveBuffer.Count > bufferLength && Channel32.Position > bufferLength && Channel32.Position / 4 < 67108864)
                     WaveBuffer = EntireSongWaveBuffer.GetRange((int)(Channel32.Position / 4 - bufferLength / 4), bufferLength / 4).ToArray();
                 else
                     for (int i = 0; i < bufferLength / 4; i++)
@@ -372,6 +372,20 @@ namespace MusicPlayer
                 config.Default.MultiThreading)
             {
                 Path = Path.Trim('"');
+
+                if (!File.Exists(Path))
+                {
+                    List<string> Hits = Playlist.FindAll(x => x.Contains(Path));
+
+                    if (Hits.Count > 0)
+                        Path = Hits[Values.RDM.Next(Hits.Count)];
+                    else
+                    {
+                        Console.WriteLine("What the fuck is this supposed to mean!?");
+                        return;
+                    }
+                }
+
                 PlayerHistory.Add(Path);
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
 
