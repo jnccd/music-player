@@ -133,8 +133,15 @@ namespace MusicPlayer
                             else
                                 Console.CursorLeft = 11;
                         }
-                        else
+                        else if (e.Key >= (ConsoleKey)48 && e.Key <= (ConsoleKey)90 || 
+                                 e.Key >= (ConsoleKey)186 && e.Key <= (ConsoleKey)226 ||
+                                 e.Key == ConsoleKey.Spacebar)
                             Path += e.KeyChar;
+
+                        Console.CursorLeft = 0;
+                        Console.Write("                                                                    ");
+                        Console.CursorLeft = 0;
+                        Console.Write("Play Song: " + Path);
                     }
                     Console.WriteLine();
                     Assets.PlayNewSong(Path);

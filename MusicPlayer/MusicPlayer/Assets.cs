@@ -83,9 +83,7 @@ namespace MusicPlayer
         public static float[] WaveBuffer;
         public static float[] FFToutput;
         public static float[] RawFFToutput;
-
         
-
         // Data Management
         public static void Load(ContentManager Content, GraphicsDevice GD)
         {
