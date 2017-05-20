@@ -84,11 +84,7 @@ namespace MusicPlayer
         public static float[] FFToutput;
         public static float[] RawFFToutput;
 
-        // Console Control
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        
 
         // Data Management
         public static void Load(ContentManager Content, GraphicsDevice GD)
@@ -163,7 +159,7 @@ namespace MusicPlayer
                 Console.WriteLine("Playlist empty!");
 
             Console.WriteLine("Loading GUI...");
-            ShowWindow(GetConsoleWindow(), 2);
+            Values.MinimizeConsole();
         }
         public static void FindAllMp3FilesInDir(string StartDir)
         {
@@ -356,7 +352,7 @@ namespace MusicPlayer
             if (output != null)
             {
                 if (output.PlaybackState == PlaybackState.Playing) output.Pause();
-                else if (output.PlaybackState == PlaybackState.Paused) output.Play();
+                else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped) output.Play();
             }
         }
         public static void GetNewPlaylistSong()
@@ -375,13 +371,21 @@ namespace MusicPlayer
 
                 if (!File.Exists(Path))
                 {
-                    List<string> Hits = Playlist.FindAll(x => x.Contains(Path));
-
+                    List<string> Hits = Playlist.FindAll(x => x.Contains(Path, StringComparison.InvariantCultureIgnoreCase));
+                    
                     if (Hits.Count > 0)
+                    {
                         Path = Hits[Values.RDM.Next(Hits.Count)];
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        if (Hits.Count == 1)
+                            Console.WriteLine(">Found one matching song: " + Path.Split('\\').Last());
+                        else
+                            Console.WriteLine(">Found " + Hits.Count + " matching songs and choose " + Path.Split('\\').Last());
+                    }
                     else
                     {
-                        Console.WriteLine("What the fuck is this supposed to mean!?");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(">What the fuck is this supposed to mean!?");
                         return;
                     }
                 }
