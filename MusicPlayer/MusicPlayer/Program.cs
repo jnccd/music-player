@@ -18,10 +18,12 @@ namespace MusicPlayer
         [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
             foreach (Process p in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
                 if (p.Id != Process.GetCurrentProcess().Id)
-                { p.CloseMainWindow(); Console.WriteLine("Killed another instance of this program!"); Thread.Sleep(300); config.Default.Reload(); }
+                { RequestedSong.Default.RequestedSongString = args[0]; RequestedSong.Default.Save(); return; }
+            
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
             
             Program.args = args;
 

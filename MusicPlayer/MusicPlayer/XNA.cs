@@ -50,7 +50,6 @@ namespace MusicPlayer
         public static Form gameWindowForm;
         RenderTarget2D TempBlur;
         RenderTarget2D BlurredTex;
-        RenderTarget2D AudioVisTarget;
 
         // Visualization
         public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
@@ -95,7 +94,6 @@ namespace MusicPlayer
             
             BlurredTex = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
             TempBlur = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
-            AudioVisTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X, Values.WindowSize.Y);
 
             InactiveSleepTime = new TimeSpan(0);
             Console.WriteLine("Finished Loading!");
@@ -107,6 +105,7 @@ namespace MusicPlayer
             {
                 while (true)
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("Play Song: ");
                     string Path = "";
                     while (!Path.Contains(".mp3\""))
@@ -145,7 +144,7 @@ namespace MusicPlayer
 
         protected override void Update(GameTime gameTime)
         {
-            if (Values.Timer % 100 == 0)
+            if (Values.Timer % 30 == 0)
             {
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
@@ -153,17 +152,20 @@ namespace MusicPlayer
 
             Control.Update();
             FPSCounter.Update(gameTime);
-            //gameWindowForm.SendToBack();
             ComputeControls();
             Values.Timer++;
             SongsFoundMessageAlpha--;
+
+            if (Values.Timer % 100 == 0)
+                CheckForRequestedSongs();
             
             // Stuff
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
                 UpdateGD();
                 
-                Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer);
+                if (Assets.WaveBuffer != null)
+                    Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer) * 1.2f;
 
                 if (Values.OutputVolume < 0.0001f)
                     Values.OutputVolume = 0.0001f;
@@ -172,19 +174,26 @@ namespace MusicPlayer
                     Assets.GetNextSong(false);
                 
                 Assets.UpdateWaveBufferWithEntireSongWB();
-                Assets.UpdateFFTbuffer();
+                if (VisSetting != Visualizations.line)
+                    Assets.UpdateFFTbuffer();
 
                 GD.Smoothen();
             }
 
             if (Assets.Channel32 != null)
-            {
-                Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume * 0.6f;
-                if (Assets.Channel32.Volume < Values.TargetVolume / 2f)
-                    Assets.Channel32.Volume = Values.TargetVolume / 2f;
-            }
+                Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume;
 
             base.Update(gameTime);
+        }
+        void CheckForRequestedSongs()
+        {
+            RequestedSong.Default.Reload();
+            if (RequestedSong.Default.RequestedSongString != "")
+            {
+                Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
+                RequestedSong.Default.RequestedSongString = "";
+                RequestedSong.Default.Save();
+            }
         }
         void ComputeControls()
         {
@@ -413,7 +422,7 @@ namespace MusicPlayer
                 float[] MostUsedFrequencyMultiplications = new float[100];
                 for (int i = 1; i <= 100; i++)
                     MostUsedFrequencyMultiplications[i - 1] = MostUsedFrequency * i;
-                Debug.WriteLine(MostUsedFrequency + " ::: " + StepLength);
+                Debug.WriteLine((MostUsedFrequency / Assets.Channel32.WaveFormat.SampleRate * Assets.RawFFToutput.Length) + " ::: " + MostUsedFrequency);
 
                 // Shadow
                 for (int i = 1; i < 512; i++)
@@ -445,144 +454,7 @@ namespace MusicPlayer
             if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
             {
                 spriteBatch.Begin();
-                //float Length = Assets.FFToutput.Length;
-
-                #region first try [INACTIVE]
-                // Shadow
-                /*for (int i = 0; i < Length; i++)
-                {
-                    double value = Assets.FFToutput[i];
-
-                    if (value > 100)
-                        value = 100;
-
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / Length + 5,
-                                    Values.WindowSize.Y / 2f + (int)value + 5),
-
-                                    new Vector2(i * Values.WindowSize.X / Length + 5,
-                                    Values.WindowSize.Y / 2f - (int)value + 5),
-
-                                    2, Color.Black * 0.6f, spriteBatch);
-                }
-
-                for (int i = 0; i < Length; i++)
-                {
-                    double value = Assets.FFToutput[i];
-
-                    if (value > 100)
-                        value = 100;
-
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / Length,
-                                    Values.WindowSize.Y / 2f + (int)value),
-
-                                    new Vector2(i * Values.WindowSize.X / Length,
-                                    Values.WindowSize.Y / 2f - (int)value),
-
-                                    2, Color.Lerp(primaryColor, secondaryColor, i / Length), spriteBatch);
-                }*/
-                #endregion
-                #region second try
-
-                #region Schatten zur Seite [INACTIVE]
-                /*int StartIndex = (int)(Math.Pow(ReadLength, 70 / (double)Values.WindowSize.X));
-                for (int i = 70; i < Values.WindowSize.X; i++)
-                {
-                    int lastindex = (int)(Math.Pow(ReadLength, (i - 1) / (double)Values.WindowSize.X));
-                    int index = (int)(Math.Pow(ReadLength, i / (double)Values.WindowSize.X));
-                    double value = Assets.GetMaxHeight(Assets.FFToutput, lastindex, index) * 175;
-
-                    if (value > 175)
-                        value = 175;
-
-                    if (value < 1)
-                        value = 1;
-
-                    Vector2 V1 = new Vector2(i - 35 + (int)(value),
-                                    Values.WindowSize.Y / 1.25f - (int)value);
-
-                    Vector2 V2 = new Vector2(i - 35,
-                                    Values.WindowSize.Y / 1.25f);
-
-                    Assets.DrawLine(V1 + (V2 - V1) / 2,
-
-                                    V2,
-
-                                    2, Color.Black * 0.3f, spriteBatch);
-                }*/
-                #endregion
-
-                #region Schlagschatten [INACTIVE]
-                /*for (int i = 70; i < Values.WindowSize.X; i++)
-                {
-                    int lastindex = (int)(Math.Pow(ReadLength, (i - 1) / (double)Values.WindowSize.X));
-                    int index = (int)(Math.Pow(ReadLength, i / (double)Values.WindowSize.X));
-                    double value = Assets.GetMaxHeight(Assets.FFToutput, lastindex, index) * 175;
-
-                    if (value > 175)
-                        value = 175;
-
-                    if (value < 1)
-                        value = 1;
-
-                    Assets.DrawLine(new Vector2(i - 35 + 5,
-                                    Values.WindowSize.Y / 1.25f - (int)value + 5),
-
-                                    new Vector2(i - 35 + 5,
-                                    Values.WindowSize.Y / 1.25f + 15),
-
-                                    1, Color.Black * 0.6f, spriteBatch);
-                }*/
-                #endregion
-
                 GD.Draw(spriteBatch);
-
-                #region No Gaussian Diagram Save [INACTIVE]
-                /*for (int i = 70; i < Values.WindowSize.X; i++)
-                {
-                    int lastindex = (int)(Math.Pow(ReadLength, (i - 1) / (double)Values.WindowSize.X));
-                    int index = (int)(Math.Pow(ReadLength, i / (double)Values.WindowSize.X));
-                    double value = Assets.GetMaxHeight(Assets.FFToutput, lastindex, index) * 175;
-
-                    if (value > 175)
-                        value = 175;
-
-                    if (value < 1)
-                        value = 1;
-
-                    Assets.DrawLine(new Vector2(i - 35,
-                                    Values.WindowSize.Y / 1.25f - (int)value),
-
-                                    new Vector2(i - 35,
-                                    Values.WindowSize.Y / 1.25f + 10),
-
-                                    1, Color.Lerp(primaryColor, secondaryColor, i / Length), spriteBatch);
-                }*/
-                #endregion
-                #endregion
-                #region third try [INACTIVE]
-                /*double Max = Assets.FFToutput.Max();
-                Debug.WriteLine("Max: " + Max.ToString());
-                for (int i = 10; i < Values.WindowSize.X - 10; i++)
-                {
-                    double value = Assets.FFToutput[i] * 70;
-                    //value = value / Max * 175;
-                    
-                    if (value > 175)
-                        value = 175;
-
-                    if (value < 1)
-                        value = 1;
-
-                    Assets.DrawLine(new Vector2(i,
-                                    Values.WindowSize.Y / 1.25f - (int)value),
-
-                                    new Vector2(i,
-                                    Values.WindowSize.Y / 1.25f),
-
-                                    2, Color.Lerp(primaryColor, secondaryColor, i / Length), spriteBatch);
-                }*/
-                #endregion
-
                 spriteBatch.End();
             }
             #endregion

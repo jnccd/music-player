@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Runtime.InteropServices;
 
 namespace MusicPlayer
 {
@@ -71,6 +72,16 @@ namespace MusicPlayer
                                 ((A1.Y - A2.Y) * (B2.X * B1.Y - B1.X * B2.Y) - (B1.Y - B2.Y) * (A2.X * A1.Y - A1.X * A2.Y)) / 
                                 ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
         }
+
+
+        // Console Control
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        public static void HideConsole() { ShowWindow(GetConsoleWindow(), 0); }
+        public static void MinimizeConsole() { ShowWindow(GetConsoleWindow(), 2); }
+        public static void ShowConsole() { ShowWindow(GetConsoleWindow(), 5); }
     }
     public static class StringExtensions
     {
