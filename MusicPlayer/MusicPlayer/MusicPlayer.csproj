@@ -107,6 +107,7 @@
     <Compile Include="Control.cs" />
     <Compile Include="FPSCounter.cs" />
     <Compile Include="GaussianDiagram.cs" />
+    <Compile Include="GigaList.cs" />
     <Compile Include="InterceptKeys.cs" />
     <Compile Include="config.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -19,8 +19,15 @@ namespace MusicPlayer
         static void Main(string[] args)
         {
             foreach (Process p in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
-                if (p.Id != Process.GetCurrentProcess().Id)
-                { RequestedSong.Default.RequestedSongString = args[0]; RequestedSong.Default.Save(); return; }
+                if (p.Id != Process.GetCurrentProcess().Id && p.MainModule.FileName == Process.GetCurrentProcess().MainModule.FileName)
+                {
+                    if (args.Length > 0)
+                    {
+                        RequestedSong.Default.RequestedSongString = args[0];
+                        RequestedSong.Default.Save();
+                    }
+                    return;
+                }
             
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
