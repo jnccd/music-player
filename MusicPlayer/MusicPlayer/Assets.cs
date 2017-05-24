@@ -78,7 +78,7 @@ namespace MusicPlayer
         public const int bufferLength = 65536;
         //public const int bufferLength = 131072; 
         //public const int bufferLength = 262144;
-        public static List<float> EntireSongWaveBuffer;
+        public static GigaFloatList EntireSongWaveBuffer;
         public static byte[] buffer;
         public static float[] WaveBuffer;
         public static float[] FFToutput;
@@ -265,7 +265,7 @@ namespace MusicPlayer
                 {
                     byte[] buffer = new byte[16384];
                     Channel32Reader.Position = 0;
-                    EntireSongWaveBuffer = new List<float>();
+                    EntireSongWaveBuffer = new GigaFloatList();
 
                     while (Channel32Reader.Position < Channel32Reader.Length)
                     {
@@ -279,19 +279,20 @@ namespace MusicPlayer
 
                         for (int i = 0; i < read / 4; i++)
                         {
-                            if (EntireSongWaveBuffer.Count < 67108864)
-                                EntireSongWaveBuffer.Add(BitConverter.ToSingle(buffer, i * 4));
+                            EntireSongWaveBuffer.Add(BitConverter.ToSingle(buffer, i * 4));
 
                             if (AbortAbort)
                                 break;
                         }
                     }
 
+                    Debug.WriteLine("SongSampleLength = " + EntireSongWaveBuffer.Count);
                     AbortAbort = false;
                 }
-            } catch {
+            } catch (Exception e) {
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count);
+                Debug.WriteLine("Exception: " + e);
                 DisposeNAudioData();
                 PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
@@ -303,8 +304,8 @@ namespace MusicPlayer
             lock (EntireSongWaveBuffer)
             {
                 WaveBuffer = new float[bufferLength / 4];
-                if (Channel32 != null && EntireSongWaveBuffer.Count > bufferLength && Channel32.Position > bufferLength && Channel32.Position / 4 < 67108864)
-                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)(Channel32.Position / 4 - bufferLength / 4), bufferLength / 4).ToArray();
+                if (Channel32 != null && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
+                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength) / 4), bufferLength / 4).ToArray();
                 else
                     for (int i = 0; i < bufferLength / 4; i++)
                         WaveBuffer[i] = 0;
