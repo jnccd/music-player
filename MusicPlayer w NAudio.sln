@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\MusicPlayer\MusicPlayer.csproj", "{211DA315-0B2A-42E4-97B1-CEAEF7DDA614}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "MusicPlayerContent", "MusicPlayer\MusicPlayerContent\MusicPlayerContent.contentproj", "{E920CD5D-7E6B-4688-AAA2-98939BC68008}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayerContent", "MusicPlayer\MusicPlayerContent\MusicPlayerContent.contentproj", "{E920CD5D-7E6B-4688-AAA2-98939BC68008}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

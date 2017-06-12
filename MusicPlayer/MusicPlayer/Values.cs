@@ -83,12 +83,38 @@ namespace MusicPlayer
         public static void MinimizeConsole() { ShowWindow(GetConsoleWindow(), 2); }
         public static void ShowConsole() { ShowWindow(GetConsoleWindow(), 5); }
     }
+
     public static class StringExtensions
     {
         public static bool Contains(this String str, String substring,
                                     StringComparison comp)
         {
             return str.IndexOf(substring, comp) >= 0;
+        }
+    }
+    public class Approximate
+    {
+
+        public static float Sqrt(float z)
+        {
+            if (z == 0) return 0;
+            FloatIntUnion u;
+            u.tmp = 0;
+            u.f = z;
+            u.tmp -= 1 << 23; /* Subtract 2^m. */
+            u.tmp >>= 1; /* Divide by 2. */
+            u.tmp += 1 << 29; /* Add ((b + 1) / 2) * 2^m. */
+            return u.f;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct FloatIntUnion
+        {
+            [FieldOffset(0)]
+            public float f;
+
+            [FieldOffset(0)]
+            public int tmp;
         }
     }
 }
