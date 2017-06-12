@@ -24,6 +24,31 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer
 {
+    public static class HammingWindowValues
+    {
+        public static float GetHammingWindow(int i)
+        {
+            if (i >= 0 && i < HammingWindow.Length)
+                return HammingWindow[i];
+            else
+                return 0;
+        }
+        public static void CreateIfNotFilled(int Length)
+        {
+            if (HammingWindow == null || HammingWindow.Length != Length)
+            {
+                HammingWindow = new float[Length];
+                HammingWindowValues.Length = Length;
+
+                for (int i = 0; i < HammingWindow.Length; i++)
+                    HammingWindow[i] = (float)FastFourierTransform.HammingWindow(i, Length);
+            }
+        }
+
+        private static float[] HammingWindow;
+        private static int Length;
+    }
+
     public static class Assets
     {
         public static SpriteFont Font;
@@ -34,6 +59,7 @@ namespace MusicPlayer
         public static Texture2D bg1;
         public static Texture2D bg2;
         public static Texture2D Volume;
+        public static Texture2D ColorFade;
 
         public static Effect gaussianBlurHorz;
         public static Effect gaussianBlurVert;
@@ -83,8 +109,14 @@ namespace MusicPlayer
         public static float[] WaveBuffer;
         public static float[] FFToutput;
         public static float[] RawFFToutput;
-        
-        // Data Management
+        public static Complex[] tempbuffer = null;
+        static int TempBufferLengthLog2;
+
+        // Debug
+        static long CurrentDebugTime = 0;
+        static List<int> SegmentLengths = new List<int>();
+
+        // Loading / Disposing Data
         public static void Load(ContentManager Content, GraphicsDevice GD)
         {
             Console.WriteLine("Loading Effects...");
@@ -98,6 +130,14 @@ namespace MusicPlayer
             Color[] Col = new Color[1];
             Col[0] = Color.White;
             White.SetData(Col);
+
+
+            int res = 10;
+            ColorFade = new Texture2D(GD, 1, res);
+            Col = new Color[res];
+            for (int i = 0; i < Col.Length; i++)
+                Col[i] = Color.FromNonPremultiplied(255, 255, 255, (int)(i / (float)res * 255));
+            ColorFade.SetData(Col);
 
 
             Volume = Content.Load<Texture2D>("volume");
@@ -122,23 +162,18 @@ namespace MusicPlayer
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => { RefreshBGtex(GD); });
 
             
-            Console.WriteLine("Loading Songs...");
+            Console.WriteLine("Searching for Songs...");
             if (Directory.Exists(config.Default.MusicPath))
-                FindAllMp3FilesInDir(config.Default.MusicPath);
+                FindAllMp3FilesInDir(config.Default.MusicPath, true);
             else
             {
                 FolderBrowserDialog open = new FolderBrowserDialog();
                 open.Description = "Select your music folder";
                 if (open.ShowDialog() != DialogResult.OK) Process.GetCurrentProcess().Kill();
                 config.Default.MusicPath = open.SelectedPath;
-                FindAllMp3FilesInDir(open.SelectedPath);
+                FindAllMp3FilesInDir(open.SelectedPath, true);
             }
-            Console.WriteLine("Found " + Playlist.Count.ToString() + " Songs!");
-
-
-            Console.WriteLine("Monitoring System Audio output...");
-            enumerator = new MMDeviceEnumerator();
-            device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
+            Console.WriteLine();
 
 
             Console.WriteLine("Starting first Song...");
@@ -159,14 +194,22 @@ namespace MusicPlayer
             Console.WriteLine("Loading GUI...");
             Values.MinimizeConsole();
         }
-        public static void FindAllMp3FilesInDir(string StartDir)
+        public static void FindAllMp3FilesInDir(string StartDir, bool ConsoleOutput)
         {
             foreach (string s in Directory.GetFiles(StartDir))
                 if (s.EndsWith(".mp3"))
                     Playlist.Add(s);
 
+            if (ConsoleOutput)
+            {
+                Console.CursorLeft = 0;
+                Console.Write("                                                                    ");
+                Console.CursorLeft = 0;
+                Console.Write("Found " + Playlist.Count.ToString() + " Songs!");
+            }
+
             foreach (string D in Directory.GetDirectories(StartDir))
-                FindAllMp3FilesInDir(D);
+                FindAllMp3FilesInDir(D, ConsoleOutput);
         }
         public static void RefreshBGtex(GraphicsDevice GD)
         {
@@ -237,30 +280,44 @@ namespace MusicPlayer
         }
         public static void UpdateFFTbuffer()
         {
-            Complex[] tempbuffer = new Complex[WaveBuffer.Length];
-
-            lock (WaveBuffer)
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
+            if (tempbuffer == null)
             {
-                for (int i = 0; i < tempbuffer.Length; i++)
-                {
-                    tempbuffer[i].X = (float)(WaveBuffer[i] * FastFourierTransform.HammingWindow(i, tempbuffer.Length));
-                    tempbuffer[i].Y = 0;
-                }
+                int complexLength = Channel32.WaveFormat.SampleRate;
+                if (complexLength > WaveBuffer.Length)
+                    complexLength = WaveBuffer.Length;
+                tempbuffer = new Complex[complexLength];
+                TempBufferLengthLog2 = (int)Math.Log(tempbuffer.Length, 2.0);
             }
+            //Debug.WriteLine("UpdateFFTbuffer 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-            FastFourierTransform.FFT(true, (int)Math.Log(tempbuffer.Length, 2.0), tempbuffer);
-            
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
+            HammingWindowValues.CreateIfNotFilled(tempbuffer.Length);
+            for (int i = 0; i < tempbuffer.Length; i++)
+            {
+                tempbuffer[i].X = WaveBuffer[i] * HammingWindowValues.GetHammingWindow(i);
+                tempbuffer[i].Y = 0;
+            }
+            //Debug.WriteLine("UpdateFFTbuffer 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
+            FastFourierTransform.FFT(true, TempBufferLengthLog2, tempbuffer);
+            //Debug.WriteLine("UpdateFFTbuffer 3 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
             FFToutput = new float[tempbuffer.Length / 2 - 1];
             RawFFToutput = new float[tempbuffer.Length / 2 - 1];
             for (int i = 0; i < FFToutput.Length; i++)
             {
-                RawFFToutput[i] = (float)(Math.Log10(1 + Math.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) * 10);
-                FFToutput[i] = (float)(RawFFToutput[i] * Math.Sqrt(i + 1));
+                RawFFToutput[i] = (Approximate.Sqrt(1 + Approximate.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) - 1) * 10;
+                FFToutput[i] = (RawFFToutput[i] * Approximate.Sqrt(i + 1));
             }
+            //Debug.WriteLine("UpdateFFTbuffer 4 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
         public static void UpdateEntireSongBuffers()
         {
-            try {
+            try
+            {
                 lock (Channel32Reader)
                 {
                     byte[] buffer = new byte[16384];
@@ -286,17 +343,19 @@ namespace MusicPlayer
                         }
                     }
 
-                    Debug.WriteLine("SongSampleLength = " + EntireSongWaveBuffer.Count);
+                    Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
+                    Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                     AbortAbort = false;
                 }
             } catch (Exception e) {
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
-                Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count);
+                Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
+                Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                 Debug.WriteLine("Exception: " + e);
-                DisposeNAudioData();
-                PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
-                PlayerHistoryIndex = PlayerHistory.Count - 1;
-                GetNextSong(true);
+                //DisposeNAudioData();
+                //PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
+                //PlayerHistoryIndex = PlayerHistory.Count - 1;
+                //GetNextSong(true);
             }
         }
         public static void UpdateWaveBufferWithEntireSongWB()
@@ -416,7 +475,8 @@ namespace MusicPlayer
         }
         public static void GetPreviousSong()
         {
-            if (Values.Timer > SongChangedTickTime + 30)
+            if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
+                config.Default.MultiThreading)
             {
                 if (PlayerHistoryIndex > 0)
                 {
@@ -437,6 +497,7 @@ namespace MusicPlayer
             }
 
             DisposeNAudioData();
+            XNA.ForceTitleRedraw();
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' '});
@@ -476,7 +537,7 @@ namespace MusicPlayer
 
             for (int i = -(int)Radius; i < (int)Radius; i++)
             {
-                int HalfHeight = (int)Math.Sqrt(Radius * Radius - i * i);
+                int HalfHeight = (int)Approximate.Sqrt(Radius * Radius - i * i);
                 SB.Draw(White, new Rectangle((int)Pos.X + i, (int)Pos.Y - HalfHeight, 1, HalfHeight * 2), Col);
             }
         }

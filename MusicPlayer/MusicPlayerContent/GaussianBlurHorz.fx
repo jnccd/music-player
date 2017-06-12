@@ -1,7 +1,7 @@
 sampler2D samp2D;
 
-int TexHeight = 500;
 int TexWidth = 300;
+int TexHeight = 500;
 
 // OLD
 /*const float BlurWeights[7] =

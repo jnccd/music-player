@@ -50,19 +50,22 @@ namespace MusicPlayer
         public static Form gameWindowForm;
         RenderTarget2D TempBlur;
         RenderTarget2D BlurredTex;
+        static RenderTarget2D TitleTarget;
 
         // Visualization
         public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
         public static BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
         public static Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
         public static Color secondaryColor = Color.FromNonPremultiplied(35, 125, 255, 255);
-        GaussianDiagram GD = new GaussianDiagram();
+        GaussianDiagram GauD = null;
 
         // Stuff
         System.Drawing.Point MouseClickedPos = new System.Drawing.Point();
         System.Drawing.Point WindowLocation = new System.Drawing.Point();
         SelectedControl selectedControl = SelectedControl.None;
         int SongsFoundMessageAlpha = 555;
+        List<string> LastConsoleInput = new List<string>();
+        long CurrentDebugTime = 0;
 
         public XNA()
         {
@@ -151,26 +154,32 @@ namespace MusicPlayer
 
         protected override void Update(GameTime gameTime)
         {
-            if (Values.Timer % 30 == 0)
+            if (Values.Timer % 10000 == 0)
             {
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
             }
 
+            //Debug.WriteLine("New Update ----------------------------------------------------------------- ");
+
             Control.Update();
-            FPSCounter.Update(gameTime);
             ComputeControls();
             Values.Timer++;
             SongsFoundMessageAlpha--;
 
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
             if (Values.Timer % 100 == 0)
                 CheckForRequestedSongs();
-            
+            //Debug.WriteLine("CheckForRequestedSongs " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+
             // Stuff
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
                 UpdateGD();
-                
+                //Debug.WriteLine("GD Update " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
                 if (Assets.WaveBuffer != null)
                     Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer) * 1.2f;
 
@@ -179,16 +188,22 @@ namespace MusicPlayer
 
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length)
                     Assets.GetNextSong(false);
-                
-                Assets.UpdateWaveBufferWithEntireSongWB();
-                if (VisSetting != Visualizations.line)
-                    Assets.UpdateFFTbuffer();
+                //Debug.WriteLine("ifs " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-                GD.Smoothen();
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                Assets.UpdateWaveBufferWithEntireSongWB();
+                //Debug.WriteLine("UpdateWaveBufferWithEntireSongWB " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                if (VisSetting != Visualizations.line && Assets.Channel32 != null)
+                    Assets.UpdateFFTbuffer();
+                //Debug.WriteLine("UpdateFFTbuffer " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
 
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
             if (Assets.Channel32 != null)
                 Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume;
+            //Debug.WriteLine("Volume Update " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
             base.Update(gameTime);
         }
@@ -280,6 +295,10 @@ namespace MusicPlayer
                     BgModes = 0;
             }
 
+            // Toggle Anti-Alising [A]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.A))
+                GauD.AntiAlising = !GauD.AntiAlising;
+
             // Higher / Lower Volume [Up/Down]
             if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Up))
                 Values.TargetVolume += 0.005f;
@@ -326,7 +345,7 @@ namespace MusicPlayer
         }
         void UpdateGD()
         {
-            if (Assets.FFToutput != null)
+            if (Assets.FFToutput != null && VisSetting != Visualizations.line)
             {
                 float ReadLength = Assets.FFToutput.Length / 3f;
                 float[] values = new float[Values.WindowSize.X - 70];
@@ -336,15 +355,43 @@ namespace MusicPlayer
                     double index = Math.Pow(ReadLength, i / (double)Values.WindowSize.X);
                     values[i - 70] = Assets.GetMaxHeight(Assets.FFToutput, (int)lastindex, (int)index);
                 }
-                GD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y / 1.25f)), 175, true, 3);
+                //Debug.WriteLine("GD Update 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                if (GauD == null)
+                    GauD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y / 1.25f)), 175, true, 3);
+                else
+                {
+                    GauD.Update(values);
+                    GauD.Smoothen();
+                }
 
-                GD.ApplyAllOutputData(i => i *= Values.TargetVolume * 2);
-                GD.ApplyAllInputData(i => i *= Values.TargetVolume * 2);
+                //Debug.WriteLine("GD Update 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
         }
 
         protected override void Draw(GameTime gameTime)
         {
+            // RenderTargets
+            if (TitleTarget == null)
+            {
+                string Title;
+                if (Assets.currentlyPlayingSongName.Contains(".mp3"))
+                    Title = Assets.currentlyPlayingSongName.TrimEnd(new char[] { '.', 'm', 'p', '3' });
+                else
+                    Title = Assets.currentlyPlayingSongName;
+
+                TitleTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X - 166, (int)Assets.Title.MeasureString(Title).Y); // DRAW TO (24, 12)
+                GraphicsDevice.SetRenderTarget(TitleTarget);
+                GraphicsDevice.Clear(Color.Transparent);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
+                
+                spriteBatch.DrawString(Assets.Title, Title, Vector2.Zero, Color.White);
+
+                spriteBatch.End();
+            }
+
+            if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
+                GauD.DrawToRenderTarget(spriteBatch, GraphicsDevice);
+
             #region Blur
             BeginBlur();
             if (BgModes == BackGroundModes.Blur)
@@ -360,7 +407,8 @@ namespace MusicPlayer
             #endregion
 
             base.Draw(gameTime);
-
+            
+            // Background
             #region Background
             // Background
             spriteBatch.Begin();
@@ -377,9 +425,9 @@ namespace MusicPlayer
                 spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
             spriteBatch.End();
             #endregion
-
             DrawBlurredTex();
 
+            // Visualizations
             #region Line graph
             // Line Graph
             if (VisSetting == Visualizations.line && Assets.Channel32 != null)
@@ -459,17 +507,13 @@ namespace MusicPlayer
             #region FFT Graph
             // FFT Graph
             if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
-            {
-                spriteBatch.Begin();
-                GD.Draw(spriteBatch);
-                spriteBatch.End();
-            }
+                GauD.DrawRenderTarget(spriteBatch);
             #endregion
             #region Raw FFT Graph
             if (VisSetting == Visualizations.rawfft && Assets.Channel32 != null && Assets.FFToutput != null)
             {
                 spriteBatch.Begin();
-                GD.DrawInputData(spriteBatch);
+                GauD.DrawInputData(spriteBatch);
                 spriteBatch.End();
             }
             #endregion
@@ -478,39 +522,35 @@ namespace MusicPlayer
             if (VisSetting == Visualizations.barchart)
             {
                 spriteBatch.Begin();
-                GD.DrawAsBars(spriteBatch);
+                GauD.DrawAsBars(spriteBatch);
                 spriteBatch.End();
             }
             #endregion
-
-            #region HUD
+            
             // HUD
+            #region HUD
             spriteBatch.Begin();
-
             // Duration Bar
             spriteBatch.Draw(Assets.White, new Rectangle(30, Values.WindowSize.Y - 25, Values.WindowSize.X - 50, 3), Color.Black * 0.6f);
             spriteBatch.Draw(Assets.White, new Rectangle(25, Values.WindowSize.Y - 30, Values.WindowSize.X - 50, 3), Color.White);
             if (Assets.Channel32 != null)
-                spriteBatch.Draw(Assets.White, new Rectangle(25, Values.WindowSize.Y - 30, (int)((Values.WindowSize.X - 50) *
+            {
+                lock (Assets.Channel32)
+                {
+                    spriteBatch.Draw(Assets.White, new Rectangle(25, Values.WindowSize.Y - 30, (int)((Values.WindowSize.X - 50) *
                         (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
                         ((float)Assets.Channel32.TotalTime.TotalSeconds))), 3), primaryColor);
+                    double Percetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
+                    if (Percetage < 1)
+                        spriteBatch.Draw(Assets.White, new Rectangle(25 + (int)((Values.WindowSize.X - 50) * Percetage), Values.WindowSize.Y - 30, Values.WindowSize.X - 50 - (int)((Values.WindowSize.X - 50) * Percetage), 3),
+                            Color.Red * 0.5f);
+                }
+            }
 
             // Song Title Displayer
-            string Title;
-            if (Assets.currentlyPlayingSongName.Contains(".mp3"))
-                Title = Assets.currentlyPlayingSongName.TrimEnd(new char[] { '.', 'm', 'p', '3' });
-            else
-                Title = Assets.currentlyPlayingSongName;
+            spriteBatch.Draw(TitleTarget, new Vector2(29, 17), Color.Black * 0.6f);
+            spriteBatch.Draw(TitleTarget, new Vector2(24, 12), Color.White);
 
-            try {
-                spriteBatch.DrawString(Assets.Title, 
-                    (Title.Length <= 37 ? Title : Title.Substring(0, 37)), new Vector2(29, 17), Color.Black * 0.6f);
-            } catch { Debug.WriteLine("Cant write: " + Title); }
-            try
-            {
-                spriteBatch.DrawString(Assets.Title,
-                    (Title.Length <= 37 ? Title : Title.Substring(0, 37)), new Vector2(24, 12), Color.White);
-            } catch { }
             if (SongsFoundMessageAlpha > 0)
             {
                 spriteBatch.DrawString(Assets.Title, "Found " + Assets.Playlist.Count + " Songs!", new Vector2(24 + 5, 45 + 5), Color.Black * 0.6f * (SongsFoundMessageAlpha / 255f));
@@ -518,20 +558,22 @@ namespace MusicPlayer
             }
 
             // Volume
-            spriteBatch.Draw(Assets.Volume, new Rectangle(Values.WindowSize.X - 25 - 75 - 8 - 24 + 5, 16 + 5, 24, 24), Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.White, new Rectangle(Values.WindowSize.X - 25 - 75 + 5, 24 + 5, 75, 8), Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.Volume, new Rectangle(Values.WindowSize.X - 25 - 75 - 8 - 24, 16, 24, 24), Color.White);
-            spriteBatch.Draw(Assets.White,  new Rectangle(Values.WindowSize.X - 25 - 75         , 24, 75, 8), Color.White);
-            spriteBatch.Draw(Assets.White,  new Rectangle(Values.WindowSize.X - 25 - 75         , 24, (int)(75 * Values.TargetVolume * 2), 8), 
-                secondaryColor);
+            spriteBatch.Draw(Assets.Volume, new Rectangle(Values.WindowSize.X - 127, 21, 24, 24), Color.Black * 0.6f);
+            spriteBatch.Draw(Assets.White,  new Rectangle(Values.WindowSize.X - 95,  29, 75, 8),  Color.Black * 0.6f);
+
+            spriteBatch.Draw(Assets.Volume, new Rectangle(Values.WindowSize.X - 132, 16, 24, 24), Color.White);
+            spriteBatch.Draw(Assets.White,  new Rectangle(Values.WindowSize.X - 100         , 24, 75, 8), Color.White);
+            spriteBatch.Draw(Assets.White,  new Rectangle(Values.WindowSize.X - 100         , 24, (int)(75 * Values.TargetVolume * 2), 8), secondaryColor);
+
             if (Assets.Channel32 != null)
-            {
-                spriteBatch.Draw(Assets.White, new Rectangle(Values.WindowSize.X - 25 - 75, 24, (int)(75 * Assets.Channel32.Volume * 2), 8),
-                primaryColor);
-            }
-            //FPSCounter.Draw(spriteBatch);
+                spriteBatch.Draw(Assets.White, new Rectangle(Values.WindowSize.X - 25 - 75, 24, (int)(75 * Assets.Channel32.Volume * 2), 8), primaryColor);
+
             spriteBatch.End();
             #endregion
+        }
+        public static void ForceTitleRedraw()
+        {
+            TitleTarget = null;
         }
         void BeginBlur()
         {
