@@ -60,10 +60,13 @@ namespace MusicPlayer
         public static Texture2D bg2;
         public static Texture2D Volume;
         public static Texture2D ColorFade;
+        public static Texture2D Play;
+        public static Texture2D Pause;
 
         public static Effect gaussianBlurHorz;
         public static Effect gaussianBlurVert;
         public static Effect PixelBlur;
+        public static Effect TitleFadeout;
         
         // Music Player Manager Values
         public static string currentlyPlayingSongName
@@ -123,6 +126,7 @@ namespace MusicPlayer
             gaussianBlurHorz = Content.Load<Effect>("GaussianBlurHorz");
             gaussianBlurVert = Content.Load<Effect>("GaussianBlurVert");
             PixelBlur = Content.Load<Effect>("PixelBlur");
+            TitleFadeout = Content.Load<Effect>("TitleFadeout");
 
 
             Console.WriteLine("Loading Textures...");
@@ -143,6 +147,8 @@ namespace MusicPlayer
             Volume = Content.Load<Texture2D>("volume");
             bg1 = Content.Load<Texture2D>("bg1");
             bg2 = Content.Load<Texture2D>("bg2");
+            Play = Content.Load<Texture2D>("play");
+            Pause = Content.Load<Texture2D>("pause");
 
 
             Console.WriteLine("Loading Fonts...");
@@ -413,6 +419,12 @@ namespace MusicPlayer
                 else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped) output.Play();
             }
         }
+        public static bool IsPlaying()
+        {
+            if (output == null) return false;
+            else if (output.PlaybackState == PlaybackState.Playing) return true;
+            return false;
+        }
         public static void GetNewPlaylistSong()
         {
             int PlaylistIndex = Values.RDM.Next(Playlist.Count);
@@ -438,7 +450,7 @@ namespace MusicPlayer
                         if (Hits.Count == 1)
                             Console.WriteLine(">Found one matching song: " + Path.Split('\\').Last());
                         else
-                            Console.WriteLine(">Found " + Hits.Count + " matching songs and choose " + Path.Split('\\').Last());
+                            Console.WriteLine(">Found " + Hits.Count + " matching songs and chose " + Path.Split('\\').Last());
                     }
                     else
                     {

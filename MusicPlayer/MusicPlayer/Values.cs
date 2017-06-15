@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace MusicPlayer
 {
@@ -72,7 +73,14 @@ namespace MusicPlayer
                                 ((A1.Y - A2.Y) * (B2.X * B1.Y - B1.X * B2.Y) - (B1.Y - B2.Y) * (A2.X * A1.Y - A1.X * A2.Y)) / 
                                 ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
         }
-
+        public static Screen TheWindowsMainScreen(Rectangle Bounds)
+        {
+            System.Drawing.Point P = new System.Drawing.Point(Bounds.X + Bounds.Width / 2, Bounds.Y + Bounds.Height / 2);
+            for (int i = 0; i < Screen.AllScreens.Length; i++)
+                if (Screen.AllScreens[i].Bounds.Contains(P))
+                    return Screen.AllScreens[i];
+            return null;
+        }
 
         // Console Control
         [DllImport("kernel32.dll")]
@@ -94,7 +102,6 @@ namespace MusicPlayer
     }
     public class Approximate
     {
-
         public static float Sqrt(float z)
         {
             if (z == 0) return 0;

@@ -94,5 +94,27 @@ namespace MusicPlayerwNAudio {
                 this["MultiThreading"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public string[] SongPaths {
+            get {
+                return ((string[])(this["SongPaths"]));
+            }
+            set {
+                this["SongPaths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] SongScores {
+            get {
+                return ((int[])(this["SongScores"]));
+            }
+            set {
+                this["SongScores"] = value;
+            }
+        }
     }
 }
