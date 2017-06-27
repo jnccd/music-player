@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MusicPlayerwNAudio {
+namespace MusicPlayer {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -114,6 +114,18 @@ namespace MusicPlayerwNAudio {
             }
             set {
                 this["SongScores"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int WavePreload {
+            get {
+                return ((int)(this["WavePreload"]));
+            }
+            set {
+                this["WavePreload"] = value;
             }
         }
     }

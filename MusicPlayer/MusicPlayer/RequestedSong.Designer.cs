@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MusicPlayerwNAudio {
+namespace MusicPlayer {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
