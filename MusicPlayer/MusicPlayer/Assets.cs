@@ -554,7 +554,6 @@ namespace MusicPlayer
 
             DisposeNAudioData();
             XNA.ForceTitleRedraw();
-            XNA.FocusWindow = true;
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' '});

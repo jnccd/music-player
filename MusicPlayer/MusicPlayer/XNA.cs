@@ -71,7 +71,7 @@ namespace MusicPlayer
         int LastConsoleInputIndex = -1;
         //long CurrentDebugTime = 0;
         long CurrentDebugTime2 = 0;
-        OptionsMenu optionsMenu = new OptionsMenu();
+        OptionsMenu optionsMenu;
         public static bool FocusWindow = false;
 
         // Draw Rectangles
@@ -201,7 +201,10 @@ namespace MusicPlayer
                     }
                     Console.WriteLine();
                     if (Assets.PlayNewSong(Path))
+                    {
                         LastConsoleInput.Add(Path);
+                        FocusWindow = true;
+                    }
                 }
             });
         }
@@ -218,7 +221,7 @@ namespace MusicPlayer
             if (Control.ScrollWheelWentUp())
                 Assets.GetNextSong(false);
 
-            if (FocusWindow) { gameWindowForm.Focus(); FocusWindow = false; }
+            if (FocusWindow) { gameWindowForm.BringToFront(); FocusWindow = false; }
 
             if (Assets.IsCurrentSongUpvoted)
             {
@@ -281,7 +284,7 @@ namespace MusicPlayer
         void ComputeControls()
         {
             // Mouse Controls
-            if (gameWindowForm.Focused && Control.WasLMBJustPressed())
+            if (Control.WasLMBJustPressed() && gameWindowForm.Focused)
             {
                 MouseClickedPos = new System.Drawing.Point(Control.CurMS.X, Control.CurMS.Y);
                 WindowLocation = gameWindowForm.Location;
@@ -537,7 +540,6 @@ namespace MusicPlayer
                     if (Diff != new Point(0, 0))
                     {
                         VirtualWindow = new Rectangle(VirtualWindow.X + Diff.X, VirtualWindow.Y + Diff.Y, VirtualWindow.Width, VirtualWindow.Height);
-                        MouseClickedPos = new System.Drawing.Point(MouseClickedPos.X - Diff.X, MouseClickedPos.Y - Diff.Y);
 
                         WindowPoints[0] = new Point(VirtualWindow.X, VirtualWindow.Y);
                         WindowPoints[1] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y);
