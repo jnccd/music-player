@@ -15,7 +15,6 @@ using System.Threading;
 using NAudio.Wave;
 using NAudio.Dsp;
 using System.IO;
-using MusicPlayerwNAudio;
 
 namespace MusicPlayer
 {
@@ -57,30 +56,38 @@ namespace MusicPlayer
         public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
         public static BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
         public static Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
-        public static Color secondaryColor = Color.FromNonPremultiplied(35, 125, 255, 255);
-        GaussianDiagram GauD = null;
+        public static Color secondaryColor = Color.FromNonPremultiplied((int)(primaryColor.R * 1.5f), (int)(primaryColor.G * 1.5f), (int)(primaryColor.B * 1.5f), 255);
+        public static GaussianDiagram GauD = null;
+        static ColorDialog LeDialog;
+        static bool ShowingColorDialog = false;
 
         // Stuff
         System.Drawing.Point MouseClickedPos = new System.Drawing.Point();
         System.Drawing.Point WindowLocation = new System.Drawing.Point();
         SelectedControl selectedControl = SelectedControl.None;
         int SongsFoundMessageAlpha = 555;
+        float UpvoteIconAlpha = 0;
         List<string> LastConsoleInput = new List<string>();
-        long CurrentDebugTime = 0;
+        int LastConsoleInputIndex = -1;
+        //long CurrentDebugTime = 0;
         long CurrentDebugTime2 = 0;
-        long CurrentDebugTime3 = 0;
+        OptionsMenu optionsMenu = new OptionsMenu();
+        public static bool FocusWindow = false;
 
         // Draw Rectangles
-        static Rectangle DurationBar = new Rectangle(50, Values.WindowSize.Y - 27, Values.WindowSize.X - 74, 3);
+        static Rectangle DurationBar = new Rectangle(50, Values.WindowSize.Y - 28, Values.WindowSize.X - 77, 3);
         static Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
         static Rectangle VolumeBar = new Rectangle(Values.WindowSize.X - 100, 24, 75, 8);
-        static Rectangle PlayPauseButton = new Rectangle(19, Values.WindowSize.Y - 34, 16, 16);
+        static Rectangle PlayPauseButton = new Rectangle(24, Values.WindowSize.Y - 35, 16, 16);
+        static Rectangle Upvote = new Rectangle(24, 43, 20, 20);
         static Rectangle TargetVolumeBar = new Rectangle(); // needs Updates
         static Rectangle ActualVolumeBar = new Rectangle(); // needs Updates
+
         static Rectangle DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
         static Rectangle VolumeIconShadow = new Rectangle(VolumeIcon.X + 5, VolumeIcon.Y + 5, VolumeIcon.Width, VolumeIcon.Height);
         static Rectangle VolumeBarShadow = new Rectangle(VolumeBar.X + 5, VolumeBar.Y + 5, VolumeBar.Width, VolumeBar.Height);
         static Rectangle PlayPauseButtonShadow = new Rectangle(PlayPauseButton.X + 5, PlayPauseButton.Y + 5, PlayPauseButton.Width, PlayPauseButton.Height);
+        static Rectangle UpvoteShadow = new Rectangle(Upvote.X + 5, Upvote.Y + 5, Upvote.Width, Upvote.Height);
 
         // Hitbox Rectangles
         Rectangle DurationBarHitbox = new Rectangle(DurationBar.X, DurationBar.Y - 10, DurationBar.Width, 23);
@@ -107,6 +114,19 @@ namespace MusicPlayer
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            gameWindowForm.FormClosing += (object sender, FormClosingEventArgs e) => {
+                Assets.SaveSongUpvote();
+
+                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+                Assets.DisposeNAudioData();
+
+                config.Default.Background = (int)BgModes;
+                config.Default.Vis = (int)VisSetting;
+                config.Default.Save();
+                //MessageBox.Show("ApplicationExit EVENT");
+            };
+
             Assets.Load(Content, GraphicsDevice);
             
             gameWindowForm.Location = new System.Drawing.Point(0, 0);
@@ -146,11 +166,31 @@ namespace MusicPlayer
                             Console.Clear();
                         }
 
+                        if (e.Key == ConsoleKey.UpArrow)
+                        {
+                            LastConsoleInputIndex++;
+                            if (LastConsoleInputIndex > LastConsoleInput.Count - 1)
+                                LastConsoleInputIndex = LastConsoleInput.Count - 1;
+                            if (LastConsoleInput.Count > 0)
+                                Path = LastConsoleInput[LastConsoleInput.Count - 1 - LastConsoleInputIndex];
+                        }
+
+                        if (e.Key == ConsoleKey.DownArrow)
+                        {
+                            LastConsoleInputIndex--;
+                            if (LastConsoleInputIndex < -1)
+                                LastConsoleInputIndex = -1;
+                            if (LastConsoleInputIndex > -1)
+                                Path = LastConsoleInput[LastConsoleInput.Count - 1 - LastConsoleInputIndex];
+                            else
+                                Path = "";
+                        }
+
                         if (e.Key == ConsoleKey.Enter)
                             break;
 
                         if (e.Key == ConsoleKey.Backspace)
-                        { 
+                        {
                             if (Path.Length > 0)
                                 Path = Path.Remove(Path.Length - 1);
                         }
@@ -160,45 +200,40 @@ namespace MusicPlayer
                             Path += e.KeyChar;
                     }
                     Console.WriteLine();
-                    Assets.PlayNewSong(Path);
+                    if (Assets.PlayNewSong(Path))
+                        LastConsoleInput.Add(Path);
                 }
             });
         }
 
         protected override void Update(GameTime gameTime)
         {
-            CurrentDebugTime2 = Stopwatch.GetTimestamp();
-            //Debug.WriteLine("New Update ----------------------------------------------------------------- ");
-
-            CurrentDebugTime = Stopwatch.GetTimestamp();
-            if (Values.Timer % 10000 == 0)
-            {
-                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
-                InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
-                Debug.WriteLine("Keysssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
-            }
-
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
             Control.Update();
-            ComputeControls();
+            if (gameWindowForm.Focused)
+                ComputeControls();
+
+            // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
+            if (Control.ScrollWheelWentDown())
+                Assets.GetPreviousSong();
+            if (Control.ScrollWheelWentUp())
+                Assets.GetNextSong(false);
+
+            if (FocusWindow) { gameWindowForm.Focus(); FocusWindow = false; }
+
+            if (Assets.IsCurrentSongUpvoted)
+            {
+                if (UpvoteIconAlpha < 1)
+                    UpvoteIconAlpha += 0.05f;
+            }
+            else if (UpvoteIconAlpha > 0)
+                UpvoteIconAlpha -= 0.05f;
+
             Values.Timer++;
             SongsFoundMessageAlpha--;
-
-            CurrentDebugTime = Stopwatch.GetTimestamp();
-            if (Values.Timer % 100 == 0)
-            {
-                CheckForRequestedSongs();
-                Debug.WriteLine("CheckForRequestedSongs " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
-            }
             
             // Stuff
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
-                //CurrentDebugTime = Stopwatch.GetTimestamp();
-                UpdateGD();
-                //Debug.WriteLine("GD Update " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
-
-                //CurrentDebugTime = Stopwatch.GetTimestamp();
                 if (Assets.WaveBuffer != null)
                     Values.OutputVolume = Values.GetAverageVolume(Assets.WaveBuffer) * 1.2f;
 
@@ -207,35 +242,40 @@ namespace MusicPlayer
 
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length)
                     Assets.GetNextSong(false);
-                //Debug.WriteLine("ifs " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-                //CurrentDebugTime = Stopwatch.GetTimestamp();
-                Assets.UpdateWaveBufferWithEntireSongWB();
-                //Debug.WriteLine("UpdateWaveBufferWithEntireSongWB " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                if (Assets.EntireSongWaveBuffer != null)
+                    Assets.UpdateWaveBufferWithEntireSongWB();
 
-                //CurrentDebugTime = Stopwatch.GetTimestamp();
                 if (VisSetting != Visualizations.line && Assets.Channel32 != null)
                     Assets.UpdateFFTbuffer();
-                //Debug.WriteLine("UpdateFFTbuffer " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                
+                UpdateGD();
             }
-
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
+            
             if (Assets.Channel32 != null)
                 Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume;
-            UpdateRectangles();
-            //Debug.WriteLine("Volume Update " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             
+            UpdateRectangles();
+
             base.Update(gameTime);
-            Debug.WriteLine("Update " + (Stopwatch.GetTimestamp() - CurrentDebugTime2));
         }
-        void CheckForRequestedSongs()
+        public static void CheckForRequestedSongs()
         {
-            RequestedSong.Default.Reload();
-            if (RequestedSong.Default.RequestedSongString != "")
+            bool Worked = false;
+            while (!Worked)
             {
-                Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
-                RequestedSong.Default.RequestedSongString = "";
-                RequestedSong.Default.Save();
+                try
+                {
+                    RequestedSong.Default.Reload();
+                    if (RequestedSong.Default.RequestedSongString != "")
+                    {
+                        Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
+                        RequestedSong.Default.RequestedSongString = "";
+                        RequestedSong.Default.Save();
+                    }
+                    Worked = true;
+                }
+                catch { }
             }
         }
         void ComputeControls()
@@ -304,6 +344,16 @@ namespace MusicPlayer
                 Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad0))
                 config.Default.WindowPos = new System.Drawing.Point(0, 0);
 
+            // Open OptionsMenu [O / F1]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.O) ||
+                Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.F1))
+            {
+                if (optionsMenu == null || optionsMenu.IsDisposed)
+                    optionsMenu = new OptionsMenu();
+
+                optionsMenu.Show();
+            }
+
             // Swap Visualisations [V]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.V))
             {
@@ -323,9 +373,17 @@ namespace MusicPlayer
                     BgModes = 0;
             }
 
+            // New Color [C]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.C))
+                ShowColorDialog();
+
             // Toggle Anti-Alising [A]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.A))
                 GauD.AntiAlising = !GauD.AntiAlising;
+
+            // Upvote/Like Current Song [L]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.L))
+                Assets.IsCurrentSongUpvoted = !Assets.IsCurrentSongUpvoted;
 
             // Higher / Lower Volume [Up/Down]
             if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Up))
@@ -338,9 +396,9 @@ namespace MusicPlayer
                 Values.TargetVolume = 0;
 
             // Next / Previous Song [Left/Right]
-            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Left) || Control.ScrollWheelWentDown())
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Left))
                 Assets.GetPreviousSong();
-            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Right) || Control.ScrollWheelWentUp())
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Right))
                 Assets.GetNextSong(false);
 
             // Close [Esc]
@@ -353,23 +411,76 @@ namespace MusicPlayer
                 if (!File.Exists(Assets.currentlyPlayingSongPath))
                     return;
                 else
-                {
                     Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
-                }
             }
 
             // Reset Music Source Folder [S]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
             {
-                config.Default.MusicPath = "";
-                ProcessStartInfo Info = new ProcessStartInfo();
-                Info.Arguments = "/C ping 127.0.0.1 -n 2 && cls && \"" + Application.ExecutablePath + "\"";
-                Info.WindowStyle = ProcessWindowStyle.Hidden;
-                Info.CreateNoWindow = true;
-                Info.FileName = "cmd.exe";
-                Process.Start(Info);
-                Application.Exit();
+                ResetMusicSourcePath();
             }
+        }
+        public static void ShowColorDialog()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                if (LeDialog == null)
+                {
+                    LeDialog = new ColorDialog();
+                    LeDialog.AllowFullOpen = true;
+                    LeDialog.AnyColor = true;
+                    LeDialog.Color = System.Drawing.Color.FromArgb(primaryColor.A, primaryColor.R, primaryColor.G, primaryColor.B);
+
+                    Color[] Background = new Color[Assets.bg.Bounds.Width * Assets.bg.Bounds.Height];
+                    Vector3 AvgColor = new Vector3();
+                    Assets.bg.GetData(Background);
+
+                    for (int i = 0; i < Background.Length; i++)
+                        AvgColor.X += Background[i].R;
+                    AvgColor.X /= Background.Length;
+
+                    for (int i = 0; i < Background.Length; i++)
+                        AvgColor.Y += Background[i].G;
+                    AvgColor.Y /= Background.Length;
+
+                    for (int i = 0; i < Background.Length; i++)
+                        AvgColor.Z += Background[i].B;
+                    AvgColor.Z /= Background.Length;
+
+                    System.Drawing.Color C = System.Drawing.Color.FromArgb(255, (int)AvgColor.X, (int)AvgColor.Y, (int)AvgColor.Z);
+
+                    LeDialog.CustomColors = new int[]{C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(),
+                            C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb(),
+                            C.ToArgb(), C.ToArgb(), C.ToArgb(), C.ToArgb()};
+                }
+                if (!ShowingColorDialog)
+                {
+                    ShowingColorDialog = true;
+                    DialogResult DR = LeDialog.ShowDialog();
+                    if (DR == DialogResult.OK)
+                    {
+                        primaryColor = Color.FromNonPremultiplied(LeDialog.Color.R, LeDialog.Color.G, LeDialog.Color.B, LeDialog.Color.A);
+                        secondaryColor = Color.FromNonPremultiplied((int)(primaryColor.R * 1.5f), (int)(primaryColor.G * 1.5f), (int)(primaryColor.B * 1.5f), 255);
+                    }
+                    ShowingColorDialog = false;
+                }
+            });
+        }
+        public static void ResetMusicSourcePath()
+        {
+            DialogResult DR = MessageBox.Show("Are you sure you want to reset the music source path?", "Source Path Reset", MessageBoxButtons.YesNo);
+
+            if (DR != DialogResult.Yes)
+                return;
+            
+            config.Default.MusicPath = "";
+            ProcessStartInfo Info = new ProcessStartInfo();
+            Info.Arguments = "/C ping 127.0.0.1 -n 2 && cls && \"" + Application.ExecutablePath + "\"";
+            Info.WindowStyle = ProcessWindowStyle.Hidden;
+            Info.CreateNoWindow = true;
+            Info.FileName = "cmd.exe";
+            Process.Start(Info);
+            Application.Exit();
         }
         void UpdateGD()
         {
@@ -462,6 +573,11 @@ namespace MusicPlayer
                     r.Y = R.Y + R.Height - P.Y;
                 return r;
             }
+        }
+        public static void ReHookGlobalKeys()
+        {
+            InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+            InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -656,15 +772,30 @@ namespace MusicPlayer
             
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
                 RasterizerState.CullNone, Assets.TitleFadeout);
-            spriteBatch.Draw(TitleTarget, new Vector2(24, 12), Color.White);
+            if (TitleTarget != null)
+                spriteBatch.Draw(TitleTarget, new Vector2(24, 12), Color.White);
             spriteBatch.End();
 
             spriteBatch.Begin();
 
-            if (SongsFoundMessageAlpha > 0)
+            if (Assets.IsCurrentSongUpvoted)
+            {
+                spriteBatch.Draw(Assets.Upvote, UpvoteShadow, Color.Black * 0.6f * UpvoteIconAlpha);
+                spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteIconAlpha);
+                spriteBatch.DrawString(Assets.Font, "Upvoted!", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteIconAlpha);
+                spriteBatch.DrawString(Assets.Font, "Upvoted!", new Vector2(Upvote.X + Upvote.Width + 3, Upvote.Y + Upvote.Height / 2 - 8), Color.White * UpvoteIconAlpha);
+            }
+            else if (SongsFoundMessageAlpha > 0)
             {
                 spriteBatch.DrawString(Assets.Title, "Found " + Assets.Playlist.Count + " Songs!", new Vector2(24 + 5, 45 + 5), Color.Black * 0.6f * (SongsFoundMessageAlpha / 255f));
                 spriteBatch.DrawString(Assets.Title, "Found " + Assets.Playlist.Count + " Songs!", new Vector2(24, 45), primaryColor * (SongsFoundMessageAlpha / 255f));
+            }
+            else
+            {
+                spriteBatch.Draw(Assets.Upvote, UpvoteShadow, Color.Black * 0.6f * UpvoteIconAlpha);
+                spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteIconAlpha);
+                spriteBatch.DrawString(Assets.Font, "Upvoted!", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteIconAlpha);
+                spriteBatch.DrawString(Assets.Font, "Upvoted!", new Vector2(Upvote.X + Upvote.Width + 3, Upvote.Y + Upvote.Height / 2 - 8), Color.White * UpvoteIconAlpha);
             }
 
             // PlayPause Button

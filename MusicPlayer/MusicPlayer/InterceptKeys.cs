@@ -50,6 +50,9 @@ namespace MusicPlayer
 
                     if ((Keys)vkCode == Keys.MediaPreviousTrack)
                         Assets.GetPreviousSong();
+
+                    if ((Keys)vkCode == Keys.MediaStop)
+                        Assets.IsCurrentSongUpvoted = !Assets.IsCurrentSongUpvoted;
                 }
 
                 // --------------------------- My code ---------------------------

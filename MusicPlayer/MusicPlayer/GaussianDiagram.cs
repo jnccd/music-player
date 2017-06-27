@@ -38,7 +38,7 @@ namespace MusicPlayer
         private static float theta;
     }
 
-    class GaussianDiagram
+    public class GaussianDiagram
     {
         Point P;
         float[] values;

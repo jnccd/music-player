@@ -31,11 +31,11 @@ namespace MusicPlayer
         {
             get
             {
-                return MusicPlayerwNAudio.config.Default.Volume;
+                return config.Default.Volume;
             }
             set
             {
-                MusicPlayerwNAudio.config.Default.Volume = value;
+                config.Default.Volume = value;
             }
         }
 
@@ -84,12 +84,34 @@ namespace MusicPlayer
 
         // Console Control
         [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
+        public static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
         [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+        [DllImport("Kernel32")]
+        public static extern void FreeConsole();
+        [DllImport("kernel32.dll")]
+        private static extern bool AttachConsole(uint dwProcessId);
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetStdHandle(UInt32 nStdHandle);
+        [DllImport("kernel32.dll")]
+        public static extern void SetStdHandle(UInt32 nStdHandle, IntPtr handle);
+
         public static void HideConsole() { ShowWindow(GetConsoleWindow(), 0); }
         public static void MinimizeConsole() { ShowWindow(GetConsoleWindow(), 2); }
         public static void ShowConsole() { ShowWindow(GetConsoleWindow(), 5); }
+
+        public static bool AttachToConsole()
+        {
+            const uint ParentProcess = 0xFFFFFFFF;
+            if (!AttachConsole(ParentProcess))
+                return false;
+
+            return true;
+        }
     }
 
     public static class StringExtensions
