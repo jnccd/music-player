@@ -18,7 +18,7 @@ namespace MusicPlayer
         public static Random RDM = new Random();
 
         public static Point WindowSize = new Point(500, 300);
-        public static Rectangle ScreenRect
+        public static Rectangle WindowRect
         {
             get
             {
@@ -73,13 +73,26 @@ namespace MusicPlayer
                                 ((A1.Y - A2.Y) * (B2.X * B1.Y - B1.X * B2.Y) - (B1.Y - B2.Y) * (A2.X * A1.Y - A1.X * A2.Y)) / 
                                 ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
         }
-        public static Screen TheWindowsMainScreen(Rectangle Bounds)
+        public static Screen TheWindowsMainScreen(Rectangle WindowBounds)
         {
-            System.Drawing.Point P = new System.Drawing.Point(Bounds.X + Bounds.Width / 2, Bounds.Y + Bounds.Height / 2);
+            System.Drawing.Point P = new System.Drawing.Point(WindowBounds.X + WindowBounds.Width / 2, 
+                WindowBounds.Y + WindowBounds.Height / 2);
+
             for (int i = 0; i < Screen.AllScreens.Length; i++)
                 if (Screen.AllScreens[i].Bounds.Contains(P))
                     return Screen.AllScreens[i];
-            return null;
+
+            int[] d = new int[Screen.AllScreens.Length];
+            for (int i = 0; i < d.Length; i++)
+                d[i] = P.X - Screen.AllScreens[i].Bounds.X + Screen.AllScreens[i].Bounds.Width / 2 +
+                     P.Y - Screen.AllScreens[i].Bounds.Y + Screen.AllScreens[i].Bounds.Height / 2;
+
+            int LowestDindex = 0;
+            for (int i = 0; i < d.Length; i++)
+                if (d[i] < d[LowestDindex])
+                    LowestDindex = i;
+
+            return Screen.AllScreens[LowestDindex];
         }
 
         // Console Control
