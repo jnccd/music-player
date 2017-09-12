@@ -45,7 +45,13 @@ namespace MusicPlayer
         }
 
         private static float[] HammingWindow;
-        private static int Length;
+        public static int Length;
+    }
+
+    public struct DistancePerSong
+    {
+        public int SongIndex;
+        public float SongDifference;
     }
 
     public static class Assets
@@ -58,10 +64,16 @@ namespace MusicPlayer
         public static Texture2D bg1;
         public static Texture2D bg2;
         public static Texture2D Volume;
+        public static Texture2D Volume2;
+        public static Texture2D Volume3;
+        public static Texture2D Volume4;
         public static Texture2D ColorFade;
         public static Texture2D Play;
         public static Texture2D Pause;
         public static Texture2D Upvote;
+        public static Texture2D Close;
+
+        public static Color SystemDefaultColor;
 
         public static Effect gaussianBlurHorz;
         public static Effect gaussianBlurVert;
@@ -119,7 +131,7 @@ namespace MusicPlayer
         static int TempBufferLengthLog2;
 
         // Debug
-        //static long CurrentDebugTime = 0;
+        static long CurrentDebugTime = 0;
         //static List<int> SegmentLengths = new List<int>();
 
         // Loading / Disposing Data
@@ -148,11 +160,15 @@ namespace MusicPlayer
 
 
             Volume = Content.Load<Texture2D>("volume");
+            Volume2 = Content.Load<Texture2D>("volume2");
+            Volume3 = Content.Load<Texture2D>("volume3");
+            Volume4 = Content.Load<Texture2D>("volume4");
             bg1 = Content.Load<Texture2D>("bg1");
             bg2 = Content.Load<Texture2D>("bg2");
             Play = Content.Load<Texture2D>("play");
             Pause = Content.Load<Texture2D>("pause");
             Upvote = Content.Load<Texture2D>("Upvote");
+            Close = Content.Load<Texture2D>("Close");
 
 
             Console.WriteLine("Loading Fonts...");
@@ -169,9 +185,36 @@ namespace MusicPlayer
             FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
             bg = Texture2D.FromStream(GD, Stream);
             Stream.Dispose();
-            SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => { RefreshBGtex(GD); });
+            XNA.TaskbarHidden = new Taskbar().AutoHide;
+            SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => {
+                RefreshBGtex(GD);
+                // System Default Color
+                int argbColorRefresh = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
+                System.Drawing.Color tempRefresh = System.Drawing.Color.FromArgb(argbColorRefresh);
+                SystemDefaultColor = Color.FromNonPremultiplied(tempRefresh.R, tempRefresh.G, tempRefresh.B, tempRefresh.A);
 
-            
+                var tb = new Taskbar();
+
+                if (XNA.TaskbarHidden == true && tb.AutoHide == false)
+                {
+                    XNA.TaskbarHidden = tb.AutoHide;
+                    XNA.KeepWindowInScreen();
+                }
+                else if (XNA.TaskbarHidden == false && tb.AutoHide == true)
+                {
+                    config.Default.WindowPos = new System.Drawing.Point(XNA.gameWindowForm.Location.X, XNA.gameWindowForm.Location.Y + 38);
+                    XNA.gameWindowForm.Location = new System.Drawing.Point(XNA.gameWindowForm.Location.X, XNA.gameWindowForm.Location.Y + 38);
+                    XNA.TaskbarHidden = tb.AutoHide;
+                    XNA.KeepWindowInScreen();
+                }
+                else 
+                    XNA.TaskbarHidden = tb.AutoHide;
+            });
+            // System Default Color
+            int argbColor = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
+            System.Drawing.Color temp = System.Drawing.Color.FromArgb(argbColor);
+            SystemDefaultColor = Color.FromNonPremultiplied(temp.R, temp.G, temp.B, temp.A);
+
             Console.WriteLine("Searching for Songs...");
             if (Directory.Exists(config.Default.MusicPath))
                 FindAllMp3FilesInDir(config.Default.MusicPath, true);
@@ -186,6 +229,13 @@ namespace MusicPlayer
             Console.WriteLine();
 
 
+            if (config.Default.Col != System.Drawing.Color.Transparent)
+            {
+                XNA.primaryColor = Color.FromNonPremultiplied(config.Default.Col.R, config.Default.Col.G, config.Default.Col.B, config.Default.Col.A);
+                XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
+            }
+
+
             Console.WriteLine("Starting first Song...");
             if (Playlist.Count > 0)
             {
@@ -194,7 +244,7 @@ namespace MusicPlayer
                 else
                 {
                     int PlaylistIndex = Values.RDM.Next(Playlist.Count);
-                    GetNextSong(true);
+                    GetNextSong(true, false);
                     PlayerHistory.Add(Playlist[PlaylistIndex]);
                 }
             }
@@ -208,15 +258,16 @@ namespace MusicPlayer
         {
             foreach (string s in Directory.GetFiles(StartDir))
                 if (s.EndsWith(".mp3"))
+                {
                     Playlist.Add(s);
-
-            if (ConsoleOutput)
-            {
-                Console.CursorLeft = 0;
-                Console.Write("                                                                    ");
-                Console.CursorLeft = 0;
-                Console.Write("Found " + Playlist.Count.ToString() + " Songs!");
-            }
+                    if (ConsoleOutput)
+                    {
+                        Console.CursorLeft = 0;
+                        Console.Write("                                                                    ");
+                        Console.CursorLeft = 0;
+                        Console.Write("Found " + Playlist.Count.ToString() + " Songs!");
+                    }
+                }
 
             foreach (string D in Directory.GetDirectories(StartDir))
                 FindAllMp3FilesInDir(D, ConsoleOutput);
@@ -227,15 +278,19 @@ namespace MusicPlayer
             {
                 lock (bg)
                 {
-                    Thread.Sleep(300);
-                    RegistryKey UserWallpaper = Registry.CurrentUser.OpenSubKey("Control Panel\\Desktop", false);
-                    if (Convert.ToInt32(UserWallpaper.GetValue("WallpaperStyle")) != 2)
+                    try
                     {
-                        MessageBox.Show("The background won't work if the Desktop WallpaperStyle isn't set to stretch! \nDer Hintergrund wird nicht funktionieren, wenn der Dektop WallpaperStyle nicht auf Dehnen gesetzt wurde!");
+                        //Thread.Sleep(400);
+                        RegistryKey UserWallpaper = Registry.CurrentUser.OpenSubKey("Control Panel\\Desktop", false);
+                        if (Convert.ToInt32(UserWallpaper.GetValue("WallpaperStyle")) != 2)
+                        {
+                            MessageBox.Show("The background won't work if the Desktop WallpaperStyle isn't set to stretch! \nDer Hintergrund wird nicht funktionieren, wenn der Dektop WallpaperStyle nicht auf Dehnen gesetzt wurde!");
+                        }
+                        FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
+                        bg = Texture2D.FromStream(GD, Stream);
+                        Stream.Dispose();
                     }
-                    FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
-                    bg = Texture2D.FromStream(GD, Stream);
-                    Stream.Dispose();
+                    catch { }
                 }
             });
         }
@@ -298,39 +353,42 @@ namespace MusicPlayer
         }
         public static void UpdateFFTbuffer()
         {
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
-            if (tempbuffer == null)
+            lock (Channel32)
             {
-                int complexLength = Channel32.WaveFormat.SampleRate;
-                if (complexLength > WaveBuffer.Length)
-                    complexLength = WaveBuffer.Length;
-                tempbuffer = new Complex[complexLength];
-                TempBufferLengthLog2 = (int)Math.Log(tempbuffer.Length, 2.0);
-            }
-            //Debug.WriteLine("UpdateFFTbuffer 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                if (tempbuffer == null)
+                {
+                    int complexLength = Channel32.WaveFormat.SampleRate;
+                    if (complexLength > WaveBuffer.Length)
+                        complexLength = WaveBuffer.Length;
+                    tempbuffer = new Complex[complexLength];
+                    TempBufferLengthLog2 = (int)Math.Log(tempbuffer.Length, 2.0);
+                }
+                //Debug.WriteLine("UpdateFFTbuffer 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
-            HammingWindowValues.CreateIfNotFilled(tempbuffer.Length);
-            for (int i = 0; i < tempbuffer.Length; i++)
-            {
-                tempbuffer[i].X = WaveBuffer[i] * HammingWindowValues.GetHammingWindow(i);
-                tempbuffer[i].Y = 0;
-            }
-            //Debug.WriteLine("UpdateFFTbuffer 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                HammingWindowValues.CreateIfNotFilled(tempbuffer.Length);
+                for (int i = 0; i < tempbuffer.Length; i++)
+                {
+                    tempbuffer[i].X = WaveBuffer[i] * HammingWindowValues.GetHammingWindow(i);
+                    tempbuffer[i].Y = 0;
+                }
+                //Debug.WriteLine("UpdateFFTbuffer 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
-            FastFourierTransform.FFT(true, TempBufferLengthLog2, tempbuffer);
-            //Debug.WriteLine("UpdateFFTbuffer 3 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                FastFourierTransform.FFT(true, TempBufferLengthLog2, tempbuffer);
+                //Debug.WriteLine("UpdateFFTbuffer 3 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
-            //CurrentDebugTime = Stopwatch.GetTimestamp();
-            FFToutput = new float[tempbuffer.Length / 2 - 1];
-            RawFFToutput = new float[tempbuffer.Length / 2 - 1];
-            for (int i = 0; i < FFToutput.Length; i++)
-            {
-                RawFFToutput[i] = (Approximate.Sqrt(1 + Approximate.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y))) - 1) * 10;
-                FFToutput[i] = (RawFFToutput[i] * Approximate.Sqrt(i + 1));
+                //CurrentDebugTime = Stopwatch.GetTimestamp();
+                FFToutput = new float[tempbuffer.Length / 2 - 1];
+                RawFFToutput = new float[tempbuffer.Length / 2 - 1];
+                for (int i = 0; i < FFToutput.Length; i++)
+                {
+                    RawFFToutput[i] = Approximate.Sqrt((tempbuffer[i].X * tempbuffer[i].X) + (tempbuffer[i].Y * tempbuffer[i].Y)) * 7;
+                    FFToutput[i] = (RawFFToutput[i] * Approximate.Sqrt(i + 1));
+                }
+                //Debug.WriteLine("UpdateFFTbuffer 4 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
-            //Debug.WriteLine("UpdateFFTbuffer 4 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
         public static void UpdateEntireSongBuffers()
         {
@@ -390,7 +448,7 @@ namespace MusicPlayer
             lock (EntireSongWaveBuffer)
             {
                 WaveBuffer = new float[bufferLength / 4];
-                if (Channel32 != null && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
+                if (Channel32 != null && Channel32.CanRead && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
                     WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength) / 4), bufferLength / 4).ToArray();
                 else
                     for (int i = 0; i < bufferLength / 4; i++)
@@ -434,7 +492,7 @@ namespace MusicPlayer
         // Music Player Managment
         public static void PlayPause()
         {
-            XNA.ReHookGlobalKeys();
+            XNA.ReHookGlobalKeyHooks();
             if (output != null)
             {
                 if (output.PlaybackState == PlaybackState.Playing) output.Pause();
@@ -452,28 +510,37 @@ namespace MusicPlayer
             if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
                 config.Default.MultiThreading)
             {
-                SaveSongUpvote();
+                SaveUserSettings();
 
                 Path = Path.Trim('"');
 
                 if (!File.Exists(Path))
                 {
-                    List<string> Hits = Playlist.FindAll(x => x.Contains(Path, StringComparison.InvariantCultureIgnoreCase));
-                    
-                    if (Hits.Count > 0)
+                    DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
+                    for (int i = 0; i < LDistances.Length; i++)
                     {
-                        Path = Hits[Values.RDM.Next(Hits.Count)];
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        if (Hits.Count == 1)
-                            Console.WriteLine(">Found one matching song: " + Path.Split('\\').Last());
-                        else
-                            Console.WriteLine(">Found " + Hits.Count + " matching songs and chose " + Path.Split('\\').Last());
+                        LDistances[i].SongDifference = Values.OwnDistance(Path, Playlist[i].Split('\\').Last().Split('.').First());
+                        LDistances[i].SongIndex = i;
                     }
-                    else
+
+                    LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
+                    int NonWorkingIndexes = 0;
+                    Path = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                    while (!File.Exists(Path))
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(">What the fuck is this supposed to mean!?");
-                        return false;
+                        NonWorkingIndexes++;
+                        Path = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(">Found one matching song: \"" + Path.Split('\\').Last().Split('.').First() + "\" with a difference of " + 
+                        Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
+
+                    Console.WriteLine("Other well fitting songs were:");
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                            Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
                 }
 
@@ -490,12 +557,20 @@ namespace MusicPlayer
             }
             return false;
         }
-        public static void GetNextSong(bool forced)
+        public static void GetNextSong(bool forced, bool DownVoteCurrentSongForUserSkip)
         {
-            if (forced || Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
-                config.Default.MultiThreading)
+            if (config.Default.MultiThreading || forced || 
+                Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
-                SaveSongUpvote();
+                if (DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
+                {
+                    int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
+                    double percentage = (Channel32.Position / (double)Channel32.Length) * 10;
+                    if (index > -1 && UpvotedSongScores[index] > (Channel32.Position / (double)Channel32.Length) * 10 && !IsCurrentSongUpvoted)
+                        UpvotedSongScores[index]--;
+                }
+
+                SaveUserSettings();
 
                 PlayerHistoryIndex++;
                 if (PlayerHistoryIndex > PlayerHistory.Count - 1)
@@ -511,7 +586,7 @@ namespace MusicPlayer
             if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
                 config.Default.MultiThreading)
             {
-                SaveSongUpvote();
+                SaveUserSettings();
 
                 if (PlayerHistoryIndex > 0)
                 {
@@ -525,27 +600,34 @@ namespace MusicPlayer
         }
         private static void GetNewPlaylistSong()
         {
+            CurrentDebugTime = Stopwatch.GetTimestamp();
             List<string> SongChoosingList = new List<string>();
             for (int i = 0; i < Playlist.Count; i++)
             {
-                SongChoosingList.Add(Playlist[i]);
-                if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                    for (int j = 0; j < UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())]; j++)
-                    {
-                        SongChoosingList.Add(Playlist[i]);
-                        SongChoosingList.Add(Playlist[i]);
-                        SongChoosingList.Add(Playlist[i]);
-                    }
+                if (PlayerHistory.Count == 0 || Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) || Playlist.Count < 2)
+                {
+                    SongChoosingList.Add(Playlist[i]);
+                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
+                        for (int j = 0; j < UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())]; j++)
+                            for (int k = 0; k < 5; k++)
+                                SongChoosingList.Add(Playlist[i]);
+
+                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 100)
+                        for (int k = 0; k < (100 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) / 2; k++)
+                            SongChoosingList.Add(Playlist[i]);
+                }
             }
 
             int SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
             PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
             PlayerHistoryIndex = PlayerHistory.Count - 1;
             PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+            Debug.WriteLine("New Song calc time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
         private static void PlaySongByPath(string PathString)
         {
-            XNA.ReHookGlobalKeys();
+            config.Default.Preload = XNA.Preload;
+            XNA.ReHookGlobalKeyHooks();
             if (T != null && T.Status == TaskStatus.Running)
             {
                 AbortAbort = true;
@@ -554,6 +636,8 @@ namespace MusicPlayer
 
             DisposeNAudioData();
             XNA.ForceTitleRedraw();
+            if (XNA.DG != null)
+                XNA.DG.Clear();
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' '});
@@ -569,20 +653,24 @@ namespace MusicPlayer
             output = new DirectSoundOut();
             output.Init(Channel32);
 
-            if (config.Default.MultiThreading)
-                T = Task.Factory.StartNew(UpdateEntireSongBuffers);
-            else
-                UpdateEntireSongBuffers();
+            if (config.Default.Preload)
+            {
+                if (config.Default.MultiThreading)
+                    T = Task.Factory.StartNew(UpdateEntireSongBuffers);
+                else
+                    UpdateEntireSongBuffers();
+            }
 
             output.Play();
             Channel32.Volume = 0;
             SongStartTime = Values.Timer;
             Channel32.Position = 1;
         }
-        public static void SaveSongUpvote()
+        public static void SaveUserSettings()
         {
             if (IsCurrentSongUpvoted)
             {
+                XNA.UpvoteSavedAlpha = 1.4f;
                 if (UpvotedSongNames.Contains(currentlyPlayingSongName))
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
@@ -595,8 +683,35 @@ namespace MusicPlayer
                 }
             }
             IsCurrentSongUpvoted = false;
+
+            // Sorting
+            int Swapi;
+            string SwapS;
+            for (int i = 1; i < UpvotedSongNames.Count; i++)
+            {
+                if (UpvotedSongScores[i - 1] < UpvotedSongScores[i])
+                {
+                    Swapi = UpvotedSongScores[i];
+                    SwapS = UpvotedSongNames[i];
+
+                    UpvotedSongScores[i] = UpvotedSongScores[i - 1];
+                    UpvotedSongNames[i] = UpvotedSongNames[i - 1];
+
+                    UpvotedSongScores[i - 1] = Swapi;
+                    UpvotedSongNames[i - 1] = SwapS;
+
+                    i = 1;
+                }
+            }
+
             config.Default.SongPaths = UpvotedSongNames.ToArray();
             config.Default.SongScores = UpvotedSongScores.ToArray();
+
+            config.Default.Background = (int)XNA.BgModes;
+            config.Default.Vis = (int)XNA.VisSetting;
+
+            config.Default.Col = System.Drawing.Color.FromArgb(XNA.primaryColor.R, XNA.primaryColor.G, XNA.primaryColor.B);
+
             config.Default.Save();
         }
 

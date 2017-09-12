@@ -10,7 +10,8 @@
     <RootNamespace>MusicPlayer</RootNamespace>
     <AssemblyName>MusicPlayer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
     <XnaProfile>Reach</XnaProfile>
@@ -48,6 +49,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>false</XnaCompressContent>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -89,6 +91,10 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MediaToolkit, Version=1.1.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MediaToolkit.1.1.0.1\lib\net40\MediaToolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
@@ -100,6 +106,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -109,9 +116,15 @@
   <ItemGroup>
     <Compile Include="Assets.cs" />
     <Compile Include="Control.cs" />
+    <Compile Include="DropShadow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DynamicGrid.cs" />
     <Compile Include="FPSCounter.cs" />
     <Compile Include="GaussianDiagram.cs" />
     <Compile Include="GigaList.cs" />
+    <Compile Include="GridPoint.cs" />
+    <Compile Include="GridSpring.cs" />
     <Compile Include="InterceptKeys.cs" />
     <Compile Include="config.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -131,6 +144,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>RequestedSong.settings</DependentUpon>
     </Compile>
+    <Compile Include="Taskbar.cs" />
     <Compile Include="XNA.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Values.cs" />
@@ -172,6 +186,9 @@
       <LastGenOutput>config.Designer.cs</LastGenOutput>
     </None>
     <None Include="MusicPlayer_TemporaryKey.pfx" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\app.manifest" />
     <None Include="RequestedSong.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

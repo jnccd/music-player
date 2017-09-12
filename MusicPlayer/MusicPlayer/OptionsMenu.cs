@@ -43,7 +43,7 @@ namespace MusicPlayer
 
         private void AAtoggle_Click(object sender, EventArgs e)
         {
-            XNA.GauD.AntiAlising = !XNA.GauD.AntiAlising;
+            config.Default.AntiAliasing = !config.Default.AntiAliasing;
         }
 
         private void Reset_Click_1(object sender, EventArgs e)

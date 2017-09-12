@@ -49,7 +49,7 @@ namespace MusicPlayer {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int Background {
             get {
                 return ((int)(this["Background"]));
@@ -61,7 +61,7 @@ namespace MusicPlayer {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int Vis {
             get {
                 return ((int)(this["Vis"]));
@@ -126,6 +126,42 @@ namespace MusicPlayer {
             }
             set {
                 this["WavePreload"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Transparent")]
+        public global::System.Drawing.Color Col {
+            get {
+                return ((global::System.Drawing.Color)(this["Col"]));
+            }
+            set {
+                this["Col"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AntiAliasing {
+            get {
+                return ((bool)(this["AntiAliasing"]));
+            }
+            set {
+                this["AntiAliasing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Preload {
+            get {
+                return ((bool)(this["Preload"]));
+            }
+            set {
+                this["Preload"] = value;
             }
         }
     }
