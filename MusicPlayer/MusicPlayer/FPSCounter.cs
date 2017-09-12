@@ -37,7 +37,7 @@ namespace MusicPlayer
             string fps = string.Format("FPS: " + frameRate);
 
             if (Assets.Font != null)
-                spriteBatch.DrawString(Assets.Font, fps, new Vector2(Values.WindowSize.X - 12 - Assets.Font.MeasureString(fps).X, 12), Color.White);
+                spriteBatch.DrawString(Assets.Font, fps, new Vector2(Values.WindowSize.X - Assets.Font.MeasureString(fps).X, 0), Color.White);
         }
     }
 }

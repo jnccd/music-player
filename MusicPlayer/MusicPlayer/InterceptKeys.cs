@@ -46,7 +46,7 @@ namespace MusicPlayer
                         Assets.PlayPause();
 
                     if ((Keys)vkCode == Keys.MediaNextTrack)
-                        Assets.GetNextSong(false);
+                        Assets.GetNextSong(false, true);
 
                     if ((Keys)vkCode == Keys.MediaPreviousTrack)
                         Assets.GetPreviousSong();
