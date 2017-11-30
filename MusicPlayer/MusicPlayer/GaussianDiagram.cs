@@ -40,25 +40,27 @@ namespace MusicPlayer
 
     public class GaussianDiagram : IDisposable
     {
-        Point P;
+        public Point P;
         float[] values;
         float[] Diagram;
         float theta;
         bool WithShadow;
-        int Height;
+        public int Height;
         float NullGaussian;
         RenderTarget2D ShadowTarget;
+        Rectangle DrawRect;
+        public float DiagramSize;
 
-        public GaussianDiagram()
-        {
-            this.values = null;
-            Diagram = null;
-            this.P = Point.Zero;
-            this.theta = 0;
-            this.WithShadow = false;
-            this.Height = 0;
-        }
-        public GaussianDiagram(float[] values, Point P, int Height, bool WithShadow, float theta)
+        //List<long> DebugTimes = new List<long>();
+        //long DebugTime;
+
+        // 3D Acceleration
+        VertexPositionColor[] pointList;
+        short[] Indices;
+        VertexPositionColor[] AA_VPC;
+        short[] AA_indices;
+
+        public GaussianDiagram(float[] values, Point P, int Height, bool WithShadow, float theta, GraphicsDevice GD)
         {
             this.values = values;
             Diagram = new float[values.Length];
@@ -67,6 +69,8 @@ namespace MusicPlayer
             this.WithShadow = WithShadow;
             this.Height = Height;
 
+            DiagramSize = 1;
+            DrawRect = new Rectangle(0, 0, 1, 0);
             GaussianValues.CreateIfNotFilled(theta);
 
             for (int x = 0; x < values.Length; x++)
@@ -84,12 +88,43 @@ namespace MusicPlayer
                         Diagram[y] = value;
                 }
             }
-
+            
             for (int i = 0; i < Diagram.Length; i++)
                 if (Diagram[i] > Height)
                     Diagram[i] = Height;
+
+            ShadowTarget = new RenderTarget2D(GD, Values.WindowSize.X, Values.WindowSize.Y);
+
+            
+
+            pointList = new VertexPositionColor[Diagram.Length * 2];
+            for (int i = 0; i < Diagram.Length; i++)
+            {
+                pointList[i*2] = new VertexPositionColor(new Vector3(i + P.X, P.Y + 10, 0), Color.White);
+                pointList[i*2 + 1] = new VertexPositionColor(new Vector3(i + P.X, P.Y - Diagram[i], 0), Color.White);
+            }
+
+            Indices = new short[pointList.Length];
+            for (int i = 0; i < pointList.Length; i++)
+            {
+                Indices[i] = (short)(i);
+            }
+
+            AA_VPC = new VertexPositionColor[4];
+            AA_VPC[0] = new VertexPositionColor(new Vector3(100, 25, 0), Color.White);
+            AA_VPC[1] = new VertexPositionColor(new Vector3(100, 100, 0), Color.Transparent);
+            AA_VPC[2] = new VertexPositionColor(new Vector3(100, 26, 0), Color.White);
+            AA_VPC[3] = new VertexPositionColor(new Vector3(100, 26, 0), Color.Transparent);
+
+            AA_indices = new short[4];
+            AA_indices[0] = 0;
+            AA_indices[1] = 1;
+            AA_indices[2] = 2;
+            AA_indices[3] = 3;
         }
 
+        public int Length { get { return Diagram.Length; } }
+        public int BaseHeight { get { return Height / 25; } }
         public void Update(float[] values)
         {
             for (int i = 0; i < Diagram.Length; i++)
@@ -241,52 +276,46 @@ namespace MusicPlayer
         
         public void DrawToRenderTarget(SpriteBatch spriteBatch, GraphicsDevice GD)
         {
-            if (ShadowTarget == null)
-                ShadowTarget = new RenderTarget2D(GD, Values.WindowSize.X, Values.WindowSize.Y);
-            
             if (Diagram != null)
             {
                 GD.SetRenderTarget(ShadowTarget);
                 GD.Clear(Color.Transparent);
+
+                int BaseHeight = Height / 25;
+                DrawRect.Width = 1;
+
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
                 #region DrawLeStuff
-                float blub = HammingWindowValues.Length / Diagram.Length;
                 for (int i = 0; i < Diagram.Length; i++)
                 {
-                    if (Diagram[i] > Height)
-                        Diagram[i] = Height;
-
-                    float value = Diagram[i] + 7;
-
-                    spriteBatch.Draw(Assets.White, new Rectangle(i + P.X, P.Y - (int)Diagram[i], 1, (int)value), Color.White);
+                    DrawRect.X = i + P.X;
+                    DrawRect.Y = P.Y - (int)Diagram[i];
+                    DrawRect.Height = (int)Diagram[i] + BaseHeight;
+                    spriteBatch.Draw(Assets.White, DrawRect, Color.White);
 
                     if (config.Default.AntiAliasing)
                     {
-                        int Cur = (int)Diagram[i];
-                        int NeighbourA;
-                        int NeighbourB;
+                        float NeighbourA;
+                        float NeighbourB;
 
-                        if (i > 0) NeighbourA = (int)Diagram[i - 1];
+                        if (i > 0) NeighbourA = Diagram[i - 1];
                         else NeighbourA = 0;
-                        if (i < Diagram.Length - 1) NeighbourB = (int)Diagram[i + 1];
+                        if (i < Diagram.Length - 1) NeighbourB = Diagram[i + 1];
                         else NeighbourB = 0;
 
                         if (NeighbourA > Diagram[i])
                         {
-                            int texheight = NeighbourA - Cur;
-                            spriteBatch.Draw(Assets.ColorFade, new Rectangle(i + P.X, P.Y - Cur - texheight,
-                                1, texheight),
-                                Color.White);
+                            DrawRect.X = i + P.X;
+                            DrawRect.Y = P.Y - (int)Diagram[i] - (int)(NeighbourA - Diagram[i]);
+                            DrawRect.Height = (int)(NeighbourA - Diagram[i]);
+                            spriteBatch.Draw(Assets.ColorFade, DrawRect, Color.White);
                         }
-                        else
+                        else if (NeighbourB > Diagram[i])
                         {
-                            if (NeighbourB > Diagram[i])
-                            {
-                                int texheight = NeighbourB - Cur;
-                                spriteBatch.Draw(Assets.ColorFade, new Rectangle(i + P.X, P.Y - Cur - texheight,
-                                        1, texheight),
-                                        Color.White);
-                            }
+                            DrawRect.X = i + P.X;
+                            DrawRect.Y = P.Y - (int)Diagram[i] - (int)(NeighbourB - Diagram[i]);
+                            DrawRect.Height = (int)(NeighbourB - Diagram[i]);
+                            spriteBatch.Draw(Assets.ColorFade, DrawRect, Color.White);
                         }
                     }
                 }
@@ -295,13 +324,148 @@ namespace MusicPlayer
                 GD.SetRenderTarget(null);
             }
         }
+        public void DrawToRenderTarget3DAcc(SpriteBatch spriteBatch, GraphicsDevice GD)
+        {
+            if (Diagram != null)
+            {
+                GD.SetRenderTarget(ShadowTarget);
+                GD.Clear(Color.Transparent);
+
+                int BaseHeight = Height / 25;
+                
+                for (int i = 0; i < Diagram.Length; i++)
+                {
+                    pointList[i*2].Position.Y = P.Y + 10;
+                    pointList[i*2 + 1].Position.Y = P.Y - Diagram[i];
+                }
+
+                Assets.basicEffect.CurrentTechnique.Passes[0].Apply();
+                GD.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleStrip,
+                    pointList,
+                    0,
+                    pointList.Length,
+                    Indices,
+                    0,
+                    pointList.Length - 2
+                );
+                
+
+                if (config.Default.AntiAliasing)
+                {
+                    for (int i = 0; i < Diagram.Length; i++)
+                    {
+                        float NeighbourA;
+                        float NeighbourB;
+
+                        if (i > 0) NeighbourA = Diagram[i - 1];
+                        else NeighbourA = 0;
+                        if (i < Diagram.Length - 1) NeighbourB = Diagram[i + 1];
+                        else NeighbourB = 0;
+
+                        if (NeighbourA > Diagram[i])
+                        {
+                            AA_VPC[0].Position.X = i + P.X;
+                            AA_VPC[1].Position.X = i + P.X;
+                            AA_VPC[2].Position.X = i + P.X + 1;
+
+                            AA_VPC[0].Position.Y = P.Y - Diagram[i];
+                            AA_VPC[1].Position.Y = P.Y - NeighbourA;
+                            AA_VPC[2].Position.Y = P.Y - Diagram[i];
+
+                            Assets.basicEffect.CurrentTechnique.Passes[0].Apply();
+                            GD.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, AA_VPC, 0, 3, AA_indices, 0, 1);
+                        }
+                        else if (NeighbourB > Diagram[i])
+                        {
+                            AA_VPC[0].Position.X = i + P.X;
+                            AA_VPC[1].Position.X = i + P.X;
+                            AA_VPC[2].Position.X = i + P.X + 1;
+
+                            AA_VPC[0].Position.Y = P.Y - Diagram[i];
+                            AA_VPC[1].Position.Y = P.Y - NeighbourB;
+                            AA_VPC[2].Position.Y = P.Y - Diagram[i];
+
+                            Assets.basicEffect.CurrentTechnique.Passes[0].Apply();
+                            GD.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, AA_VPC, 0, 3, AA_indices, 0, 1);
+                        }
+                    }
+                }
+
+                GD.SetRenderTarget(null);
+            }
+        }
         public void DrawRenderTarget(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null);
+            // Startup Animation
+            if (Values.Timer < 40)
+            {
+                Height = 0;
+                DiagramSize = 0;
+
+                // Shadow
+                DrawRect.X = P.X + 5;
+                DrawRect.Y = P.Y + 5;
+                DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
+                DrawRect.Height = 8;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Black * 0.6f);
+
+                DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
+                DrawRect.Height = 8;
+                DrawRect.X = P.X + Length - DrawRect.Width + 5;
+                DrawRect.Y = P.Y + 5;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Black * 0.6f);
+
+
+                // Normal
+                DrawRect.X = P.X;
+                DrawRect.Y = P.Y;
+                DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
+                DrawRect.Height = 8;
+                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+
+                DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
+                DrawRect.Height = 8;
+                DrawRect.X = P.X + Length - DrawRect.Width;
+                DrawRect.Y = P.Y;
+                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+            }
+            else if (Values.Timer < 50)
+            { }
+            else if (Values.Timer < 300)
+            {
+                DiagramSize = 1;
+                Height = (int)(175 * Values.AnimationFunction(((Values.Timer - 50) / 50f)));
+
+                // Shadow
+                DrawRect.X = P.X + 5;
+                DrawRect.Y = P.Y + 5;
+                DrawRect.Width = Length - 1;
+                DrawRect.Height = 8;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Black * 0.6f);
+
+                // Normal
+                DrawRect.X = P.X;
+                DrawRect.Y = P.Y;
+                DrawRect.Width = Length - 1;
+                DrawRect.Height = 8;
+                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+            }
+
+            // Drawing the Target
             if (WithShadow)
-                spriteBatch.Draw(ShadowTarget, new Rectangle(5, 5, Values.WindowSize.X, Values.WindowSize.Y), Color.Black * 0.6f);
-            spriteBatch.Draw(ShadowTarget, new Rectangle(0, 0, Values.WindowSize.X, Values.WindowSize.Y), XNA.primaryColor);
-            spriteBatch.End();
+            {
+                DrawRect.X = (int)(Values.WindowSize.X / 2 + (5 - Values.WindowSize.X / 2) * DiagramSize);
+                DrawRect.Y = (int)(Values.WindowSize.Y / 2 + (5 - Values.WindowSize.Y / 2) * DiagramSize);
+                DrawRect.Width = (int)(Values.WindowSize.X * DiagramSize);
+                DrawRect.Height = (int)(Values.WindowSize.Y * DiagramSize);
+                spriteBatch.Draw(ShadowTarget, DrawRect, Color.Black * 0.6f);
+            }
+            DrawRect.X = (int)(Values.WindowSize.X / 2 + (0 - Values.WindowSize.X / 2) * DiagramSize);
+            DrawRect.Y = (int)(Values.WindowSize.Y / 2 + (0 - Values.WindowSize.Y / 2) * DiagramSize);
+            DrawRect.Width = (int)(Values.WindowSize.X * DiagramSize);
+            DrawRect.Height = (int)(Values.WindowSize.Y * DiagramSize);
+            spriteBatch.Draw(ShadowTarget, DrawRect, XNA.primaryColor);
         }
 
         public void DrawAsBars(SpriteBatch spriteBatch)

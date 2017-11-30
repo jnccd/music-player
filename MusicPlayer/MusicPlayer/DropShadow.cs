@@ -27,7 +27,7 @@ namespace MusicPlayer
             
             this.ShowInTaskbar = false;
             this.parentForm = parentForm;
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
         }
 
         private void DropShadow_Shown(object sender, EventArgs e)

@@ -79,6 +79,7 @@ namespace MusicPlayer
         public static Effect gaussianBlurVert;
         public static Effect PixelBlur;
         public static Effect TitleFadeout;
+        public static BasicEffect basicEffect;
         
         // Music Player Manager Values
         public static string currentlyPlayingSongName
@@ -95,14 +96,30 @@ namespace MusicPlayer
                 return PlayerHistory[PlayerHistoryIndex];
             }
         }
+        public static string previouslyPlayingSongName
+        {
+            get
+            {
+                return PlayerHistory[PlayerHistoryIndex - 1].Split('\\').Last();
+            }
+        }
+        public static string previouslyPlayingSongPath
+        {
+            get
+            {
+                return PlayerHistory[PlayerHistoryIndex - 1];
+            }
+        }
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
         public static int PlayerHistoryIndex = 0;
-        public static int SongChangedTickTime = -10000;
+        public static int SongChangedTickTime = -100000;
         public static int SongStartTime;
         public static bool IsCurrentSongUpvoted;
         public static List<string> UpvotedSongNames;
         public static List<int> UpvotedSongScores;
+        public static List<int> UpvotedSongStreaks;
+        public static int LastUpvotedSongStreak;
 
         // MultiThreading
         public static Task T = null;
@@ -123,34 +140,42 @@ namespace MusicPlayer
         //public const int bufferLength = 131072; 
         //public const int bufferLength = 262144;
         public static GigaFloatList EntireSongWaveBuffer;
-        public static byte[] buffer;
-        public static float[] WaveBuffer;
+        public static byte[] buffer = new byte[bufferLength];
+        public static float[] WaveBuffer = new float[bufferLength / 4];
         public static float[] FFToutput;
         public static float[] RawFFToutput;
         public static Complex[] tempbuffer = null;
         static int TempBufferLengthLog2;
 
         // Debug
-        static long CurrentDebugTime = 0;
+        public static long CurrentDebugTime = 0;
         //static List<int> SegmentLengths = new List<int>();
 
         // Loading / Disposing Data
-        public static void Load(ContentManager Content, GraphicsDevice GD)
+        public static void LoadLoadingScreen(ContentManager Content, GraphicsDevice GD)
         {
-            Console.WriteLine("Loading Effects...");
-            gaussianBlurHorz = Content.Load<Effect>("GaussianBlurHorz");
-            gaussianBlurVert = Content.Load<Effect>("GaussianBlurVert");
-            PixelBlur = Content.Load<Effect>("PixelBlur");
-            TitleFadeout = Content.Load<Effect>("TitleFadeout");
-
-
-            Console.WriteLine("Loading Textures...");
             White = new Texture2D(GD, 1, 1);
             Color[] Col = new Color[1];
             Col[0] = Color.White;
             White.SetData(Col);
 
+            gaussianBlurHorz = Content.Load<Effect>("GaussianBlurHorz");
+            gaussianBlurVert = Content.Load<Effect>("GaussianBlurVert");
+        }
+        public static void Load(ContentManager Content, GraphicsDevice GD)
+        {
+            Console.WriteLine("Loading Effects...");
+            PixelBlur = Content.Load<Effect>("PixelBlur");
+            TitleFadeout = Content.Load<Effect>("TitleFadeout");
+            basicEffect = new BasicEffect(GD);
+            basicEffect.World = Matrix.Identity;
+            basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), Vector3.Zero, Vector3.Up);
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, GD.Viewport.Width, GD.Viewport.Height, 0, 1.0f, 1000.0f);
+            basicEffect.VertexColorEnabled = true;
 
+
+            Console.WriteLine("Loading Textures...");
+            Color[] Col = new Color[1];
             int res = 8;
             ColorFade = new Texture2D(GD, 1, res);
             Col = new Color[res];
@@ -216,7 +241,7 @@ namespace MusicPlayer
             SystemDefaultColor = Color.FromNonPremultiplied(temp.R, temp.G, temp.B, temp.A);
 
             Console.WriteLine("Searching for Songs...");
-            if (Directory.Exists(config.Default.MusicPath))
+            if (Directory.Exists(config.Default.MusicPath) && DirOrSubDirsContainMp3(config.Default.MusicPath))
                 FindAllMp3FilesInDir(config.Default.MusicPath, true);
             else
             {
@@ -224,6 +249,7 @@ namespace MusicPlayer
                 open.Description = "Select your music folder";
                 if (open.ShowDialog() != DialogResult.OK) Process.GetCurrentProcess().Kill();
                 config.Default.MusicPath = open.SelectedPath;
+                config.Default.Save();
                 FindAllMp3FilesInDir(open.SelectedPath, true);
             }
             Console.WriteLine();
@@ -234,7 +260,11 @@ namespace MusicPlayer
                 XNA.primaryColor = Color.FromNonPremultiplied(config.Default.Col.R, config.Default.Col.G, config.Default.Col.B, config.Default.Col.A);
                 XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
             }
-
+            else
+            {
+                XNA.primaryColor = SystemDefaultColor;
+                XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
+            }
 
             Console.WriteLine("Starting first Song...");
             if (Playlist.Count > 0)
@@ -271,6 +301,17 @@ namespace MusicPlayer
 
             foreach (string D in Directory.GetDirectories(StartDir))
                 FindAllMp3FilesInDir(D, ConsoleOutput);
+        }
+        public static bool DirOrSubDirsContainMp3(string StartDir)
+        {
+            foreach (string s in Directory.GetFiles(StartDir))
+                if (s.EndsWith(".mp3"))
+                    return true;
+
+            foreach (string D in Directory.GetDirectories(StartDir))
+                if (DirOrSubDirsContainMp3(D))
+                    return true;
+            return false;
         }
         public static void RefreshBGtex(GraphicsDevice GD)
         {
@@ -329,8 +370,8 @@ namespace MusicPlayer
         // Visualization
         public static void UpdateWaveBuffer()
         {
-            buffer = new byte[bufferLength];
-            WaveBuffer = new float[bufferLength / 4];
+            //buffer = new byte[bufferLength];
+            //WaveBuffer = new float[bufferLength / 4];
 
             if (Channel32 != null && Channel32Reader != null && Channel32Reader.CanRead)
             {
@@ -358,7 +399,7 @@ namespace MusicPlayer
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 if (tempbuffer == null)
                 {
-                    int complexLength = Channel32.WaveFormat.SampleRate;
+                    int complexLength = Channel32.WaveFormat.SampleRate / 2;
                     if (complexLength > WaveBuffer.Length)
                         complexLength = WaveBuffer.Length;
                     tempbuffer = new Complex[complexLength];
@@ -392,9 +433,6 @@ namespace MusicPlayer
         }
         public static void UpdateEntireSongBuffers()
         {
-            if (config.Default.MultiThreading)
-                Thread.CurrentThread.Priority = ThreadPriority.Lowest;
-
             try
             {
                 lock (Channel32Reader)
@@ -449,7 +487,7 @@ namespace MusicPlayer
             {
                 WaveBuffer = new float[bufferLength / 4];
                 if (Channel32 != null && Channel32.CanRead && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
-                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength) / 4), bufferLength / 4).ToArray();
+                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength / 2) / 4), bufferLength / 4).ToArray();
                 else
                     for (int i = 0; i < bufferLength / 4; i++)
                         WaveBuffer[i] = 0;
@@ -557,6 +595,20 @@ namespace MusicPlayer
             }
             return false;
         }
+        public static bool PlayPlaylistSong(string SongNameWithFileEnd)
+        {
+            for (int i = 0; i < Playlist.Count; i++)
+            {
+                if (Playlist[i].Split('\\').Last() == SongNameWithFileEnd)
+                {
+                    PlayerHistory.Add(Playlist[i]);
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    PlaySongByPath(Playlist[i]);
+                    return true;
+                }
+            }
+            return false;
+        }
         public static void GetNextSong(bool forced, bool DownVoteCurrentSongForUserSkip)
         {
             if (config.Default.MultiThreading || forced || 
@@ -566,8 +618,19 @@ namespace MusicPlayer
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
                     double percentage = (Channel32.Position / (double)Channel32.Length) * 10;
-                    if (index > -1 && UpvotedSongScores[index] > (Channel32.Position / (double)Channel32.Length) * 10 && !IsCurrentSongUpvoted)
-                        UpvotedSongScores[index]--;
+
+                    if (index > -1 && UpvotedSongScores[index] > (Channel32.Position / (double)Channel32.Length) * 10 && !IsCurrentSongUpvoted ||
+                        index > -1 && 0.1 > (Channel32.Position / (double)Channel32.Length) && !IsCurrentSongUpvoted)
+                    {
+                        if (UpvotedSongStreaks[index] > -1)
+                            UpvotedSongStreaks[index] = -1;
+                        else
+                            UpvotedSongStreaks[index] -= 2;
+
+                        UpvotedSongScores[index] += UpvotedSongStreaks[index];
+
+                        XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+                    }
                 }
 
                 SaveUserSettings();
@@ -602,19 +665,28 @@ namespace MusicPlayer
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
             List<string> SongChoosingList = new List<string>();
+            int ChanceIncreasePerUpvote = Playlist.Count / 100;
             for (int i = 0; i < Playlist.Count; i++)
             {
-                if (PlayerHistory.Count == 0 || Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) || Playlist.Count < 2)
+                if (PlayerHistory.Count == 0 || 
+                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) || 
+                    Playlist.Count < 2)
                 {
                     SongChoosingList.Add(Playlist[i]);
-                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        for (int j = 0; j < UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())]; j++)
-                            for (int k = 0; k < 5; k++)
-                                SongChoosingList.Add(Playlist[i]);
 
-                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 100)
-                        for (int k = 0; k < (100 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) / 2; k++)
-                            SongChoosingList.Add(Playlist[i]);
+                    int amount = 0;
+
+                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
+                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
+                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4)
+                            * ChanceIncreasePerUpvote;
+
+                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
+                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
+                                Playlist.Count / 25f);
+
+                    for (int k = 0; k < amount; k++)
+                        SongChoosingList.Add(Playlist[i]);
                 }
             }
 
@@ -647,9 +719,6 @@ namespace MusicPlayer
             Channel32 = new WaveChannel32(mp3);
             Channel32Reader = new WaveChannel32(mp3Reader);
 
-            var meter = new MeteringSampleProvider(mp3.ToSampleProvider());
-            meter.StreamVolume += (s, e) => Debug.WriteLine("{0} - {1}", e.MaxSampleValues[0], e.MaxSampleValues[1]);
-
             output = new DirectSoundOut();
             output.Init(Channel32);
 
@@ -664,7 +733,7 @@ namespace MusicPlayer
             output.Play();
             Channel32.Volume = 0;
             SongStartTime = Values.Timer;
-            Channel32.Position = 1;
+            Channel32.Position = bufferLength / 2;
         }
         public static void SaveUserSettings()
         {
@@ -674,30 +743,44 @@ namespace MusicPlayer
                 if (UpvotedSongNames.Contains(currentlyPlayingSongName))
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
-                    UpvotedSongScores[index]++;
+
+                    if (UpvotedSongStreaks[index] < 1)
+                        UpvotedSongStreaks[index] = 1;
+                    else if (Channel32 != null && Channel32.Position > Channel32.Length - bufferLength / 2)
+                        UpvotedSongStreaks[index]++;
+                    if (UpvotedSongScores[index] < 0)
+                        UpvotedSongScores[index] = 0;
+
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index];
+                    LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 }
                 else
                 {
                     UpvotedSongNames.Add(currentlyPlayingSongName);
                     UpvotedSongScores.Add(1);
+                    UpvotedSongStreaks.Add(1);
                 }
             }
             IsCurrentSongUpvoted = false;
 
             // Sorting
             int Swapi;
+            int Swapi2;
             string SwapS;
             for (int i = 1; i < UpvotedSongNames.Count; i++)
             {
                 if (UpvotedSongScores[i - 1] < UpvotedSongScores[i])
                 {
                     Swapi = UpvotedSongScores[i];
+                    Swapi2 = UpvotedSongStreaks[i];
                     SwapS = UpvotedSongNames[i];
 
                     UpvotedSongScores[i] = UpvotedSongScores[i - 1];
+                    UpvotedSongStreaks[i] = UpvotedSongStreaks[i - 1];
                     UpvotedSongNames[i] = UpvotedSongNames[i - 1];
 
                     UpvotedSongScores[i - 1] = Swapi;
+                    UpvotedSongStreaks[i - 1] = Swapi2;
                     UpvotedSongNames[i - 1] = SwapS;
 
                     i = 1;
@@ -706,6 +789,7 @@ namespace MusicPlayer
 
             config.Default.SongPaths = UpvotedSongNames.ToArray();
             config.Default.SongScores = UpvotedSongScores.ToArray();
+            config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
 
             config.Default.Background = (int)XNA.BgModes;
             config.Default.Vis = (int)XNA.VisSetting;
@@ -713,6 +797,99 @@ namespace MusicPlayer
             config.Default.Col = System.Drawing.Color.FromArgb(XNA.primaryColor.R, XNA.primaryColor.G, XNA.primaryColor.B);
 
             config.Default.Save();
+        }
+        public static float SongAge(string SongPath)
+        {
+            if (File.Exists(SongPath))
+                return (float)Math.Round(DateTime.Today.Subtract(File.GetCreationTime(SongPath)).TotalHours / 24.0, 2);
+            else
+                return 0;
+        }
+        public static float PlayChance(string SongPath)
+        {
+            List<string> SongChoosingList = new List<string>();
+            int ChanceIncreasePerUpvote = Playlist.Count / 100;
+            for (int i = 0; i < Playlist.Count; i++)
+            {
+                if (File.Exists(Playlist[i]))
+                {
+                    SongChoosingList.Add(Playlist[i]);
+
+                    int amount = 0;
+
+                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
+                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
+                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4) 
+                            * ChanceIncreasePerUpvote;
+                    
+                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
+                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
+                                Playlist.Count / 25f);
+
+                    for (int k = 0; k < amount; k++)
+                        SongChoosingList.Add(Playlist[i]);
+                }
+            }
+
+            int TargetTickets = 0;
+            foreach (string s in SongChoosingList)
+                if (s == SongPath)
+                    TargetTickets++;
+            return TargetTickets / (float)SongChoosingList.Count;
+        }
+        public static object[,] GetSongInformationList()
+        {
+            object[,] SongInformationArray = new object[Playlist.Count, 5];
+
+            List<string> SongChoosingList = new List<string>();
+            int ChanceIncreasePerUpvote = Playlist.Count / 100;
+            for (int i = 0; i < Playlist.Count; i++)
+            {
+                if (PlayerHistory.Count == 0 || PlayerHistoryIndex == 0 ||
+                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) ||
+                    Playlist.Count < 2)
+                {
+                    SongChoosingList.Add(Playlist[i]);
+
+                    int amount = 0;
+
+                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
+                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
+                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4)
+                            * ChanceIncreasePerUpvote;
+
+                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
+                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
+                                Playlist.Count / 25f);
+
+                    for (int k = 0; k < amount; k++)
+                        SongChoosingList.Add(Playlist[i]);
+                }
+            }
+
+            for (int i = 0; i < UpvotedSongNames.Count; i++)
+            {
+                SongInformationArray[i, 0] = UpvotedSongNames[i];
+                SongInformationArray[i, 1] = UpvotedSongScores[i];
+                SongInformationArray[i, 2] = UpvotedSongStreaks[i];
+                SongInformationArray[i, 3] = SongAge(GetSongPathFromSongName(UpvotedSongNames[i]));
+
+                int TargetTickets = 0;
+                string SongName = GetSongPathFromSongName(UpvotedSongNames[i]);
+                foreach (string s in SongChoosingList)
+                    if (s == SongName)
+                        TargetTickets++;
+                SongInformationArray[i, 4] = TargetTickets / (float)SongChoosingList.Count * 100;
+            }
+            
+            return SongInformationArray;
+        }
+        public static string GetSongPathFromSongName(string SongName)
+        {
+            foreach (string s in Playlist)
+                if (s.Split('\\').Last() == SongName)
+                    return s;
+            return "COULDNT FIND SONG NAME!";
         }
 
         // Draw Methods
