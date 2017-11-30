@@ -232,7 +232,7 @@ namespace MusicPlayer
                     XNA.TaskbarHidden = tb.AutoHide;
                     XNA.KeepWindowInScreen();
                 }
-                else 
+                else
                     XNA.TaskbarHidden = tb.AutoHide;
             });
             // System Default Color

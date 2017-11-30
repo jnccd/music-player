@@ -90,7 +90,7 @@ namespace MusicPlayer
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
+                MessageBox.Show("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace + "\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source);
                 string strPath = Environment.CurrentDirectory + @"\Log.txt";
                 if (!File.Exists(strPath))
                 {
@@ -99,7 +99,7 @@ namespace MusicPlayer
                 using (StreamWriter sw = File.AppendText(strPath))
                 {
                     sw.WriteLine();
-                    sw.WriteLine("=============Error Logging ===========");
+                    sw.WriteLine("==========================Error Logging========================");
                     sw.WriteLine("============Start=============" + DateTime.Now);
                     sw.WriteLine("Error Message: " + ex.Message);
                     sw.WriteLine("Stack Trace: " + ex.StackTrace);
