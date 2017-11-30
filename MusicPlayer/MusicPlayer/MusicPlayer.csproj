@@ -47,12 +47,13 @@
     <NoStdLib>true</NoStdLib>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
-    <XnaCompressContent>false</XnaCompressContent>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <XnaCompressContent>True</XnaCompressContent>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
@@ -62,7 +63,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>true</XnaCompressContent>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>MusicPlayer.Program</StartupObject>
@@ -104,6 +106,7 @@
       <HintPath>D:\Eigene Dateien\Downloads\Setups\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -143,6 +146,12 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>RequestedSong.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Statistics.Designer.cs">
+      <DependentUpon>Statistics.cs</DependentUpon>
     </Compile>
     <Compile Include="Taskbar.cs" />
     <Compile Include="XNA.cs" />
@@ -198,6 +207,9 @@
   <ItemGroup>
     <EmbeddedResource Include="OptionsMenu.resx">
       <DependentUpon>OptionsMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Statistics.resx">
+      <DependentUpon>Statistics.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

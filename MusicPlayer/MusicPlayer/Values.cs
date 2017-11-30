@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Collections;
 
 namespace MusicPlayer
 {
@@ -142,31 +143,48 @@ namespace MusicPlayer
             int Errors = 0;
             int Distances = 0;
             int LastFindingIndex = -5;
-            foreach(char c in Input.ToCharArray())
+            List<float> Scores = new List<float>();
+
+            for (int k = 0; k < SongName.Length; k++)
             {
-                int j = LastFindingIndex;
-                if (j < 0)
-                    j = 0;
-                int a = SongName.IndexOf(char.ToLower(c), j);
-                int b = SongName.IndexOf(char.ToUpper(c), j);
-
-                if (a == -1 && b == -1)
-                    Errors++;
-                else
+                if (SongName.ElementAt(k) == char.ToUpper(Input.First()) ||
+                    SongName.ElementAt(k) == char.ToLower(Input.First()))
                 {
-                    int i;
-                    if (b == -1 || a < b && a != -1)
-                        i = a;
-                    else
-                        i = b;
+                    LastFindingIndex = k - 1;
+                    foreach (char c in Input.ToCharArray())
+                    {
+                        int j = LastFindingIndex;
+                        if (j < 0)
+                            j = 0;
+                        int a = SongName.IndexOf(char.ToLower(c), j);
+                        int b = SongName.IndexOf(char.ToUpper(c), j);
 
-                    if (LastFindingIndex != -5)
-                        Distances += i - LastFindingIndex - 1;
-                    LastFindingIndex = i;
+                        if (a == -1 && b == -1)
+                            Errors++;
+                        else
+                        {
+                            int i;
+                            if (b == -1 || a < b && a != -1)
+                                i = a;
+                            else
+                                i = b;
+
+                            if (LastFindingIndex != -5)
+                                Distances += i - LastFindingIndex - 1;
+                            LastFindingIndex = i;
+                        }
+                    }
+                    Scores.Add(Errors + Distances / 3f);
+                    Errors = 0;
+                    Distances = 0;
+                    LastFindingIndex = -5;
                 }
             }
 
-            return Errors + Distances / 3f;
+            if (Scores.Count > 0)
+                return Scores.Min();
+            else
+                return 1000;
         }
 
         public static float GetAverageAmplitude(float[] samples)
@@ -234,6 +252,11 @@ namespace MusicPlayer
                 return 0;
         }
 
+        public static float AnimationFunction(float x)
+        {
+            return (float)((Math.Pow(2, -1.5 * (x - 1) * (x - 1)) / 10f + 1) * (-Math.Pow(5, -x) + 1));
+        }
+
         public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
         {
             Vector2 HelpingVector = new Vector2(-(Line1.Y - Line2.Y), Line1.X - Line2.X);
@@ -270,7 +293,9 @@ namespace MusicPlayer
 
             return Screen.AllScreens[LowestDindex];
         }
-        
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetConsoleWindow();
         [DllImport("user32.dll", SetLastError = true)]

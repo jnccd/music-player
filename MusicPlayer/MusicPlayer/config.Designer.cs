@@ -164,5 +164,27 @@ namespace MusicPlayer {
                 this["Preload"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] SongUpvoteStreak {
+            get {
+                return ((int[])(this["SongUpvoteStreak"]));
+            }
+            set {
+                this["SongUpvoteStreak"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public string[] SongHistory {
+            get {
+                return ((string[])(this["SongHistory"]));
+            }
+            set {
+                this["SongHistory"] = value;
+            }
+        }
     }
 }

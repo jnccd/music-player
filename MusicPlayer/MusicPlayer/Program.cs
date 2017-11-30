@@ -10,39 +10,10 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Text;
+using System.Configuration;
 
 namespace MusicPlayer
 {
-    public static class ConsoleHelper
-    {
-        public static void CreateConsole()
-        {
-            AllocConsole();
-
-            // stdout's handle seems to always be equal to 7
-            IntPtr defaultStdout = new IntPtr(7);
-            IntPtr currentStdout = GetStdHandle(StdOutputHandle);
-
-            if (currentStdout != defaultStdout)
-                // reset stdout
-                SetStdHandle(StdOutputHandle, defaultStdout);
-
-            // reopen stdout
-            TextWriter writer = new StreamWriter(Console.OpenStandardOutput())
-            { AutoFlush = true };
-            Console.SetOut(writer);
-        }
-
-        // P/Invoke required:
-        private const UInt32 StdOutputHandle = 0xFFFFFFF5;
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetStdHandle(UInt32 nStdHandle);
-        [DllImport("kernel32.dll")]
-        private static extern void SetStdHandle(UInt32 nStdHandle, IntPtr handle);
-        [DllImport("kernel32")]
-        static extern bool AllocConsole();
-    }
-
     public static class Program
     {
         public static string[] args;
@@ -63,6 +34,8 @@ namespace MusicPlayer
                     return;
                 }
 
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Values.DisableConsoleRezise();
 
             if (config.Default.SongPaths != null)
@@ -75,13 +48,17 @@ namespace MusicPlayer
                 Assets.UpvotedSongNames = new List<string>();
                 Assets.UpvotedSongScores = new List<int>();
             }
+            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != config.Default.SongScores.Length)
+            {
+                Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
+                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
+                    Assets.UpvotedSongStreaks.Add(0);
+            }
+            else
+                Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
 
             Console.Clear();
-
-            // Testing Ground
-            //for (int i = 0; i < 100; i++)
-            //    Console.Write(Convert.ToChar(i));
-
+            
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
 
@@ -90,12 +67,17 @@ namespace MusicPlayer
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
 
             FileSystemWatcher weightwatchers = new FileSystemWatcher();
+            /*
             string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
 #if DEBUG
             weightwatchers.Path = P[1] + @"\1.0.0.0";
 #else
             weightwatchers.Path = P[0] + @"\1.0.0.0";
 #endif
+*/
+            string SettingsPath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+            SettingsPath = SettingsPath.Remove(SettingsPath.Length - "\\user.config".Length);
+            weightwatchers.Path = SettingsPath;
             weightwatchers.Changed += ((object source, FileSystemEventArgs e) => {
                 XNA.CheckForRequestedSongs();
             });
