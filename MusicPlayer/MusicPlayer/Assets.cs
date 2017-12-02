@@ -677,13 +677,12 @@ namespace MusicPlayer
                     int amount = 0;
 
                     if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
-                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4)
+                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
                             * ChanceIncreasePerUpvote;
 
                     if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
                         amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 25f);
+                                Playlist.Count / 23f);
 
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
@@ -818,13 +817,12 @@ namespace MusicPlayer
                     int amount = 0;
 
                     if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
-                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4) 
+                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
                             * ChanceIncreasePerUpvote;
-                    
+
                     if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
                         amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 25f);
+                                Playlist.Count / 23f);
 
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
