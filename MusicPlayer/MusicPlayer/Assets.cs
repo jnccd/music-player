@@ -843,9 +843,7 @@ namespace MusicPlayer
             int ChanceIncreasePerUpvote = Playlist.Count / 100;
             for (int i = 0; i < Playlist.Count; i++)
             {
-                if (PlayerHistory.Count == 0 || PlayerHistoryIndex == 0 ||
-                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) ||
-                    Playlist.Count < 2)
+                if (File.Exists(Playlist[i]))
                 {
                     SongChoosingList.Add(Playlist[i]);
 
