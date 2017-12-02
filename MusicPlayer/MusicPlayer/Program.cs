@@ -90,7 +90,7 @@ namespace MusicPlayer
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace + "\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source);
+                MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: \n" + ex.InnerException + "\n\nSource: " + ex.Source);
                 string strPath = Environment.CurrentDirectory + @"\Log.txt";
                 if (!File.Exists(strPath))
                 {
