@@ -72,6 +72,7 @@ namespace MusicPlayer
         public static Texture2D Pause;
         public static Texture2D Upvote;
         public static Texture2D Close;
+        public static Texture2D Options;
 
         public static Color SystemDefaultColor;
 
@@ -182,8 +183,7 @@ namespace MusicPlayer
             for (int i = 0; i < Col.Length; i++)
                 Col[i] = Color.FromNonPremultiplied(255, 255, 255, (int)(i / (float)res * 255));
             ColorFade.SetData(Col);
-
-
+            
             Volume = Content.Load<Texture2D>("volume");
             Volume2 = Content.Load<Texture2D>("volume2");
             Volume3 = Content.Load<Texture2D>("volume3");
@@ -194,6 +194,7 @@ namespace MusicPlayer
             Pause = Content.Load<Texture2D>("pause");
             Upvote = Content.Load<Texture2D>("Upvote");
             Close = Content.Load<Texture2D>("Close");
+            Options = Content.Load<Texture2D>("Options");
 
 
             Console.WriteLine("Loading Fonts...");
@@ -632,7 +633,7 @@ namespace MusicPlayer
                         XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                     }
                 }
-
+                
                 SaveUserSettings();
 
                 PlayerHistoryIndex++;
