@@ -45,6 +45,7 @@ namespace MusicPlayer
         DragWindow,
         PlayPauseButton,
         UpvoteButton,
+        OptionsButton,
         None,
         CloseButton
     }
@@ -92,15 +93,16 @@ namespace MusicPlayer
         
         // Draw Rectangles
         static Rectangle DrawRect = new Rectangle(1, 1, 1, 1);
-        static Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 129, 3);
+        static Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 157, 3);
         static Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
         static Rectangle VolumeBar = new Rectangle(Values.WindowSize.X - 100, 24, 75, 8);
         static Rectangle PlayPauseButton = new Rectangle(24, Values.WindowSize.Y - 34, 16, 16);
         static Rectangle Upvote = new Rectangle(24, 43, 20, 20);
         static Rectangle TargetVolumeBar = new Rectangle(); // needs Updates
         static Rectangle ActualVolumeBar = new Rectangle(); // needs Updates
-        static Rectangle UpvoteButton = new Rectangle(Values.WindowSize.X - 70, Values.WindowSize.Y - 35, 19, 19);
+        static Rectangle UpvoteButton = new Rectangle(Values.WindowSize.X - 98, Values.WindowSize.Y - 35, 19, 19);
         static Rectangle CloseButton = new Rectangle(Values.WindowSize.X - 43, Values.WindowSize.Y - 34, 18, 18);
+        static Rectangle OptionsButton = new Rectangle(Values.WindowSize.X - 71, Values.WindowSize.Y - 34, 19, 19);
 
         static Rectangle DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
         static Rectangle VolumeIconShadow = new Rectangle(VolumeIcon.X + 5, VolumeIcon.Y + 5, VolumeIcon.Width, VolumeIcon.Height);
@@ -109,6 +111,7 @@ namespace MusicPlayer
         static Rectangle UpvoteShadow = new Rectangle(Upvote.X + 5, Upvote.Y + 5, Upvote.Width, Upvote.Height);
         static Rectangle UpvoteButtonShadow = new Rectangle(UpvoteButton.X + 5, UpvoteButton.Y + 5, UpvoteButton.Width, UpvoteButton.Height);
         static Rectangle CloseButtonShadow = new Rectangle(CloseButton.X + 5, CloseButton.Y + 5, CloseButton.Width, CloseButton.Height);
+        static Rectangle OptionsButtonShadow = new Rectangle(OptionsButton.X + 5, OptionsButton.Y + 5, OptionsButton.Width, OptionsButton.Height);
 
         // Hitbox Rectangles
         Rectangle DurationBarHitbox = new Rectangle(DurationBar.X, DurationBar.Y - 10, DurationBar.Width, 23);
@@ -553,6 +556,8 @@ namespace MusicPlayer
                     selectedControl = SelectedControl.PlayPauseButton;
                 else if (Control.GetMouseRect().Intersects(CloseButton))
                     selectedControl = SelectedControl.CloseButton;
+                else if (Control.GetMouseRect().Intersects(OptionsButton))
+                    selectedControl = SelectedControl.OptionsButton;
                 else
                     selectedControl = SelectedControl.DragWindow;
             }
@@ -582,6 +587,21 @@ namespace MusicPlayer
                 case SelectedControl.CloseButton:
                     if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
                         gameWindowForm.Close();
+                    break;
+
+                case SelectedControl.OptionsButton:
+                    if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
+                    {
+                        if (optionsMenu == null || optionsMenu.IsDisposed)
+                        {
+                            optionsMenu = new OptionsMenu();
+                            optionsMenu.Show();
+                        }
+                        else
+                        {
+                            optionsMenu.BringToFront();
+                        }
+                    }
                     break;
 
                 case SelectedControl.UpvoteButton:
@@ -621,9 +641,16 @@ namespace MusicPlayer
                 Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.F1))
             {
                 if (optionsMenu == null || optionsMenu.IsDisposed)
+                {
                     optionsMenu = new OptionsMenu();
-
-                optionsMenu.Show();
+                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                    optionsMenu.Show();
+                }
+                else
+                {
+                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                    optionsMenu.BringToFront();
+                }
             }
 
             // Swap Visualisations [V]
@@ -1195,6 +1222,10 @@ namespace MusicPlayer
             // CloseButton
             spriteBatch.Draw(Assets.Close, CloseButtonShadow, Color.Black * 0.6f);
             spriteBatch.Draw(Assets.Close, CloseButton, Color.White);
+
+            // OptionsButton
+            spriteBatch.Draw(Assets.Options, OptionsButtonShadow, Color.Black * 0.6f);
+            spriteBatch.Draw(Assets.Options, OptionsButton, Color.White);
 
             // Catalyst Grid
             //for (int x = 1; x < Values.WindowSize.X; x += 2)
