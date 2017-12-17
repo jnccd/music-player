@@ -117,10 +117,13 @@ namespace MusicPlayer
         public static int SongChangedTickTime = -100000;
         public static int SongStartTime;
         public static bool IsCurrentSongUpvoted;
-        public static List<string> UpvotedSongNames;
-        public static List<int> UpvotedSongScores;
-        public static List<int> UpvotedSongStreaks;
         public static int LastUpvotedSongStreak;
+
+        // Song Data
+        public static List<string> UpvotedSongNames;
+        public static List<float> UpvotedSongScores;
+        public static List<int> UpvotedSongStreaks;
+        public static List<string> SongHistory;
 
         // MultiThreading
         public static Task T = null;
@@ -237,9 +240,15 @@ namespace MusicPlayer
                     XNA.TaskbarHidden = tb.AutoHide;
             });
             // System Default Color
-            int argbColor = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
-            System.Drawing.Color temp = System.Drawing.Color.FromArgb(argbColor);
-            SystemDefaultColor = Color.FromNonPremultiplied(temp.R, temp.G, temp.B, temp.A);
+            try
+            {
+                int argbColor = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
+                System.Drawing.Color temp = System.Drawing.Color.FromArgb(argbColor);
+                SystemDefaultColor = Color.FromNonPremultiplied(temp.R, temp.G, temp.B, temp.A);
+            } catch {
+                Console.WriteLine("Couldn't find System Default Color!");
+                SystemDefaultColor = Color.White;
+            }
 
             Console.WriteLine("Searching for Songs...");
             if (Directory.Exists(config.Default.MusicPath) && DirOrSubDirsContainMp3(config.Default.MusicPath))
@@ -665,30 +674,7 @@ namespace MusicPlayer
         private static void GetNewPlaylistSong()
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
-            List<string> SongChoosingList = new List<string>();
-            int ChanceIncreasePerUpvote = Playlist.Count / 100;
-            for (int i = 0; i < Playlist.Count; i++)
-            {
-                if (PlayerHistory.Count == 0 || 
-                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) || 
-                    Playlist.Count < 2)
-                {
-                    SongChoosingList.Add(Playlist[i]);
-
-                    int amount = 0;
-
-                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
-                            * ChanceIncreasePerUpvote;
-
-                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
-                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 23f);
-
-                    for (int k = 0; k < amount; k++)
-                        SongChoosingList.Add(Playlist[i]);
-                }
-            }
+            List<string> SongChoosingList = GetSongChoosingList(true);
 
             int SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
             PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
@@ -764,7 +750,7 @@ namespace MusicPlayer
             IsCurrentSongUpvoted = false;
 
             // Sorting
-            int Swapi;
+            float Swapi;
             int Swapi2;
             string SwapS;
             for (int i = 1; i < UpvotedSongNames.Count; i++)
@@ -807,28 +793,7 @@ namespace MusicPlayer
         }
         public static float PlayChance(string SongPath)
         {
-            List<string> SongChoosingList = new List<string>();
-            int ChanceIncreasePerUpvote = Playlist.Count / 100;
-            for (int i = 0; i < Playlist.Count; i++)
-            {
-                if (File.Exists(Playlist[i]))
-                {
-                    SongChoosingList.Add(Playlist[i]);
-
-                    int amount = 0;
-
-                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
-                            * ChanceIncreasePerUpvote;
-
-                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
-                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 23f);
-
-                    for (int k = 0; k < amount; k++)
-                        SongChoosingList.Add(Playlist[i]);
-                }
-            }
+            List<string> SongChoosingList = GetSongChoosingList(false);
 
             int TargetTickets = 0;
             foreach (string s in SongChoosingList)
@@ -840,29 +805,7 @@ namespace MusicPlayer
         {
             object[,] SongInformationArray = new object[Playlist.Count, 5];
 
-            List<string> SongChoosingList = new List<string>();
-            int ChanceIncreasePerUpvote = Playlist.Count / 100;
-            for (int i = 0; i < Playlist.Count; i++)
-            {
-                if (File.Exists(Playlist[i]))
-                {
-                    SongChoosingList.Add(Playlist[i]);
-
-                    int amount = 0;
-
-                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] +
-                            UpvotedSongStreaks[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())] * 4)
-                            * ChanceIncreasePerUpvote;
-
-                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
-                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 25f);
-
-                    for (int k = 0; k < amount; k++)
-                        SongChoosingList.Add(Playlist[i]);
-                }
-            }
+            List<string> SongChoosingList = GetSongChoosingList(false);
 
             for (int i = 0; i < UpvotedSongNames.Count; i++)
             {
@@ -887,6 +830,35 @@ namespace MusicPlayer
                 if (s.Split('\\').Last() == SongName)
                     return s;
             return "COULDNT FIND SONG NAME!";
+        }
+        private static List<string> GetSongChoosingList(bool ForNextSongChoosing)
+        {
+            List<string> SongChoosingList = new List<string>();
+            int ChanceIncreasePerUpvote = Playlist.Count / 100;
+            for (int i = 0; i < Playlist.Count; i++)
+            {
+                if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
+                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) ||
+                    Playlist.Count < 2) || 
+                    !ForNextSongChoosing && (File.Exists(Playlist[i])))
+                {
+                    SongChoosingList.Add(Playlist[i]);
+
+                    int amount = 0;
+
+                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
+                        amount += (int)(UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
+                            * ChanceIncreasePerUpvote;
+
+                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
+                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
+                                Playlist.Count / 23f);
+
+                    for (int k = 0; k < amount; k++)
+                        SongChoosingList.Add(Playlist[i]);
+                }
+            }
+            return SongChoosingList;
         }
 
         // Draw Methods

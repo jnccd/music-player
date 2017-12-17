@@ -87,11 +87,14 @@ namespace MusicPlayer
         public static bool FocusWindow = false;
         public static bool Preload;
         public static bool TaskbarHidden = false;
-        int originY;
+        static int originY;
         float[] values;
         bool WasFocusedLastFrame = true;
-        
-        // Draw Rectangles
+        public static bool PauseConsoleInputThread = false;
+        Task ConsoleManager;
+
+        // Draw
+        static Vector2 DrawVector = new Vector2(1, 1);
         static Rectangle DrawRect = new Rectangle(1, 1, 1, 1);
         static Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 157, 3);
         static Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
@@ -189,10 +192,12 @@ namespace MusicPlayer
 
         void StartSongInputLoop()
         {
-            Task.Factory.StartNew(() =>
+            ConsoleManager = Task.Factory.StartNew(() =>
             {
                 while (true)
                 {
+                    while (PauseConsoleInputThread) { }
+
                     string Path = "";
                     originY = Console.CursorTop;
                     while (!Path.Contains(".mp3\""))
@@ -208,6 +213,8 @@ namespace MusicPlayer
                         Console.Write(Path);
 
                         ConsoleKeyInfo e = Console.ReadKey();
+
+                        while (PauseConsoleInputThread) { }
 
                         if (e.Key == ConsoleKey.UpArrow)
                         {
@@ -315,89 +322,13 @@ namespace MusicPlayer
                                         download = Path.Remove(0, "/d".Length + 1);
                                     Path = "";
 
-                                    // Get fitting youtube video
-                                    string url = string.Format("https://www.youtube.com/results?search_query=" + download);
-                                    HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                                    req.KeepAlive = false;
-                                    WebResponse W = req.GetResponse();
-                                    string ResultURL;
-                                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                                    {
-                                        string html = sr.ReadToEnd();
-                                        int index = html.IndexOf("href=\"/watch?");
-                                        string startcuthtml = html.Remove(0, index + 6);
-                                        index = startcuthtml.IndexOf('"');
-                                        string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                                        ResultURL = "https://www.youtube.com" + cuthtml;
-                                    }
-
-                                    // Get video title
-                                    req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
-                                    req.KeepAlive = false;
-                                    W = req.GetResponse();
-                                    string VideoTitle;
-                                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                                    {
-                                        string html = sr.ReadToEnd();
-                                        int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
-                                        string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
-                                        index = startcuthtml.IndexOf('"');
-                                        VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
-
-                                        // Decode the encoded string.
-                                        StringWriter myWriter = new StringWriter();
-                                        System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
-                                        VideoTitle = myWriter.ToString();
-
-                                        Console.ForegroundColor = ConsoleColor.Yellow;
-                                        Console.Write("Found matching song at ");
-
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.Write(ResultURL);
-
-                                        Console.ForegroundColor = ConsoleColor.Yellow;
-                                        Console.Write("\nnamed: ");
-
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.WriteLine(VideoTitle);
-                                        Console.ForegroundColor = ConsoleColor.Yellow;
-                                    }
-
-                                    // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
-                                    string videofile = "" + Environment.CurrentDirectory + "\\Downloads\\File.mp4";
-                                    if (File.Exists(videofile))
-                                        File.Delete(videofile);
-
-                                    // Download Video File
-                                    Process P = new Process();
-                                    string b = Environment.CurrentDirectory;
-                                    P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"/Downloads/File.mp4\" " + ResultURL)
-                                    {
-                                        UseShellExecute = false
-                                    };
-
-                                    P.Start();
-                                    P.WaitForExit();
-
-                                    // Convert Video File to mp3 and put it into the default folder
-                                    Console.WriteLine("Converting to mp3...");
-                                    MediaFile input = new MediaFile { Filename = videofile };
-                                    MediaFile output = new MediaFile { Filename = config.Default.MusicPath + "\\" + VideoTitle + ".mp3" };
-
-                                    using (var engine = new Engine())
-                                    {
-                                        engine.GetMetadata(input);
-                                        engine.Convert(input, output);
-                                    }
-
-                                    File.Delete(videofile);
-                                    Assets.PlayNewSong(output.Filename);
+                                    Download(download);
                                 }
                                 catch (Exception ex)
                                 {
                                     Console.WriteLine(ex.ToString());
                                 }
-                                
+
                                 originY = Console.CursorTop;
                             }
                             else
@@ -419,8 +350,97 @@ namespace MusicPlayer
                     Console.WriteLine();
                     if (Assets.PlayNewSong(Path))
                         LastConsoleInput.Add(Path.Trim('"'));
+
+                    while (PauseConsoleInputThread) { }
                 }
             });
+        }
+        public static void Download(string download)
+        {
+            PauseConsoleInputThread = true;
+            Values.ShowConsole();
+
+            // Get fitting youtube video
+            string url = string.Format("https://www.youtube.com/results?search_query=" + download);
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+            req.KeepAlive = false;
+            WebResponse W = req.GetResponse();
+            string ResultURL;
+            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+            {
+                string html = sr.ReadToEnd();
+                int index = html.IndexOf("href=\"/watch?");
+                string startcuthtml = html.Remove(0, index + 6);
+                index = startcuthtml.IndexOf('"');
+                string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                ResultURL = "https://www.youtube.com" + cuthtml;
+            }
+
+            // Get video title
+            req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
+            req.KeepAlive = false;
+            W = req.GetResponse();
+            string VideoTitle;
+            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+            {
+                string html = sr.ReadToEnd();
+                int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
+                string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
+                index = startcuthtml.IndexOf('"');
+                VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
+
+                // Decode the encoded string.
+                StringWriter myWriter = new StringWriter();
+                System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
+                VideoTitle = myWriter.ToString();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Found matching song at ");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write(ResultURL);
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("\nnamed: ");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(VideoTitle);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+
+            // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
+            string videofile = "" + Environment.CurrentDirectory + "\\Downloads\\File.mp4";
+            if (File.Exists(videofile))
+                File.Delete(videofile);
+
+            // Download Video File
+            Process P = new Process();
+            string b = Environment.CurrentDirectory;
+            P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"/Downloads/File.mp4\" " + ResultURL)
+            {
+                UseShellExecute = false
+            };
+
+            P.Start();
+            P.WaitForExit();
+
+            // Convert Video File to mp3 and put it into the default folder
+            Console.WriteLine("Converting to mp3...");
+            MediaFile input = new MediaFile { Filename = videofile };
+            MediaFile output = new MediaFile { Filename = config.Default.MusicPath + "\\" + VideoTitle + ".mp3" };
+
+            using (var engine = new Engine())
+            {
+                engine.GetMetadata(input);
+                engine.Convert(input, output);
+            }
+
+            File.Delete(videofile);
+            Assets.PlayNewSong(output.Filename);
+            Assets.SaveUserSettings();
+            originY = Console.CursorTop;
+
+            PauseConsoleInputThread = false;
         }
 
         protected override void Update(GameTime gameTime)
@@ -430,6 +450,9 @@ namespace MusicPlayer
             Control.Update();
             if (gameWindowForm.Focused)
                 ComputeControls();
+
+            if (ConsoleManager.IsFaulted)
+                MessageBox.Show("The Console-Input Thread died!/nError Message: " + ConsoleManager.Exception);
 
             // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
             if (Control.ScrollWheelWentDown())
@@ -1003,8 +1026,13 @@ namespace MusicPlayer
             spriteBatch.Begin();
             if (BgModes == BackGroundModes.None)
                 foreach (Screen S in Screen.AllScreens)
-                    spriteBatch.Draw(Assets.bg, new Rectangle(S.Bounds.X - gameWindowForm.Location.X, S.Bounds.Y - gameWindowForm.Location.Y,
-                        S.Bounds.Width, S.Bounds.Height), Color.White);
+                {
+                    DrawRect.X = S.Bounds.X - gameWindowForm.Location.X;
+                    DrawRect.Y = S.Bounds.Y - gameWindowForm.Location.Y;
+                    DrawRect.Width = S.Bounds.Width;
+                    DrawRect.Height = S.Bounds.Height;
+                    spriteBatch.Draw(Assets.bg, DrawRect, Color.White);
+                }
             else if (BgModes == BackGroundModes.bg1)
                 spriteBatch.Draw(Assets.bg1, Vector2.Zero, Color.White);
             else if (BgModes == BackGroundModes.bg2)
@@ -1015,24 +1043,41 @@ namespace MusicPlayer
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(Assets.White, new Rectangle(0, 0, Values.WindowSize.X, 1), Color.Gray * 0.25f);
-            spriteBatch.Draw(Assets.White, new Rectangle(0, 0, 1, Values.WindowSize.Y), Color.Gray * 0.25f);
-            spriteBatch.Draw(Assets.White, new Rectangle(Values.WindowSize.X - 1, 0, 1, Values.WindowSize.Y), Color.Gray * 0.25f);
-            spriteBatch.Draw(Assets.White, new Rectangle(0, Values.WindowSize.Y - 1, Values.WindowSize.X, 1), Color.Gray * 0.25f);
+            // Borders
+            DrawRect.X = Values.WindowSize.X - 1;
+            DrawRect.Y = 0;
+            DrawRect.Width = 1;
+            DrawRect.Height = Values.WindowSize.Y;
+            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+            DrawRect.X = 0;
+            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+            DrawRect.Width = Values.WindowSize.X;
+            DrawRect.Height = 1;
+            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+            DrawRect.Y = Values.WindowSize.Y - 1;
+            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+            
+            
             #endregion
 
             #region Second Row HUD Shadows
             if (UpvoteSavedAlpha > 0)
             {
+                DrawVector.X = Upvote.X + Upvote.Width + 8;
+                DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 3;
                 spriteBatch.Draw(Assets.Upvote, UpvoteShadow, Color.Black * 0.6f * UpvoteSavedAlpha);
                 //spriteBatch.DrawString(Assets.Font, "Upvote saved! (" + Assets.LastUpvotedSongStreak.ToString() + " points)", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteSavedAlpha);
-                spriteBatch.DrawString(Assets.Font, "Upvote saved!", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteSavedAlpha);
+                spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.Black * 0.6f * UpvoteSavedAlpha);
             }
             else if (SecondRowMessageAlpha > 0)
+            {
+                DrawVector.X = 29;
+                DrawVector.Y = 50;
                 if (SecondRowMessageAlpha > 1)
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, new Vector2(29, 50), Color.Black * 0.6f);
+                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f);
                 else
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, new Vector2(29, 50), Color.Black * 0.6f * SecondRowMessageAlpha);
+                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f * SecondRowMessageAlpha);
+            }
             #endregion
 
             // Visualizations
@@ -1144,19 +1189,27 @@ namespace MusicPlayer
                 {
                     float PlayPercetage = (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
                         ((float)Assets.Channel32.TotalTime.TotalSeconds));
-                    spriteBatch.Draw(Assets.White, new Rectangle(DurationBar.X, DurationBar.Y, (int)(DurationBar.Width * PlayPercetage), 3), primaryColor);
+                    DrawRect.X = DurationBar.X;
+                    DrawRect.Y = DurationBar.Y;
+                    DrawRect.Width = (int)(DurationBar.Width * PlayPercetage);
+                    DrawRect.Height = 3;
+                    spriteBatch.Draw(Assets.White, DrawRect, primaryColor);
                     if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
                     {
                         double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
                         if (LoadPercetage < 1)
-                            spriteBatch.Draw(Assets.White, new Rectangle(DurationBar.X + (int)(DurationBar.Width * LoadPercetage), DurationBar.Y, DurationBar.Width - (int)(DurationBar.Width * LoadPercetage), 3),
-                                secondaryColor);
+                        {
+                            DrawRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
+                            DrawRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
+                            spriteBatch.Draw(Assets.White, DrawRect, secondaryColor);
+                        }
                     }
                     if (config.Default.AntiAliasing)
                     {
+                        DrawRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
+                        DrawRect.Width = 1;
                         float AAPercentage = (PlayPercetage * DurationBar.Width) % 1;
-                        spriteBatch.Draw(Assets.White, new Rectangle(DurationBar.X + (int)(DurationBar.Width * PlayPercetage), DurationBar.Y, 
-                            1, 3), primaryColor * AAPercentage);
+                        spriteBatch.Draw(Assets.White, DrawRect, primaryColor * AAPercentage);
                     }
                 }
             }
@@ -1165,16 +1218,20 @@ namespace MusicPlayer
             if (UpvoteSavedAlpha > 0)
             {
                 spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteSavedAlpha);
-                //spriteBatch.DrawString(Assets.Font, "Upvote saved! (" + Assets.LastUpvotedSongStreak.ToString() + " points)", 
-                //    new Vector2(Upvote.X + Upvote.Width + 3, Upvote.Y + Upvote.Height / 2 - 8), Color.White * UpvoteSavedAlpha);
-                spriteBatch.DrawString(Assets.Font, "Upvote saved!", 
-                    new Vector2(Upvote.X + Upvote.Width + 3, Upvote.Y + Upvote.Height / 2 - 8), Color.White * UpvoteSavedAlpha);
+
+                DrawVector.X = Upvote.X + Upvote.Width + 3;
+                DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 8;
+                spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.White * UpvoteSavedAlpha);
             }
             else if (SecondRowMessageAlpha > 0)
+            {
+                DrawVector.X = 24;
+                DrawVector.Y = 45;
                 if (SecondRowMessageAlpha > 1)
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, new Vector2(24, 45), Color.White);
+                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White);
                 else
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, new Vector2(24, 45), Color.White * SecondRowMessageAlpha);
+                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White * SecondRowMessageAlpha);
+            }
 
             // PlayPause Button
             if (Assets.IsPlaying())
@@ -1240,7 +1297,11 @@ namespace MusicPlayer
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
                 RasterizerState.CullNone, Assets.TitleFadeout);
             if (TitleTarget != null)
-                spriteBatch.Draw(TitleTarget, new Vector2(24, 13), Color.White);
+            {
+                DrawVector.X = 24;
+                DrawVector.Y = 13;
+                spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+            }
             spriteBatch.End();
             #endregion
 
@@ -1279,8 +1340,10 @@ namespace MusicPlayer
         }
         void DrawBlurredTex()
         {
+            DrawVector.X = -50;
+            DrawVector.Y = -50;
             spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, Assets.gaussianBlurHorz);
-            spriteBatch.Draw(BlurredTex, new Vector2(-50), Color.White);
+            spriteBatch.Draw(BlurredTex, DrawVector, Color.White);
             spriteBatch.End();
         }
     }

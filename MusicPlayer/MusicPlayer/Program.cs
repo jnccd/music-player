@@ -31,14 +31,17 @@ namespace MusicPlayer
                         RequestedSong.Default.RequestedSongString = args[0];
                         RequestedSong.Default.Save();
                     }
+                    Thread.Sleep(1500);
                     return;
                 }
 
+            // Smol settings
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Values.DisableConsoleRezise();
 
-            if (config.Default.SongPaths != null)
+            // Song Data List initialization
+            if (config.Default.SongPaths != null && config.Default.SongScores != null)
             {
                 Assets.UpvotedSongNames = config.Default.SongPaths.ToList();
                 Assets.UpvotedSongScores = config.Default.SongScores.ToList();
@@ -46,9 +49,17 @@ namespace MusicPlayer
             else
             {
                 Assets.UpvotedSongNames = new List<string>();
-                Assets.UpvotedSongScores = new List<int>();
+                Assets.UpvotedSongScores = new List<float>();
             }
-            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != config.Default.SongScores.Length)
+            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
+            {
+                Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
+                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
+                    Assets.UpvotedSongStreaks.Add(0);
+            }
+            else
+                Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
+            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
             {
                 Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
                 for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
@@ -59,6 +70,7 @@ namespace MusicPlayer
 
             Console.Clear();
             
+            // Actual start
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
 
@@ -67,21 +79,28 @@ namespace MusicPlayer
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
 
             FileSystemWatcher weightwatchers = new FileSystemWatcher();
-            /*
-            string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
+            
+            try
+            {
+                string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
 #if DEBUG
-            weightwatchers.Path = P[1] + @"\1.0.0.0";
+                string SettingsPath = P[1] + @"\1.0.0.0";
 #else
-            weightwatchers.Path = P[0] + @"\1.0.0.0";
+                string SettingsPath = P[0] + @"\1.0.0.0";
 #endif
-*/
-            string SettingsPath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
-            SettingsPath = SettingsPath.Remove(SettingsPath.Length - "\\user.config".Length);
-            weightwatchers.Path = SettingsPath;
-            weightwatchers.Changed += ((object source, FileSystemEventArgs e) => {
-                XNA.CheckForRequestedSongs();
-            });
-            weightwatchers.EnableRaisingEvents = true;
+                if (Directory.Exists(SettingsPath))
+                {
+                    weightwatchers.Path = SettingsPath;
+                    weightwatchers.Changed += ((object source, FileSystemEventArgs e) => {
+                        XNA.CheckForRequestedSongs();
+                    });
+                    weightwatchers.EnableRaisingEvents = true;
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't set filewatcher! (WRONG SETTINGSPATH: " + SettingsPath + " )");
+                }
+            } catch { Console.WriteLine("Couldn't set filewatcher! (ERROR)"); }
 
             try
             {
