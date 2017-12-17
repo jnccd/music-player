@@ -108,9 +108,9 @@ namespace MusicPlayer {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public int[] SongScores {
+        public float[] SongScores {
             get {
-                return ((int[])(this["SongScores"]));
+                return ((float[])(this["SongScores"]));
             }
             set {
                 this["SongScores"] = value;

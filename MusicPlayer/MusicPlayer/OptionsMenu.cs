@@ -17,7 +17,7 @@ namespace MusicPlayer
 {
     public partial class OptionsMenu : Form
     {
-        Statistics S;
+        Statistics S = null;
         bool DownloadFinished;
 
         public OptionsMenu()
@@ -86,8 +86,13 @@ namespace MusicPlayer
         }
         private void ShowStatistics_Click(object sender, EventArgs e)
         {
-            S = new Statistics();
-            S.Show();
+            if (S == null || S.IsDisposed)
+            {
+                S = new Statistics();
+                S.Show();
+            }
+            else
+                S.BringToFront();
         }
         private void ShowConsole_Click(object sender, EventArgs e)
         {
@@ -136,6 +141,7 @@ namespace MusicPlayer
             Download.Text = "Downloading...";
             Download.Enabled = false;
             DownloadBox.Enabled = false;
+            XNA.PauseConsoleInputThread = true;
 
             Task.Factory.StartNew(() =>
             {
@@ -145,80 +151,7 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        // Get fitting youtube video
-                        string url = string.Format("https://www.youtube.com/results?search_query=" + download);
-                        HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-                        req.KeepAlive = false;
-                        WebResponse W = req.GetResponse();
-                        string ResultURL;
-                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                        {
-                            string html = sr.ReadToEnd();
-                            int index = html.IndexOf("href=\"/watch?");
-                            string startcuthtml = html.Remove(0, index + 6);
-                            index = startcuthtml.IndexOf('"');
-                            string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                            ResultURL = "https://www.youtube.com" + cuthtml;
-                        }
-
-                        // Get video title
-                        req = (HttpWebRequest)WebRequest.Create(ResultURL);
-                        req.KeepAlive = false;
-                        W = req.GetResponse();
-                        string VideoTitle;
-                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                        {
-                            string html = sr.ReadToEnd();
-                            int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
-                            string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
-                            index = startcuthtml.IndexOf('"');
-                            VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
-
-                            // Decode the encoded string.
-                            StringWriter myWriter = new StringWriter();
-                            System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
-                            VideoTitle = myWriter.ToString();
-                        }
-
-                        if (MessageBox.Show("Closest song found: " + VideoTitle, "Song found", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                        {
-
-                            // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
-                            string videofile = "" + Environment.CurrentDirectory + "\\Downloads\\File.mp4";
-                            if (File.Exists(videofile))
-                                File.Delete(videofile);
-
-                            // Download Video File
-                            Process P = new Process();
-                            P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"/Downloads/File.mp4\" " + ResultURL)
-                            {
-                                UseShellExecute = false, RedirectStandardOutput = true
-                            };
-
-                            P.Start();
-                            string result = "";
-
-                            while (!P.HasExited)
-                            {
-                                result += P.StandardOutput.ReadLine();
-                                DownloadBox.Text = result;
-                                P.Refresh();
-                            }
-
-                            P.WaitForExit();
-
-                            // Convert Video File to mp3 and put it into the default folder
-                            MediaFile input = new MediaFile { Filename = videofile };
-                            MediaFile output = new MediaFile { Filename = config.Default.MusicPath + "\\" + VideoTitle + ".mp3" };
-                            using (var engine = new Engine())
-                            {
-                                engine.GetMetadata(input);
-                                engine.Convert(input, output);
-                            }
-
-                            File.Delete(videofile);
-                            Assets.PlayNewSong(output.Filename);
-                        }
+                        XNA.Download(download);
                     }
                     catch (Exception ex)
                     {
@@ -242,6 +175,7 @@ namespace MusicPlayer
                 Download.Enabled = true;
                 DownloadBox.Enabled = true;
                 DownloadFinished = false;
+                XNA.PauseConsoleInputThread = false;
             }
         }
     }

@@ -23,7 +23,7 @@
     <Setting Name="SongPaths" Type="System.String[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="SongScores" Type="System.Int32[]" Scope="User">
+    <Setting Name="SongScores" Type="System.Single[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="WavePreload" Type="System.Int32" Scope="User">
