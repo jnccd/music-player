@@ -19,6 +19,7 @@ namespace MusicPlayer
     {
         Statistics S = null;
         bool DownloadFinished;
+        bool DoesPreloadActuallyWork = false;
 
         public OptionsMenu()
         {
@@ -44,21 +45,24 @@ namespace MusicPlayer
 
         private void PreloadToggle_Click(object sender, EventArgs e)
         {
-            XNA.Preload = !XNA.Preload;
-
-            XNA.ShowSecondRowMessage("Preload was set to " + XNA.Preload + " \nThis setting will be applied when the next song starts", 1);
-
-            if (XNA.Preload)
+            if (DoesPreloadActuallyWork)
             {
-                PreloadToggle.Text = "Disable Preload";
-                trackBar1.Enabled = true;
-                label1.Enabled = true;
-            }
-            else
-            {
-                PreloadToggle.Text = "Enable Preload";
-                trackBar1.Enabled = false;
-                label1.Enabled = false;
+                XNA.Preload = !XNA.Preload;
+
+                XNA.ShowSecondRowMessage("Preload was set to " + XNA.Preload + " \nThis setting will be applied when the next song starts", 1);
+
+                if (XNA.Preload)
+                {
+                    PreloadToggle.Text = "Disable Preload";
+                    trackBar1.Enabled = true;
+                    label1.Enabled = true;
+                }
+                else
+                {
+                    PreloadToggle.Text = "Enable Preload";
+                    trackBar1.Enabled = false;
+                    label1.Enabled = false;
+                }
             }
         }
         private void trackBar1_Scroll(object sender, EventArgs e)
