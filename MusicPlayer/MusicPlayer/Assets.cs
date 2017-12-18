@@ -699,6 +699,18 @@ namespace MusicPlayer
                 T.Wait();
             }
 
+            string Title;
+            if (currentlyPlayingSongName.Contains(".mp3"))
+            {
+                Title = currentlyPlayingSongName.TrimEnd(new char[] { '3' });
+                Title = Title.TrimEnd(new char[] { 'p' });
+                Title = Title.TrimEnd(new char[] { 'm' });
+                Title = Title.TrimEnd(new char[] { '.' });
+            }
+            else
+                Title = currentlyPlayingSongName;
+            SongHistory.Add(Title);
+
             DisposeNAudioData();
             XNA.ForceTitleRedraw();
             if (XNA.DG != null)
@@ -787,6 +799,7 @@ namespace MusicPlayer
             config.Default.SongPaths = UpvotedSongNames.ToArray();
             config.Default.SongScores = UpvotedSongScores.ToArray();
             config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
+            config.Default.SongHistory = SongHistory.ToArray();
 
             config.Default.Background = (int)XNA.BgModes;
             config.Default.Vis = (int)XNA.VisSetting;

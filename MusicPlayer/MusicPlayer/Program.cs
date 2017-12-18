@@ -41,32 +41,24 @@ namespace MusicPlayer
             Values.DisableConsoleRezise();
 
             // Song Data List initialization
-            if (config.Default.SongPaths != null && config.Default.SongScores != null)
-            {
+            if (config.Default.SongPaths != null && config.Default.SongScores != null) {
                 Assets.UpvotedSongNames = config.Default.SongPaths.ToList();
                 Assets.UpvotedSongScores = config.Default.SongScores.ToList();
             }
-            else
-            {
+            else {
                 Assets.UpvotedSongNames = new List<string>();
                 Assets.UpvotedSongScores = new List<float>();
             }
-            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
-            {
+            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count) {
                 Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
                 for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
                     Assets.UpvotedSongStreaks.Add(0);
-            }
-            else
+            } else
                 Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
-            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
-            {
-                Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
-                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
-                    Assets.UpvotedSongStreaks.Add(0);
-            }
+            if (config.Default.SongHistory != null)
+                Assets.SongHistory = config.Default.SongHistory.ToList();
             else
-                Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
+                Assets.SongHistory = new List<string>();
 
             Console.Clear();
             
