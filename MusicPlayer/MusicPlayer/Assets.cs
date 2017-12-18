@@ -624,22 +624,29 @@ namespace MusicPlayer
             if (config.Default.MultiThreading || forced || 
                 Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
-                if (DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
+                if (PlayerHistoryIndex > 0)
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
-                    double percentage = (Channel32.Position / (double)Channel32.Length) * 10;
 
-                    if (index > -1 && UpvotedSongScores[index] > (Channel32.Position / (double)Channel32.Length) * 10 && !IsCurrentSongUpvoted ||
-                        index > -1 && 0.1 > (Channel32.Position / (double)Channel32.Length) && !IsCurrentSongUpvoted)
+                    if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
                     {
-                        if (UpvotedSongStreaks[index] > -1)
-                            UpvotedSongStreaks[index] = -1;
-                        else
-                            UpvotedSongStreaks[index] -= 2;
+                        double percentage = (Channel32.Position / (double)Channel32.Length);
 
-                        UpvotedSongScores[index] += UpvotedSongStreaks[index];
+                        if (UpvotedSongScores[index] > 120)
+                            UpvotedSongScores[index] = 120;
 
-                        XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+                        if (UpvotedSongScores[index] > percentage * 10 && !IsCurrentSongUpvoted ||
+                            0.1 > percentage && !IsCurrentSongUpvoted)
+                        {
+                            if (UpvotedSongStreaks[index] > -1)
+                                UpvotedSongStreaks[index] = -1;
+                            else
+                                UpvotedSongStreaks[index] -= 2;
+
+                            UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index] + UpvotedSongStreaks[index]);
+
+                            XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+                        }
                     }
                 }
                 
@@ -729,6 +736,10 @@ namespace MusicPlayer
                 if (UpvotedSongNames.Contains(currentlyPlayingSongName))
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
+                    double percentage = (Channel32.Position / (double)Channel32.Length);
+
+                    if (UpvotedSongScores[index] < -20)
+                        UpvotedSongScores[index] = -20;
 
                     if (UpvotedSongStreaks[index] < 1)
                         UpvotedSongStreaks[index] = 1;
@@ -737,7 +748,7 @@ namespace MusicPlayer
                     if (UpvotedSongScores[index] < 0)
                         UpvotedSongScores[index] = 0;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index];
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index] + UpvotedSongStreaks[index]) * (float)percentage;
                     LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 }
                 else
@@ -784,6 +795,15 @@ namespace MusicPlayer
 
             config.Default.Save();
         }
+        private static float GetUpvoteWeight(float SongScore)
+        {
+            return (float)Math.Pow(2, -SongScore / 20);
+        }
+        private static float GetDownvoteWeight(float SongScore)
+        {
+            return (float)Math.Pow(2, (SongScore - 100) / 20);
+        }
+        // For Statistics
         public static float SongAge(string SongPath)
         {
             if (File.Exists(SongPath))
@@ -852,7 +872,7 @@ namespace MusicPlayer
 
                     if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
                         amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 23f);
+                                Playlist.Count / 20f);
 
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
@@ -860,7 +880,7 @@ namespace MusicPlayer
             }
             return SongChoosingList;
         }
-
+        
         // Draw Methods
         public static void DrawLine(Vector2 End1, Vector2 End2, int Thickness, Color Col, SpriteBatch SB)
         {
