@@ -190,14 +190,13 @@ namespace MusicPlayer
             Shadow.Show();
         }
 
+        // Console Management
         void StartSongInputLoop()
         {
             ConsoleManager = Task.Factory.StartNew(() =>
             {
                 while (true)
                 {
-                    while (PauseConsoleInputThread) { }
-
                     string Path = "";
                     originY = Console.CursorTop;
                     while (!Path.Contains(".mp3\""))
@@ -214,6 +213,7 @@ namespace MusicPlayer
 
                         ConsoleKeyInfo e = Console.ReadKey();
 
+                        if (PauseConsoleInputThread) { Console.CursorLeft = 0; }
                         while (PauseConsoleInputThread) { }
 
                         if (e.Key == ConsoleKey.UpArrow)
@@ -350,8 +350,6 @@ namespace MusicPlayer
                     Console.WriteLine();
                     if (Assets.PlayNewSong(Path))
                         LastConsoleInput.Add(Path.Trim('"'));
-
-                    while (PauseConsoleInputThread) { }
                 }
             });
         }
@@ -452,7 +450,7 @@ namespace MusicPlayer
                 ComputeControls();
 
             if (ConsoleManager.IsFaulted)
-                MessageBox.Show("The Console-Input Thread died!/nError Message: " + ConsoleManager.Exception);
+                MessageBox.Show("The Console-Input Thread died! May it rest in pieces./nError Message: " + ConsoleManager.Exception);
 
             // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
             if (Control.ScrollWheelWentDown())
