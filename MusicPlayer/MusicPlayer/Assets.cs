@@ -643,13 +643,13 @@ namespace MusicPlayer
                             else
                                 UpvotedSongStreaks[index] -= 2;
 
-                            UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index] + UpvotedSongStreaks[index]);
+                            UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]);
 
                             XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                         }
                     }
                 }
-                
+
                 SaveUserSettings();
 
                 PlayerHistoryIndex++;
@@ -760,7 +760,7 @@ namespace MusicPlayer
                     if (UpvotedSongScores[index] < 0)
                         UpvotedSongScores[index] = 0;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index] + UpvotedSongStreaks[index]) * (float)percentage;
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage;
                     LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 }
                 else
@@ -864,10 +864,10 @@ namespace MusicPlayer
                     return s;
             return "COULDNT FIND SONG NAME!";
         }
-        private static List<string> GetSongChoosingList(bool ForNextSongChoosing)
+        private static List<string> GetSongChoosingList(bool ForNextSongChoosing) // This determines the song chances
         {
             List<string> SongChoosingList = new List<string>();
-            int ChanceIncreasePerUpvote = Playlist.Count / 100;
+            int ChanceIncreasePerUpvote = Playlist.Count / 80;
             for (int i = 0; i < Playlist.Count; i++)
             {
                 if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
@@ -885,7 +885,7 @@ namespace MusicPlayer
 
                     if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
                         amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 20f);
+                                Playlist.Count / 23f);
 
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
