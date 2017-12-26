@@ -749,10 +749,16 @@ namespace MusicPlayer
                     Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
             }
 
-            // Reset Music Source Folder [S]
+            // Show Statistics [S]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
             {
-                ResetMusicSourcePath();
+                if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
+                {
+                    optionsMenu.S = new Statistics();
+                    optionsMenu.S.Show();
+                }
+                else
+                    optionsMenu.S.BringToFront();
             }
         }
         public static void ShowColorDialog()

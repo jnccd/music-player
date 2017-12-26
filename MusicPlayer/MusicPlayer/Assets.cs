@@ -909,12 +909,12 @@ namespace MusicPlayer
             if (!File.Exists(path))
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(path))
-                    sw.WriteLine(Title + ":");
+                    sw.WriteLine(Title);
 
             // This text is always added, making the file longer over time
             // if it is not deleted.
             using (StreamWriter sw = File.AppendText(path))
-                sw.WriteLine(Title + ":");
+                sw.WriteLine(Title);
         }
 
         // Draw Methods
