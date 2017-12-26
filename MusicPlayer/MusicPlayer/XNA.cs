@@ -92,6 +92,7 @@ namespace MusicPlayer
         bool WasFocusedLastFrame = true;
         public static bool PauseConsoleInputThread = false;
         Task ConsoleManager;
+        const float MaxVolume = 0.75f;
 
         // Draw
         static Vector2 DrawVector = new Vector2(1, 1);
@@ -407,7 +408,7 @@ namespace MusicPlayer
             }
 
             // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
-            string videofile = "" + Environment.CurrentDirectory + "\\Downloads\\File.mp4";
+            string videofile = Environment.CurrentDirectory + "\\Downloads\\File.mp4";
             if (File.Exists(videofile))
                 File.Delete(videofile);
 
@@ -594,9 +595,9 @@ namespace MusicPlayer
             switch (selectedControl)
             {
                 case SelectedControl.VolumeSlider:
-                    float value = (Control.GetMouseVector().X - VolumeBar.X) / (VolumeBar.Width * 2f);
+                    float value = (Control.GetMouseVector().X - VolumeBar.X) / (VolumeBar.Width / MaxVolume);
                     if (value < 0) value = 0;
-                    if (value > 0.5f) value = 0.5f;
+                    if (value > MaxVolume) value = MaxVolume;
                     Values.TargetVolume = value;
                     break;
 
@@ -724,8 +725,8 @@ namespace MusicPlayer
                 Values.TargetVolume += 0.005f;
             if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Down))
                 Values.TargetVolume -= 0.005f;
-            if (Values.TargetVolume > 0.5f)
-                Values.TargetVolume = 0.5f;
+            if (Values.TargetVolume > MaxVolume)
+                Values.TargetVolume = MaxVolume;
             if (Values.TargetVolume < 0)
                 Values.TargetVolume = 0;
 
@@ -844,14 +845,14 @@ namespace MusicPlayer
         {
             TargetVolumeBar.X = Values.WindowSize.X - 100;
             TargetVolumeBar.Y = 24;
-            TargetVolumeBar.Width = (int)(75 * Values.TargetVolume * 2);
+            TargetVolumeBar.Width = (int)(75 * Values.TargetVolume / MaxVolume);
             TargetVolumeBar.Height = 8;
 
             if (Assets.Channel32 != null)
             {
                 ActualVolumeBar.X = Values.WindowSize.X - 25 - 75;
                 ActualVolumeBar.Y = 24;
-                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume * 2);
+                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume);
                 ActualVolumeBar.Height = 8;
             }
         }
@@ -1244,12 +1245,12 @@ namespace MusicPlayer
             }
 
             // Volume
-            if (Values.TargetVolume > 0.45f)
+            if (Values.TargetVolume > MaxVolume * 0.9f)
             {
                 spriteBatch.Draw(Assets.Volume, VolumeIconShadow, Color.Black * 0.6f);
                 spriteBatch.Draw(Assets.Volume, VolumeIcon, Color.White);
             }
-            else if (Values.TargetVolume > 0.15f)
+            else if (Values.TargetVolume > MaxVolume * 0.3f)
             {
                 spriteBatch.Draw(Assets.Volume2, VolumeIconShadow, Color.Black * 0.6f);
                 spriteBatch.Draw(Assets.Volume2, VolumeIcon, Color.White);

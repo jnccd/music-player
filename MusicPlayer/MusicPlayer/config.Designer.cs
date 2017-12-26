@@ -175,16 +175,5 @@ namespace MusicPlayer {
                 this["SongUpvoteStreak"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public string[] SongHistory {
-            get {
-                return ((string[])(this["SongHistory"]));
-            }
-            set {
-                this["SongHistory"] = value;
-            }
-        }
     }
 }
