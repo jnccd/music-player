@@ -46,6 +46,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.ShowProgramFolder = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -105,7 +106,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(205, 23);
             this.button1.TabIndex = 5;
-            this.button1.Text = "Reset Music Source Folder [S]";
+            this.button1.Text = "Reset Music Source Folder";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Reset_Click_1);
             // 
@@ -113,9 +114,9 @@
             // 
             this.ShowStatistics.Location = new System.Drawing.Point(12, 129);
             this.ShowStatistics.Name = "ShowStatistics";
-            this.ShowStatistics.Size = new System.Drawing.Size(416, 23);
+            this.ShowStatistics.Size = new System.Drawing.Size(205, 23);
             this.ShowStatistics.TabIndex = 6;
-            this.ShowStatistics.Text = "Show Statistics";
+            this.ShowStatistics.Text = "Show Statistics [S]";
             this.ShowStatistics.UseVisualStyleBackColor = true;
             this.ShowStatistics.Click += new System.EventHandler(this.ShowStatistics_Click);
             // 
@@ -213,11 +214,22 @@
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // ShowProgramFolder
+            // 
+            this.ShowProgramFolder.Location = new System.Drawing.Point(223, 129);
+            this.ShowProgramFolder.Name = "ShowProgramFolder";
+            this.ShowProgramFolder.Size = new System.Drawing.Size(205, 23);
+            this.ShowProgramFolder.TabIndex = 16;
+            this.ShowProgramFolder.Text = "Show Program Folder";
+            this.ShowProgramFolder.UseVisualStyleBackColor = true;
+            this.ShowProgramFolder.Click += new System.EventHandler(this.ShowProgramFolder_Click);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(438, 301);
+            this.Controls.Add(this.ShowProgramFolder);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.Download);
@@ -263,5 +275,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button ShowProgramFolder;
     }
 }

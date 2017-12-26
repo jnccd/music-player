@@ -17,7 +17,7 @@ namespace MusicPlayer
 {
     public partial class OptionsMenu : Form
     {
-        Statistics S = null;
+        public Statistics S = null;
         bool DownloadFinished;
         bool DoesPreloadActuallyWork = false;
 
@@ -181,6 +181,11 @@ namespace MusicPlayer
                 DownloadFinished = false;
                 XNA.PauseConsoleInputThread = false;
             }
+        }
+
+        private void ShowProgramFolder_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", "/select, \"" + Environment.CurrentDirectory + "\"");
         }
     }
 }
