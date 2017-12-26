@@ -788,7 +788,11 @@ namespace MusicPlayer
                 if (UpvotedSongNames.Contains(currentlyPlayingSongName))
                 {
                     int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
-                    double percentage = (Channel32.Position / (double)Channel32.Length);
+                    double percentage;
+                    if (Channel32 == null)
+                        percentage = 1;
+                    else
+                        percentage = (Channel32.Position / (double)Channel32.Length);
 
                     if (UpvotedSongScores[index] < -20)
                         UpvotedSongScores[index] = -20;
