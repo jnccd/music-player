@@ -123,7 +123,6 @@ namespace MusicPlayer
         public static List<string> UpvotedSongNames;
         public static List<float> UpvotedSongScores;
         public static List<int> UpvotedSongStreaks;
-        public static List<string> SongHistory;
 
         // MultiThreading
         public static Task T = null;
@@ -624,31 +623,7 @@ namespace MusicPlayer
             if (config.Default.MultiThreading || forced || 
                 Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
-                if (PlayerHistoryIndex > 0)
-                {
-                    int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
-
-                    if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
-                    {
-                        double percentage = (Channel32.Position / (double)Channel32.Length);
-
-                        if (UpvotedSongScores[index] > 120)
-                            UpvotedSongScores[index] = 120;
-
-                        if (UpvotedSongScores[index] > percentage * 10 && !IsCurrentSongUpvoted ||
-                            0.1 > percentage && !IsCurrentSongUpvoted)
-                        {
-                            if (UpvotedSongStreaks[index] > -1)
-                                UpvotedSongStreaks[index] = -1;
-                            else
-                                UpvotedSongStreaks[index] -= 2;
-
-                            UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]);
-
-                            XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
-                        }
-                    }
-                }
+                DownvoteCurrentSongIfNeccesary(DownVoteCurrentSongForUserSkip);
 
                 SaveUserSettings();
 
@@ -698,18 +673,8 @@ namespace MusicPlayer
                 AbortAbort = true;
                 T.Wait();
             }
-
-            string Title;
-            if (currentlyPlayingSongName.Contains(".mp3"))
-            {
-                Title = currentlyPlayingSongName.TrimEnd(new char[] { '3' });
-                Title = Title.TrimEnd(new char[] { 'p' });
-                Title = Title.TrimEnd(new char[] { 'm' });
-                Title = Title.TrimEnd(new char[] { '.' });
-            }
-            else
-                Title = currentlyPlayingSongName;
-            SongHistory.Add(Title);
+            
+            SaveCurrentSongToHistoryFile();
 
             DisposeNAudioData();
             XNA.ForceTitleRedraw();
@@ -742,6 +707,81 @@ namespace MusicPlayer
         }
         public static void SaveUserSettings()
         {
+            UpvoteCurrentSongIfNeccesary();
+
+            // Sorting
+            float Swapi;
+            int Swapi2;
+            string SwapS;
+            for (int i = 1; i < UpvotedSongNames.Count; i++)
+            {
+                if (UpvotedSongScores[i - 1] < UpvotedSongScores[i])
+                {
+                    Swapi = UpvotedSongScores[i];
+                    Swapi2 = UpvotedSongStreaks[i];
+                    SwapS = UpvotedSongNames[i];
+
+                    UpvotedSongScores[i] = UpvotedSongScores[i - 1];
+                    UpvotedSongStreaks[i] = UpvotedSongStreaks[i - 1];
+                    UpvotedSongNames[i] = UpvotedSongNames[i - 1];
+
+                    UpvotedSongScores[i - 1] = Swapi;
+                    UpvotedSongStreaks[i - 1] = Swapi2;
+                    UpvotedSongNames[i - 1] = SwapS;
+
+                    i = 1;
+                }
+            }
+
+            config.Default.SongPaths = UpvotedSongNames.ToArray();
+            config.Default.SongScores = UpvotedSongScores.ToArray();
+            config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
+
+            config.Default.Background = (int)XNA.BgModes;
+            config.Default.Vis = (int)XNA.VisSetting;
+
+            config.Default.Col = System.Drawing.Color.FromArgb(XNA.primaryColor.R, XNA.primaryColor.G, XNA.primaryColor.B);
+
+            config.Default.Save();
+        }
+        private static float GetUpvoteWeight(float SongScore)
+        {
+            return (float)Math.Pow(2, -SongScore / 20);
+        }
+        private static float GetDownvoteWeight(float SongScore)
+        {
+            return (float)Math.Pow(2, (SongScore - 100) / 20);
+        }
+        private static void DownvoteCurrentSongIfNeccesary(bool DownVoteCurrentSongForUserSkip)
+        {
+            if (PlayerHistoryIndex > 0)
+            {
+                int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
+
+                if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
+                {
+                    double percentage = (Channel32.Position / (double)Channel32.Length);
+
+                    if (UpvotedSongScores[index] > 120)
+                        UpvotedSongScores[index] = 120;
+
+                    if (UpvotedSongScores[index] > percentage * 10 && !IsCurrentSongUpvoted ||
+                        0.1 > percentage && !IsCurrentSongUpvoted)
+                    {
+                        if (UpvotedSongStreaks[index] > -1)
+                            UpvotedSongStreaks[index] = -1;
+                        else
+                            UpvotedSongStreaks[index] -= 2;
+
+                        UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]);
+
+                        XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+                    }
+                }
+            }
+        }
+        private static void UpvoteCurrentSongIfNeccesary()
+        {
             if (IsCurrentSongUpvoted)
             {
                 XNA.UpvoteSavedAlpha = 1.4f;
@@ -771,50 +811,6 @@ namespace MusicPlayer
                 }
             }
             IsCurrentSongUpvoted = false;
-
-            // Sorting
-            float Swapi;
-            int Swapi2;
-            string SwapS;
-            for (int i = 1; i < UpvotedSongNames.Count; i++)
-            {
-                if (UpvotedSongScores[i - 1] < UpvotedSongScores[i])
-                {
-                    Swapi = UpvotedSongScores[i];
-                    Swapi2 = UpvotedSongStreaks[i];
-                    SwapS = UpvotedSongNames[i];
-
-                    UpvotedSongScores[i] = UpvotedSongScores[i - 1];
-                    UpvotedSongStreaks[i] = UpvotedSongStreaks[i - 1];
-                    UpvotedSongNames[i] = UpvotedSongNames[i - 1];
-
-                    UpvotedSongScores[i - 1] = Swapi;
-                    UpvotedSongStreaks[i - 1] = Swapi2;
-                    UpvotedSongNames[i - 1] = SwapS;
-
-                    i = 1;
-                }
-            }
-
-            config.Default.SongPaths = UpvotedSongNames.ToArray();
-            config.Default.SongScores = UpvotedSongScores.ToArray();
-            config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
-            config.Default.SongHistory = SongHistory.ToArray();
-
-            config.Default.Background = (int)XNA.BgModes;
-            config.Default.Vis = (int)XNA.VisSetting;
-
-            config.Default.Col = System.Drawing.Color.FromArgb(XNA.primaryColor.R, XNA.primaryColor.G, XNA.primaryColor.B);
-
-            config.Default.Save();
-        }
-        private static float GetUpvoteWeight(float SongScore)
-        {
-            return (float)Math.Pow(2, -SongScore / 20);
-        }
-        private static float GetDownvoteWeight(float SongScore)
-        {
-            return (float)Math.Pow(2, (SongScore - 100) / 20);
         }
         // For Statistics
         public static float SongAge(string SongPath)
@@ -868,6 +864,8 @@ namespace MusicPlayer
         {
             List<string> SongChoosingList = new List<string>();
             int ChanceIncreasePerUpvote = Playlist.Count / 80;
+            if (ChanceIncreasePerUpvote < 1)
+                ChanceIncreasePerUpvote = 1;
             for (int i = 0; i < Playlist.Count; i++)
             {
                 if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
@@ -893,7 +891,32 @@ namespace MusicPlayer
             }
             return SongChoosingList;
         }
-        
+        private static void SaveCurrentSongToHistoryFile()
+        {
+            string path = Environment.CurrentDirectory + "\\History.txt";
+            string Title;
+            if (currentlyPlayingSongName.Contains(".mp3"))
+            {
+                Title = currentlyPlayingSongName.TrimEnd(new char[] { '3' });
+                Title = Title.TrimEnd(new char[] { 'p' });
+                Title = Title.TrimEnd(new char[] { 'm' });
+                Title = Title.TrimEnd(new char[] { '.' });
+            }
+            else
+                Title = currentlyPlayingSongName;
+
+            // This text is added only once to the file.
+            if (!File.Exists(path))
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path))
+                    sw.WriteLine(Title + ":");
+
+            // This text is always added, making the file longer over time
+            // if it is not deleted.
+            using (StreamWriter sw = File.AppendText(path))
+                sw.WriteLine(Title + ":");
+        }
+
         // Draw Methods
         public static void DrawLine(Vector2 End1, Vector2 End2, int Thickness, Color Col, SpriteBatch SB)
         {

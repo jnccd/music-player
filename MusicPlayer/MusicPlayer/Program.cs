@@ -55,10 +55,6 @@ namespace MusicPlayer
                     Assets.UpvotedSongStreaks.Add(0);
             } else
                 Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
-            if (config.Default.SongHistory != null)
-                Assets.SongHistory = config.Default.SongHistory.ToList();
-            else
-                Assets.SongHistory = new List<string>();
 
             Console.Clear();
             
