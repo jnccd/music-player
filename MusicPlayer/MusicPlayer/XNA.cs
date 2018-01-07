@@ -93,6 +93,7 @@ namespace MusicPlayer
         public static bool PauseConsoleInputThread = false;
         Task ConsoleManager;
         const float MaxVolume = 0.75f;
+        static int lastSongRequestCheck = -100;
 
         // Draw
         static Vector2 DrawVector = new Vector2(1, 1);
@@ -252,6 +253,11 @@ namespace MusicPlayer
                                 FocusWindow = true;
                                 originY++;
                             }
+                            else if (Path == "/s")
+                            {
+                                Console.WriteLine("Target Volume: " + Values.TargetVolume + ", Output Volume: " + Values.OutputVolume);
+                                originY = Console.CursorTop + 1;
+                            }
                             else if (Path == "/t" || Path == "/time")
                             {
                                 LastConsoleInput.Add(Path);
@@ -408,13 +414,13 @@ namespace MusicPlayer
             }
 
             // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
-            string videofile = Environment.CurrentDirectory + "\\Downloads\\File.mp4";
+            string videofile = Values.CurrentExecutablePath + "\\Downloads\\File.mp4";
             if (File.Exists(videofile))
                 File.Delete(videofile);
 
             // Download Video File
             Process P = new Process();
-            string b = Environment.CurrentDirectory;
+            string b = Values.CurrentExecutablePath;
             P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"/Downloads/File.mp4\" " + ResultURL)
             {
                 UseShellExecute = false
@@ -534,22 +540,27 @@ namespace MusicPlayer
         }
         public static void CheckForRequestedSongs()
         {
-            bool Worked = false;
-            while (!Worked)
+            Task.Factory.StartNew(() =>
             {
-                try
+                bool Worked = false;
+                while (!Worked && lastSongRequestCheck < Values.Timer - 5)
                 {
-                    RequestedSong.Default.Reload();
-                    if (RequestedSong.Default.RequestedSongString != "")
+                    try
                     {
-                        Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
-                        RequestedSong.Default.RequestedSongString = "";
-                        RequestedSong.Default.Save();
+                        Thread.Sleep(30);
+                        RequestedSong.Default.Reload();
+                        if (RequestedSong.Default.RequestedSongString != "")
+                        {
+                            lastSongRequestCheck = Values.Timer;
+                            Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
+                            RequestedSong.Default.RequestedSongString = "";
+                            RequestedSong.Default.Save();
+                        }
+                        Worked = true;
                     }
-                    Worked = true;
+                    catch { }
                 }
-                catch { }
-            }
+            });
         }
         void ComputeControls()
         {

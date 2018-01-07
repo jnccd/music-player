@@ -185,7 +185,7 @@ namespace MusicPlayer
 
         private void ShowProgramFolder_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe", "/select, \"" + Environment.CurrentDirectory + "\"");
+            Process.Start("explorer.exe", "/select, \"" + Values.CurrentExecutablePath + "\"");
         }
     }
 }
