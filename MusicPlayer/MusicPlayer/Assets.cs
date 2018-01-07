@@ -773,7 +773,7 @@ namespace MusicPlayer
                         else
                             UpvotedSongStreaks[index] -= 2;
 
-                        UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]);
+                        UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 4;
 
                         XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                     }
@@ -804,7 +804,7 @@ namespace MusicPlayer
                     if (UpvotedSongScores[index] < 0)
                         UpvotedSongScores[index] = 0;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage;
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 4;
                     LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 }
                 else
@@ -897,7 +897,7 @@ namespace MusicPlayer
         }
         private static void SaveCurrentSongToHistoryFile()
         {
-            string path = Environment.CurrentDirectory + "\\History.txt";
+            string path = Values.CurrentExecutablePath + "\\History.txt";
             string Title;
             if (currentlyPlayingSongName.Contains(".mp3"))
             {

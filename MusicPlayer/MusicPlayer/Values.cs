@@ -27,6 +27,8 @@ namespace MusicPlayer
             }
         }
 
+        public static string CurrentExecutablePath = System.Reflection.Assembly.GetExecutingAssembly().Location.Substring(0, System.Reflection.Assembly.GetExecutingAssembly().Location.LastIndexOf("\\MusicPlayer.exe"));
+
         public static float OutputVolume = 0;
         public static float LastOutputVolume = 0;
         public static float OutputVolumeIncrease = 0;

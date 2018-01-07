@@ -25,13 +25,13 @@ namespace MusicPlayer
             foreach (Process p in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
                 if (p.Id != Process.GetCurrentProcess().Id && p.MainModule.FileName == Process.GetCurrentProcess().MainModule.FileName)
                 {
-                    Console.WriteLine("Found another instance... sending data...");
+                    Console.WriteLine("Found another instance. \nSending data...");
                     if (args.Length > 0)
                     {
                         RequestedSong.Default.RequestedSongString = args[0];
                         RequestedSong.Default.Save();
                     }
-                    Thread.Sleep(1500);
+                    Console.WriteLine("Data sent! Closing...");
                     return;
                 }
 
@@ -98,7 +98,7 @@ namespace MusicPlayer
             catch (Exception ex)
             {
                 MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: \n" + ex.InnerException + "\n\nSource: " + ex.Source);
-                string strPath = Environment.CurrentDirectory + @"\Log.txt";
+                string strPath = Values.CurrentExecutablePath + @"\Log.txt";
                 if (!File.Exists(strPath))
                 {
                     File.Create(strPath).Dispose();
