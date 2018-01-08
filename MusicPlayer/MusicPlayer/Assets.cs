@@ -758,25 +758,21 @@ namespace MusicPlayer
             {
                 int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
 
-                if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1)
+                if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1 && !IsCurrentSongUpvoted)
                 {
-                    double percentage = (Channel32.Position / (double)Channel32.Length);
+                    float percentage = Channel32.Position / (float)Channel32.Length;
 
                     if (UpvotedSongScores[index] > 120)
                         UpvotedSongScores[index] = 120;
 
-                    if (UpvotedSongScores[index] > percentage * 10 && !IsCurrentSongUpvoted ||
-                        0.1 > percentage && !IsCurrentSongUpvoted)
-                    {
-                        if (UpvotedSongStreaks[index] > -1)
-                            UpvotedSongStreaks[index] = -1;
-                        else
-                            UpvotedSongStreaks[index] -= 2;
+                    if (UpvotedSongStreaks[index] > -1)
+                        UpvotedSongStreaks[index] = -1;
+                    else
+                        UpvotedSongStreaks[index] -= 2;
 
-                        UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 4;
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 4 * (1 - percentage);
 
-                        XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
-                    }
+                    XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                 }
             }
         }
