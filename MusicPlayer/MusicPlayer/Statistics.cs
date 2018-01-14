@@ -61,5 +61,58 @@ namespace MusicPlayer
             }
             catch { }
         }
+
+        private void bRefresh_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Rows.Clear();
+            object[] o = new object[6];
+            object[,] SongInfo = Assets.GetSongInformationList();
+
+            for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
+            {
+                o[0] = SongInfo[i, 0];
+                o[1] = SongInfo[i, 1];
+                o[2] = SongInfo[i, 2];
+                o[3] = SongInfo[i, 3];
+                o[4] = SongInfo[i, 4];
+                o[5] = SongInfo[i, 5];
+
+                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
+                    dataGridView1.Rows.Add(o);
+            }
+
+            dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
+            dataGridView1.Columns[1].Width = 80;
+            dataGridView1.Columns[2].Width = 80;
+            dataGridView1.Columns[3].Width = 80;
+            dataGridView1.Columns[4].Width = 80;
+            dataGridView1.Columns[5].Width = 80;
+        }
+
+        private void bSearch_Click(object sender, EventArgs e)
+        {
+            string Path = textBox1.Text;
+            textBox1.Text = "";
+
+            DistancePerSong[] LDistances = new DistancePerSong[dataGridView1.Rows.Count];
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                LDistances[i].SongDifference = Values.OwnDistance(Path, ((string)(dataGridView1.Rows[i].Cells[0].Value)));
+                LDistances[i].SongIndex = i;
+            }
+
+            LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
+
+            dataGridView1.ClearSelection();
+
+            dataGridView1.Rows[LDistances.First().SongIndex].Selected = true;
+            for (int i = 1; i < LDistances.Length; i++)
+            {
+                if (LDistances[i].SongDifference > 1)
+                    break;
+                dataGridView1.Rows[LDistances[i].SongIndex].Selected = true;
+            }
+            dataGridView1.FirstDisplayedScrollingRowIndex = LDistances.First().SongIndex;
+        }
     }
 }

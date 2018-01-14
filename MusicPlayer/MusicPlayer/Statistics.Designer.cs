@@ -35,6 +35,9 @@
             this.SongTotalUpvotes = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Chance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bRefresh = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.bSearch = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,9 +54,9 @@
             this.SongTotalUpvotes,
             this.SongAge,
             this.Chance});
-            this.dataGridView1.Location = new System.Drawing.Point(13, 13);
+            this.dataGridView1.Location = new System.Drawing.Point(13, 41);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(761, 600);
+            this.dataGridView1.Size = new System.Drawing.Size(854, 585);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
             this.dataGridView1.Resize += new System.EventHandler(this.dataGridView1_Resize);
@@ -88,17 +91,48 @@
             this.Chance.HeaderText = "PlayChance (in %)";
             this.Chance.Name = "Chance";
             // 
+            // bRefresh
+            // 
+            this.bRefresh.Location = new System.Drawing.Point(13, 12);
+            this.bRefresh.Name = "bRefresh";
+            this.bRefresh.Size = new System.Drawing.Size(147, 23);
+            this.bRefresh.TabIndex = 1;
+            this.bRefresh.Text = "Refresh";
+            this.bRefresh.UseVisualStyleBackColor = true;
+            this.bRefresh.Click += new System.EventHandler(this.bRefresh_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(167, 14);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(547, 20);
+            this.textBox1.TabIndex = 2;
+            // 
+            // bSearch
+            // 
+            this.bSearch.Location = new System.Drawing.Point(720, 12);
+            this.bSearch.Name = "bSearch";
+            this.bSearch.Size = new System.Drawing.Size(147, 23);
+            this.bSearch.TabIndex = 3;
+            this.bSearch.Text = "Search";
+            this.bSearch.UseVisualStyleBackColor = true;
+            this.bSearch.Click += new System.EventHandler(this.bSearch_Click);
+            // 
             // Statistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(786, 625);
+            this.ClientSize = new System.Drawing.Size(879, 638);
+            this.Controls.Add(this.bSearch);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.bRefresh);
             this.Controls.Add(this.dataGridView1);
             this.Name = "Statistics";
             this.Text = "Statistics";
             this.Load += new System.EventHandler(this.Statistics_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -111,5 +145,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SongTotalUpvotes;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongAge;
         private System.Windows.Forms.DataGridViewTextBoxColumn Chance;
+        private System.Windows.Forms.Button bRefresh;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button bSearch;
     }
 }
