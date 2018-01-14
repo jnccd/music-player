@@ -49,12 +49,23 @@ namespace MusicPlayer
                 Assets.UpvotedSongNames = new List<string>();
                 Assets.UpvotedSongScores = new List<float>();
             }
+            // Streaks
             if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count) {
                 Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
                 for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
                     Assets.UpvotedSongStreaks.Add(0);
             } else
                 Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
+            // TotalLikes
+            if (config.Default.SongTotalLikes == null || config.Default.SongTotalLikes.Length != Assets.UpvotedSongScores.Count)
+            {
+                Assets.UpvotedSongTotalLikes = new List<int>(Assets.UpvotedSongScores.Count);
+                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
+                    Assets.UpvotedSongTotalLikes.Add(0);
+            }
+            else
+                Assets.UpvotedSongTotalLikes = config.Default.SongTotalLikes.ToList();
+
 
             Console.Clear();
             

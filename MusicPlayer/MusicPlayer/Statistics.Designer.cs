@@ -32,6 +32,7 @@
             this.SongName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongScore = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongTrend = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SongTotalUpvotes = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Chance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -47,6 +48,7 @@
             this.SongName,
             this.SongScore,
             this.SongTrend,
+            this.SongTotalUpvotes,
             this.SongAge,
             this.Chance});
             this.dataGridView1.Location = new System.Drawing.Point(13, 13);
@@ -70,6 +72,11 @@
             // 
             this.SongTrend.HeaderText = "SongTrend";
             this.SongTrend.Name = "SongTrend";
+            // 
+            // SongTotalUpvotes
+            // 
+            this.SongTotalUpvotes.HeaderText = "SongTotalUpvotes";
+            this.SongTotalUpvotes.Name = "SongTotalUpvotes";
             // 
             // SongAge
             // 
@@ -101,6 +108,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SongName;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongScore;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongTrend;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SongTotalUpvotes;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongAge;
         private System.Windows.Forms.DataGridViewTextBoxColumn Chance;
     }

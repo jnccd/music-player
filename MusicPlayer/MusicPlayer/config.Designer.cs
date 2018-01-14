@@ -175,5 +175,16 @@ namespace MusicPlayer {
                 this["SongUpvoteStreak"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] SongTotalLikes {
+            get {
+                return ((int[])(this["SongTotalLikes"]));
+            }
+            set {
+                this["SongTotalLikes"] = value;
+            }
+        }
     }
 }
