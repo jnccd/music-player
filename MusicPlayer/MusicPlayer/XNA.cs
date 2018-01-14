@@ -540,27 +540,30 @@ namespace MusicPlayer
         }
         public static void CheckForRequestedSongs()
         {
-            Task.Factory.StartNew(() =>
+            if (lastSongRequestCheck < Values.Timer - 5)
             {
-                bool Worked = false;
-                while (!Worked && lastSongRequestCheck < Values.Timer - 5)
+                Task.Factory.StartNew(() =>
                 {
-                    try
+                    bool Worked = false;
+                    while (!Worked && lastSongRequestCheck < Values.Timer - 5)
                     {
-                        Thread.Sleep(30);
-                        RequestedSong.Default.Reload();
-                        if (RequestedSong.Default.RequestedSongString != "")
+                        try
                         {
-                            lastSongRequestCheck = Values.Timer;
-                            Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
-                            RequestedSong.Default.RequestedSongString = "";
-                            RequestedSong.Default.Save();
+                            Thread.Sleep(30);
+                            RequestedSong.Default.Reload();
+                            if (RequestedSong.Default.RequestedSongString != "")
+                            {
+                                lastSongRequestCheck = Values.Timer;
+                                Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
+                                RequestedSong.Default.RequestedSongString = "";
+                                RequestedSong.Default.Save();
+                            }
+                            Worked = true;
                         }
-                        Worked = true;
+                        catch { }
                     }
-                    catch { }
-                }
-            });
+                });
+            }
         }
         void ComputeControls()
         {
