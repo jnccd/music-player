@@ -92,6 +92,7 @@ namespace MusicPlayer
         bool WasFocusedLastFrame = true;
         public static bool PauseConsoleInputThread = false;
         Task ConsoleManager;
+        static Task SongCheckThread;
         const float MaxVolume = 0.75f;
         static int lastSongRequestCheck = -100;
 
@@ -540,16 +541,19 @@ namespace MusicPlayer
         }
         public static void CheckForRequestedSongs()
         {
-            if (lastSongRequestCheck < Values.Timer - 5)
+            if (lastSongRequestCheck < Values.Timer - 15)
             {
-                Task.Factory.StartNew(() =>
+                if (SongCheckThread != null)
+                    SongCheckThread.Wait();
+
+                SongCheckThread = Task.Factory.StartNew(() =>
                 {
                     bool Worked = false;
                     while (!Worked && lastSongRequestCheck < Values.Timer - 5)
                     {
                         try
                         {
-                            Thread.Sleep(30);
+                            Thread.Sleep(100);
                             RequestedSong.Default.Reload();
                             if (RequestedSong.Default.RequestedSongString != "")
                             {
