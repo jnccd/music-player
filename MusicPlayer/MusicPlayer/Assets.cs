@@ -587,6 +587,8 @@ namespace MusicPlayer
                     Console.WriteLine("Other well fitting songs were:");
                     for (int i = 1; i <= 5; i++)
                     {
+                        if (LDistances[NonWorkingIndexes + i].SongDifference > 3)
+                            break;
                         Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
@@ -770,6 +772,8 @@ namespace MusicPlayer
 
                     if (UpvotedSongScores[index] > 120)
                         UpvotedSongScores[index] = 120;
+                    if (UpvotedSongScores[index] > -1)
+                        UpvotedSongScores[index] = -1;
 
                     if (UpvotedSongStreaks[index] > -1)
                         UpvotedSongStreaks[index] = -1;
@@ -796,8 +800,10 @@ namespace MusicPlayer
                     else
                         percentage = (Channel32.Position / (double)Channel32.Length);
 
-                    if (UpvotedSongScores[index] < -20)
-                        UpvotedSongScores[index] = -20;
+                    if (UpvotedSongScores[index] < 120)
+                        UpvotedSongScores[index] = 120;
+                    if (UpvotedSongScores[index] < -1)
+                        UpvotedSongScores[index] = -1;
 
                     if (UpvotedSongStreaks[index] < 1)
                         UpvotedSongStreaks[index] = 1;

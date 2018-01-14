@@ -142,11 +142,14 @@ namespace MusicPlayer
         }
         public static float OwnDistance(string Input, string SongName)
         {
+            if (Input == "" || Input == null || SongName == "" || SongName == null)
+                return float.MaxValue;
+
             int Errors = 0;
             int Distances = 0;
             int LastFindingIndex = -5;
             List<float> Scores = new List<float>();
-
+            
             for (int k = 0; k < SongName.Length; k++)
             {
                 if (SongName.ElementAt(k) == char.ToUpper(Input.First()) ||
