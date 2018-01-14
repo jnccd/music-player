@@ -123,6 +123,7 @@ namespace MusicPlayer
         public static List<string> UpvotedSongNames;
         public static List<float> UpvotedSongScores;
         public static List<int> UpvotedSongStreaks;
+        public static List<int> UpvotedSongTotalLikes;
 
         // MultiThreading
         public static Task T = null;
@@ -712,6 +713,7 @@ namespace MusicPlayer
             // Sorting
             float Swapi;
             int Swapi2;
+            int Swapi3;
             string SwapS;
             for (int i = 1; i < UpvotedSongNames.Count; i++)
             {
@@ -719,14 +721,17 @@ namespace MusicPlayer
                 {
                     Swapi = UpvotedSongScores[i];
                     Swapi2 = UpvotedSongStreaks[i];
+                    Swapi3 = UpvotedSongTotalLikes[i];
                     SwapS = UpvotedSongNames[i];
 
                     UpvotedSongScores[i] = UpvotedSongScores[i - 1];
                     UpvotedSongStreaks[i] = UpvotedSongStreaks[i - 1];
+                    UpvotedSongTotalLikes[i] = UpvotedSongTotalLikes[i - 1];
                     UpvotedSongNames[i] = UpvotedSongNames[i - 1];
 
                     UpvotedSongScores[i - 1] = Swapi;
                     UpvotedSongStreaks[i - 1] = Swapi2;
+                    UpvotedSongTotalLikes[i - 1] = Swapi3;
                     UpvotedSongNames[i - 1] = SwapS;
 
                     i = 1;
@@ -736,6 +741,7 @@ namespace MusicPlayer
             config.Default.SongPaths = UpvotedSongNames.ToArray();
             config.Default.SongScores = UpvotedSongScores.ToArray();
             config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
+            config.Default.SongTotalLikes = UpvotedSongTotalLikes.ToArray();
 
             config.Default.Background = (int)XNA.BgModes;
             config.Default.Vis = (int)XNA.VisSetting;
@@ -802,12 +808,14 @@ namespace MusicPlayer
 
                     UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 4;
                     LastUpvotedSongStreak = UpvotedSongStreaks[index];
+                    UpvotedSongTotalLikes[index]++;
                 }
                 else
                 {
                     UpvotedSongNames.Add(currentlyPlayingSongName);
                     UpvotedSongScores.Add(1);
                     UpvotedSongStreaks.Add(1);
+                    UpvotedSongTotalLikes.Add(1);
                 }
             }
             IsCurrentSongUpvoted = false;
@@ -832,7 +840,7 @@ namespace MusicPlayer
         }
         public static object[,] GetSongInformationList()
         {
-            object[,] SongInformationArray = new object[Playlist.Count, 5];
+            object[,] SongInformationArray = new object[Playlist.Count, 6];
 
             List<string> SongChoosingList = GetSongChoosingList(false);
 
@@ -841,14 +849,15 @@ namespace MusicPlayer
                 SongInformationArray[i, 0] = UpvotedSongNames[i];
                 SongInformationArray[i, 1] = UpvotedSongScores[i];
                 SongInformationArray[i, 2] = UpvotedSongStreaks[i];
-                SongInformationArray[i, 3] = SongAge(GetSongPathFromSongName(UpvotedSongNames[i]));
+                SongInformationArray[i, 3] = UpvotedSongTotalLikes[i];
+                SongInformationArray[i, 4] = SongAge(GetSongPathFromSongName(UpvotedSongNames[i]));
 
                 int TargetTickets = 0;
                 string SongName = GetSongPathFromSongName(UpvotedSongNames[i]);
                 foreach (string s in SongChoosingList)
                     if (s == SongName)
                         TargetTickets++;
-                SongInformationArray[i, 4] = TargetTickets / (float)SongChoosingList.Count * 100;
+                SongInformationArray[i, 5] = TargetTickets / (float)SongChoosingList.Count * 100;
             }
             
             return SongInformationArray;
