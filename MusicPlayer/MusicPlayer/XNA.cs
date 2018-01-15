@@ -755,7 +755,7 @@ namespace MusicPlayer
                 Assets.GetNextSong(false, true);
 
             // Close [Esc]
-            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive)
+            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive && MessageBox.Show("Do you really want to close my senpai? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 Exit();
 
             // Show Music File in Explorer [E]

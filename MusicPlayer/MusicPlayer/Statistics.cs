@@ -64,6 +64,7 @@ namespace MusicPlayer
 
         private void bRefresh_Click(object sender, EventArgs e)
         {
+            int RowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
             dataGridView1.Rows.Clear();
             object[] o = new object[6];
             object[,] SongInfo = Assets.GetSongInformationList();
@@ -87,6 +88,7 @@ namespace MusicPlayer
             dataGridView1.Columns[3].Width = 80;
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
+            dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
         }
 
         private void bSearch_Click(object sender, EventArgs e)
