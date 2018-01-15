@@ -772,7 +772,7 @@ namespace MusicPlayer
 
                     if (UpvotedSongScores[index] > 120)
                         UpvotedSongScores[index] = 120;
-                    if (UpvotedSongScores[index] > -1)
+                    if (UpvotedSongScores[index] < -1)
                         UpvotedSongScores[index] = -1;
 
                     if (UpvotedSongStreaks[index] > -1)
@@ -800,7 +800,7 @@ namespace MusicPlayer
                     else
                         percentage = (Channel32.Position / (double)Channel32.Length);
 
-                    if (UpvotedSongScores[index] < 120)
+                    if (UpvotedSongScores[index] > 120)
                         UpvotedSongScores[index] = 120;
                     if (UpvotedSongScores[index] < -1)
                         UpvotedSongScores[index] = -1;
