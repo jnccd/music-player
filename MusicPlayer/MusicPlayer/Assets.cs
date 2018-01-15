@@ -583,12 +583,13 @@ namespace MusicPlayer
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(">Found one matching song: \"" + Path.Split('\\').Last().Split('.').First() + "\" with a difference of " + 
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
-
-                    Console.WriteLine("Other well fitting songs were:");
+                    
                     for (int i = 1; i <= 5; i++)
                     {
-                        if (LDistances[NonWorkingIndexes + i].SongDifference > 3)
+                        if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
                             break;
+                        if (i == 1)
+                            Console.WriteLine("Other well fitting songs were:");
                         Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
