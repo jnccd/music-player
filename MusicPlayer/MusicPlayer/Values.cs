@@ -191,6 +191,54 @@ namespace MusicPlayer
             else
                 return 1000;
         }
+        public static float OwnDistanceWrapper(string Input, string SongName)
+        {
+            if (Input == null || Input == "" || SongName == "" || SongName == null)
+                return float.MaxValue;
+
+            Input = Input.ToLower();
+            SongName = SongName.ToLower();
+
+            if (SongName.Length <= Input.Length)
+                return LevenshteinDistance(Input, SongName);
+
+            List<float> Distances = new List<float>();
+
+            if (false)
+            {
+                // old
+                for (int i = 0; i < SongName.Length - Input.Length; i++)
+                {
+                    string Work = SongName;
+                    Work = Work.Remove(0, i);
+                    Work = Work.Remove(Input.Length, Work.Length - Input.Length);
+
+                    Distances.Add(LevenshteinDistance(Work, Input));
+                }
+            }
+            else
+            {
+                string[] InSplit = Input.Split(' ');
+
+                if (InSplit.Length == 1)
+                {
+                    string[] split = SongName.Split(' ');
+                    for (int i = 0; i < split.Length; i++)
+                        Distances.Add(LevenshteinDistance(split[i], Input));
+                }
+                else
+                {
+                    float count = 0;
+                    for (int i = 0; i < InSplit.Length; i++)
+                    {
+                        count += OwnDistanceWrapper(InSplit[i], SongName);
+                    }
+                    Distances.Add(count);
+                }
+            }
+
+            return Distances.Min();
+        }
 
         public static float GetAverageAmplitude(float[] samples)
         {
