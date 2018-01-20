@@ -567,7 +567,7 @@ namespace MusicPlayer
                     DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
                     for (int i = 0; i < LDistances.Length; i++)
                     {
-                        LDistances[i].SongDifference = Values.OwnDistance(Path, Playlist[i].Split('\\').Last().Split('.').First());
+                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, Playlist[i].Split('\\').Last().Split('.').First());
                         LDistances[i].SongIndex = i;
                     }
 

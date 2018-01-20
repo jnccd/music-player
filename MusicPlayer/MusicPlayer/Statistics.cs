@@ -99,7 +99,7 @@ namespace MusicPlayer
             DistancePerSong[] LDistances = new DistancePerSong[dataGridView1.Rows.Count];
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
-                LDistances[i].SongDifference = Values.OwnDistance(Path, ((string)(dataGridView1.Rows[i].Cells[0].Value)));
+                LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, ((string)(dataGridView1.Rows[i].Cells[0].Value)));
                 LDistances[i].SongIndex = i;
             }
 
