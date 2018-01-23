@@ -51,6 +51,13 @@ namespace MusicPlayer
             dataGridView1.Columns[3].Width = 80;
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
+
+            bRefresh.Width = this.Width / 895 * 147;
+            textBox1.Width = this.Width / 895 * 547;
+            bSearch.Width = this.Width / 895 * 147;
+
+            textBox1.Location = new Point(bRefresh.Bounds.X + bRefresh.Bounds.Width + 7, textBox1.Location.Y);
+            bSearch.Location = new Point(textBox1.Bounds.X + textBox1.Bounds.Width + 7, bSearch.Location.Y);
         }
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -115,6 +122,12 @@ namespace MusicPlayer
                 dataGridView1.Rows[LDistances[i].SongIndex].Selected = true;
             }
             dataGridView1.FirstDisplayedScrollingRowIndex = LDistances.First().SongIndex;
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                bSearch_Click(this, EventArgs.Empty);
         }
     }
 }

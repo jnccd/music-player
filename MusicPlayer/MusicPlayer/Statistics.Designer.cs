@@ -57,7 +57,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(13, 41);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(854, 585);
-            this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
             this.dataGridView1.Resize += new System.EventHandler(this.dataGridView1_Resize);
             // 
@@ -93,6 +93,7 @@
             // 
             // bRefresh
             // 
+            this.bRefresh.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.bRefresh.Location = new System.Drawing.Point(13, 12);
             this.bRefresh.Name = "bRefresh";
             this.bRefresh.Size = new System.Drawing.Size(147, 23);
@@ -103,13 +104,16 @@
             // 
             // textBox1
             // 
+            this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.textBox1.Location = new System.Drawing.Point(167, 14);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(547, 20);
-            this.textBox1.TabIndex = 2;
+            this.textBox1.TabIndex = 0;
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // bSearch
             // 
+            this.bSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.bSearch.Location = new System.Drawing.Point(720, 12);
             this.bSearch.Name = "bSearch";
             this.bSearch.Size = new System.Drawing.Size(147, 23);
