@@ -555,7 +555,7 @@ namespace MusicPlayer
         }
         public static bool PlayNewSong(string Path)
         {
-            if (Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading ||
+            if (Values.Timer > SongChangedTickTime + 10 && !config.Default.MultiThreading ||
                 config.Default.MultiThreading)
             {
                 SaveUserSettings();
@@ -601,7 +601,17 @@ namespace MusicPlayer
                 if (!Playlist.Contains(Path))
                     Playlist.Add(Path);
 
-                PlaySongByPath(Path);
+                try
+                {
+                    PlaySongByPath(Path);
+                }
+                catch
+                {
+                    MessageBox.Show("That song is not readable!");
+                    PlayerHistory.Remove(Path);
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    GetNextSong(true, false);
+                }
 
                 SongChangedTickTime = Values.Timer;
                 return true;
