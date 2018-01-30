@@ -428,8 +428,13 @@ namespace MusicPlayer
             };
 
             P.Start();
-            P.WaitForExit();
+            
+            foreach (char c in Path.GetInvalidFileNameChars())
+                VideoTitle = VideoTitle.Replace(c, '-');
+            VideoTitle = VideoTitle.Replace('.', '-');
 
+            P.WaitForExit();
+            
             // Convert Video File to mp3 and put it into the default folder
             Console.WriteLine("Converting to mp3...");
             MediaFile input = new MediaFile { Filename = videofile };
