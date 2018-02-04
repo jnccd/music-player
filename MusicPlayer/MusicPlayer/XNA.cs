@@ -1007,9 +1007,8 @@ namespace MusicPlayer
 
                 spriteBatch.End();
             }
-
             
-            if (VisSetting == Visualizations.fft && Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
+            if (VisSetting == Visualizations.fft && Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing || Assets.output != null && GauD.WasRenderTargetContentLost())
             {
                 //CurrentDebugTime2 = Stopwatch.GetTimestamp();
                 GauD.DrawToRenderTarget3DAcc(spriteBatch, GraphicsDevice);
