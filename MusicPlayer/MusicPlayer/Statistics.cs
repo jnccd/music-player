@@ -129,5 +129,10 @@ namespace MusicPlayer
             if (e.KeyCode == Keys.Enter)
                 bSearch_Click(this, EventArgs.Empty);
         }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

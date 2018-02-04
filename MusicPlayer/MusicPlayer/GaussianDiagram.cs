@@ -49,6 +49,8 @@ namespace MusicPlayer
         float NullGaussian;
         RenderTarget2D ShadowTarget;
         Rectangle DrawRect;
+        SpriteBatch SB;
+        GraphicsDevice GD;
         public float DiagramSize;
 
         //List<long> DebugTimes = new List<long>();
@@ -273,9 +275,16 @@ namespace MusicPlayer
                         Diagram[i] = Height;
             }
         }
-        
+        public bool WasRenderTargetContentLost()
+        {
+            return ShadowTarget == null || ShadowTarget.IsContentLost;
+        }
+
         public void DrawToRenderTarget(SpriteBatch spriteBatch, GraphicsDevice GD)
         {
+            this.SB = spriteBatch;
+            this.GD = GD;
+
             if (Diagram != null)
             {
                 GD.SetRenderTarget(ShadowTarget);
@@ -326,6 +335,9 @@ namespace MusicPlayer
         }
         public void DrawToRenderTarget3DAcc(SpriteBatch spriteBatch, GraphicsDevice GD)
         {
+            this.SB = spriteBatch;
+            this.GD = GD;
+
             if (Diagram != null)
             {
                 GD.SetRenderTarget(ShadowTarget);
