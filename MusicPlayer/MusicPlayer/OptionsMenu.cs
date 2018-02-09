@@ -137,6 +137,7 @@ namespace MusicPlayer
             XNA.BgModes++;
             if ((int)XNA.BgModes > Enum.GetNames(typeof(BackGroundModes)).Length - 1)
                 XNA.BgModes = 0;
+            XNA.ForceBackgroundRedraw();
         }
 
         private void Download_Click(object sender, EventArgs e) // WIP
