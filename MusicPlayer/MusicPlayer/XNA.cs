@@ -59,6 +59,7 @@ namespace MusicPlayer
         RenderTarget2D TempBlur;
         RenderTarget2D BlurredTex;
         static RenderTarget2D TitleTarget;
+        static RenderTarget2D BackgroundTarget;
 
         // Visualization
         public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
@@ -669,6 +670,7 @@ namespace MusicPlayer
                     config.Default.WindowPos = new System.Drawing.Point(gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X,
                                                                         gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y);
                     KeepWindowInScreen();
+                    ForceBackgroundRedraw();
                     break;
             }
             gameWindowForm.Location = config.Default.WindowPos;
@@ -715,6 +717,7 @@ namespace MusicPlayer
                 BgModes++;
                 if ((int)BgModes > Enum.GetNames(typeof(BackGroundModes)).Length - 1)
                     BgModes = 0;
+                ForceBackgroundRedraw();
             }
 
             // New Color [C]
@@ -775,6 +778,12 @@ namespace MusicPlayer
             // Show Statistics [S]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
             {
+                if (optionsMenu == null || optionsMenu.IsDisposed)
+                {
+                    optionsMenu = new OptionsMenu();
+                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                }
+
                 if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
                 {
                     optionsMenu.S = new Statistics();
@@ -969,6 +978,7 @@ namespace MusicPlayer
 
             // RenderTargets
             #region RT
+            // Song Title
             if (TitleTarget == null || TitleTarget.IsContentLost || TitleTarget.IsDisposed)
             {
                 string Title;
@@ -1008,6 +1018,7 @@ namespace MusicPlayer
                 spriteBatch.End();
             }
             
+            // FFT Diagram
             if (VisSetting == Visualizations.fft && Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing || Assets.output != null && GauD.WasRenderTargetContentLost())
             {
                 //CurrentDebugTime2 = Stopwatch.GetTimestamp();
@@ -1019,73 +1030,82 @@ namespace MusicPlayer
                 //Debug.WriteLine("Draw GauD " + (Stopwatch.GetTimestamp() - CurrentDebugTime2));
             }
 
-            #endregion
-            #region Blur
-            BeginBlur();
-            if (BgModes == BackGroundModes.Blur)
+            // Background
+            if (BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed)
             {
-                spriteBatch.Begin();
-                // Blurred Background
-                foreach (Screen S in Screen.AllScreens)
-                    spriteBatch.Draw(Assets.bg, new Rectangle(S.Bounds.X - gameWindowForm.Location.X + 50, S.Bounds.Y - gameWindowForm.Location.Y + 50,
-                        S.Bounds.Width, S.Bounds.Height), Color.White);
+                if (BgModes == BackGroundModes.Blur)
+                {
+                    BeginBlur();
+                    spriteBatch.Begin();
+                    // Blurred Background
+                    foreach (Screen S in Screen.AllScreens)
+                        spriteBatch.Draw(Assets.bg, new Rectangle(S.Bounds.X - gameWindowForm.Location.X + 50, S.Bounds.Y - gameWindowForm.Location.Y + 50,
+                            S.Bounds.Width, S.Bounds.Height), Color.White);
+                    spriteBatch.End();
+                    EndBlur();
+                }
+                if (BgModes == BackGroundModes.BlurTeint)
+                {
+                    BeginBlur();
+                    spriteBatch.Begin();
+                    // Blurred Background
+                    foreach (Screen S in Screen.AllScreens)
+                        spriteBatch.Draw(Assets.bg, new Rectangle(S.Bounds.X - gameWindowForm.Location.X + 50, S.Bounds.Y - gameWindowForm.Location.Y + 50,
+                            S.Bounds.Width, S.Bounds.Height), Color.White);
+                    spriteBatch.Draw(Assets.White, new Rectangle(0, 0, Values.WindowRect.Width + 100, Values.WindowRect.Height + 100),
+                        Color.FromNonPremultiplied(primaryColor.R / 2, primaryColor.G / 2, primaryColor.B / 2, 255 / 2));
+                    spriteBatch.End();
+                    EndBlur();
+                }
+
+                BackgroundTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X, Values.WindowSize.Y);
+                GraphicsDevice.SetRenderTarget(BackgroundTarget);
+                GraphicsDevice.Clear(Color.Transparent);
+
+                if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurTeint)
+                    DrawBlurredTex();
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
+
+                if (BgModes == BackGroundModes.None)
+                    foreach (Screen S in Screen.AllScreens)
+                    {
+                        DrawRect.X = S.Bounds.X - gameWindowForm.Location.X;
+                        DrawRect.Y = S.Bounds.Y - gameWindowForm.Location.Y;
+                        DrawRect.Width = S.Bounds.Width;
+                        DrawRect.Height = S.Bounds.Height;
+                        spriteBatch.Draw(Assets.bg, DrawRect, Color.White);
+                    }
+                else if (BgModes == BackGroundModes.bg1)
+                    spriteBatch.Draw(Assets.bg1, Vector2.Zero, Color.White);
+                else if (BgModes == BackGroundModes.bg2)
+                    spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
+
+                // Borders
+                DrawRect.X = Values.WindowSize.X - 1;
+                DrawRect.Y = 0;
+                DrawRect.Width = 1;
+                DrawRect.Height = Values.WindowSize.Y;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                DrawRect.X = 0;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                DrawRect.Width = Values.WindowSize.X;
+                DrawRect.Height = 1;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                DrawRect.Y = Values.WindowSize.Y - 1;
+                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+
                 spriteBatch.End();
             }
-            if (BgModes == BackGroundModes.BlurTeint)
-            {
-                spriteBatch.Begin();
-                // Blurred Background
-                foreach (Screen S in Screen.AllScreens)
-                    spriteBatch.Draw(Assets.bg, new Rectangle(S.Bounds.X - gameWindowForm.Location.X + 50, S.Bounds.Y - gameWindowForm.Location.Y + 50,
-                        S.Bounds.Width, S.Bounds.Height), Color.White);
-                spriteBatch.Draw(Assets.White, new Rectangle(0, 0, Values.WindowRect.Width + 100, Values.WindowRect.Height + 100), 
-                    Color.FromNonPremultiplied(primaryColor.R / 2, primaryColor.G / 2, primaryColor.B / 2, 255 / 2));
-                spriteBatch.End();
-            }
-            EndBlur();
             #endregion
             
             base.Draw(gameTime);
 
-            // Background
-            #region Background
-            // Background
-            spriteBatch.Begin();
-            if (BgModes == BackGroundModes.None)
-                foreach (Screen S in Screen.AllScreens)
-                {
-                    DrawRect.X = S.Bounds.X - gameWindowForm.Location.X;
-                    DrawRect.Y = S.Bounds.Y - gameWindowForm.Location.Y;
-                    DrawRect.Width = S.Bounds.Width;
-                    DrawRect.Height = S.Bounds.Height;
-                    spriteBatch.Draw(Assets.bg, DrawRect, Color.White);
-                }
-            else if (BgModes == BackGroundModes.bg1)
-                spriteBatch.Draw(Assets.bg1, Vector2.Zero, Color.White);
-            else if (BgModes == BackGroundModes.bg2)
-                spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
-            spriteBatch.End();
-
-            DrawBlurredTex();
+            GraphicsDevice.SetRenderTarget(null);
 
             spriteBatch.Begin();
 
-            // Borders
-            DrawRect.X = Values.WindowSize.X - 1;
-            DrawRect.Y = 0;
-            DrawRect.Width = 1;
-            DrawRect.Height = Values.WindowSize.Y;
-            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-            DrawRect.X = 0;
-            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-            DrawRect.Width = Values.WindowSize.X;
-            DrawRect.Height = 1;
-            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-            DrawRect.Y = Values.WindowSize.Y - 1;
-            spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-            
-            
-            #endregion
+            spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
 
             #region Second Row HUD Shadows
             if (UpvoteSavedAlpha > 0)
@@ -1349,7 +1369,13 @@ namespace MusicPlayer
         }
         public static void ForceTitleRedraw()
         {
-            TitleTarget = null;
+            if (TitleTarget != null)
+                TitleTarget.Dispose();
+        }
+        public static void ForceBackgroundRedraw()
+        {
+            if (BackgroundTarget != null)
+                BackgroundTarget.Dispose();
         }
         void BeginBlur()
         {

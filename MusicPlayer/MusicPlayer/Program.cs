@@ -41,20 +41,24 @@ namespace MusicPlayer
             Values.DisableConsoleRezise();
 
             // Song Data List initialization
-            if (config.Default.SongPaths != null && config.Default.SongScores != null) {
+            if (config.Default.SongPaths != null && config.Default.SongScores != null)
+            {
                 Assets.UpvotedSongNames = config.Default.SongPaths.ToList();
                 Assets.UpvotedSongScores = config.Default.SongScores.ToList();
             }
-            else {
+            else
+            {
                 Assets.UpvotedSongNames = new List<string>();
                 Assets.UpvotedSongScores = new List<float>();
             }
             // Streaks
-            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count) {
+            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
+            {
                 Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
                 for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
                     Assets.UpvotedSongStreaks.Add(0);
-            } else
+            }
+            else
                 Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
             // TotalLikes
             if (config.Default.SongTotalLikes == null || config.Default.SongTotalLikes.Length != Assets.UpvotedSongScores.Count)
@@ -68,7 +72,7 @@ namespace MusicPlayer
 
 
             Console.Clear();
-            
+
             // Actual start
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
@@ -78,7 +82,7 @@ namespace MusicPlayer
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
 
             FileSystemWatcher weightwatchers = new FileSystemWatcher();
-            
+
             try
             {
                 string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
@@ -90,7 +94,8 @@ namespace MusicPlayer
                 if (Directory.Exists(SettingsPath))
                 {
                     weightwatchers.Path = SettingsPath;
-                    weightwatchers.Changed += ((object source, FileSystemEventArgs e) => {
+                    weightwatchers.Changed += ((object source, FileSystemEventArgs e) =>
+                    {
                         XNA.CheckForRequestedSongs();
                     });
                     weightwatchers.EnableRaisingEvents = true;
@@ -99,8 +104,13 @@ namespace MusicPlayer
                 {
                     Console.WriteLine("Couldn't set filewatcher! (WRONG SETTINGSPATH: " + SettingsPath + " )");
                 }
-            } catch { Console.WriteLine("Couldn't set filewatcher! (ERROR)"); }
+            }
+            catch { Console.WriteLine("Couldn't set filewatcher! (ERROR)"); }
 
+#if DEBUG
+            using (XNA game = new XNA())
+                game.Run();
+#else
             try
             {
                 using (XNA game = new XNA())
@@ -128,6 +138,7 @@ namespace MusicPlayer
                     sw.WriteLine("=============End=============");
                 }
             }
+#endif
         }
     }
 }
