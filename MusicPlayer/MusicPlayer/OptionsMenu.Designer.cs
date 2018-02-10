@@ -199,7 +199,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.Controls.Add(this.PreloadToggle);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.trackBar1);
