@@ -14,6 +14,14 @@ namespace MusicPlayer
     {
         public Statistics()
         {
+            /*
+            this.EnableBlur();
+            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.LimeGreen;
+            TransparencyKey = Color.LimeGreen;
+            */
             InitializeComponent();
         }
 

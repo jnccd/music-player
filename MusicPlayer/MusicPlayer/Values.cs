@@ -409,6 +409,53 @@ namespace MusicPlayer
         }
     }
 
+    public static class WindowExtension
+    {
+        [DllImport("user32.dll")]
+        static internal extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+        public static void EnableBlur(this Form @this)
+        {
+            var accent = new AccentPolicy();
+            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
+            var accentStructSize = Marshal.SizeOf(accent);
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            Marshal.StructureToPtr(accent, accentPtr, false);
+            var Data = new WindowCompositionAttributeData();
+            Data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+            Data.SizeOfData = accentStructSize;
+            Data.Data = accentPtr;
+            SetWindowCompositionAttribute(@this.Handle, ref Data);
+            Marshal.FreeHGlobal(accentPtr);
+        }
+
+    }
+    enum AccentState
+    {
+        ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_GRADIENT = 1,
+        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+        ACCENT_ENABLE_BLURBEHIND = 3,
+        ACCENT_INVALID_STATE = 4
+    }
+    struct AccentPolicy
+    {
+        public AccentState AccentState;
+        public int AccentFlags;
+        public int GradientColor;
+        public int AnimationId;
+    }
+    struct WindowCompositionAttributeData
+    {
+        public WindowCompositionAttribute Attribute;
+        public IntPtr Data;
+        public int SizeOfData;
+    }
+    enum WindowCompositionAttribute
+    {
+        WCA_ACCENT_POLICY = 19
+    }
+
     public static class StringExtensions
     {
         public static bool Contains(this String str, String substring,

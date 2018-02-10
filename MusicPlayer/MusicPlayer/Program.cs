@@ -22,18 +22,26 @@ namespace MusicPlayer
         static void Main(string[] args)
         {
             Console.WriteLine("Checking for other MusicPlayer instances...");
-            foreach (Process p in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
-                if (p.Id != Process.GetCurrentProcess().Id && p.MainModule.FileName == Process.GetCurrentProcess().MainModule.FileName)
-                {
-                    Console.WriteLine("Found another instance. \nSending data...");
-                    if (args.Length > 0)
+            try
+            {
+                foreach (Process p in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
+                    if (p.Id != Process.GetCurrentProcess().Id && p.MainModule.FileName == Process.GetCurrentProcess().MainModule.FileName)
                     {
-                        RequestedSong.Default.RequestedSongString = args[0];
-                        RequestedSong.Default.Save();
+                        Console.WriteLine("Found another instance. \nSending data...");
+                        if (args.Length > 0)
+                        {
+                            RequestedSong.Default.RequestedSongString = args[0];
+                            RequestedSong.Default.Save();
+                        }
+                        Console.WriteLine("Data sent! Closing...");
+                        return;
                     }
-                    Console.WriteLine("Data sent! Closing...");
-                    return;
-                }
+            } catch
+            {
+                Console.WriteLine("I died befroe I could even die...\nPls restart.");
+                Thread.Sleep(1000);
+                return;
+            }
 
             // Smol settings
             Application.EnableVisualStyles();

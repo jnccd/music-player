@@ -23,7 +23,16 @@ namespace MusicPlayer
 
         public OptionsMenu()
         {
+            /*
+            this.EnableBlur();
+            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.LimeGreen;
+            TransparencyKey = Color.LimeGreen;
+            */
             InitializeComponent();
+            //FormBorderStyle = FormBorderStyle.None;
         }
 
         private void OptionsMenu_Load(object sender, EventArgs e)
