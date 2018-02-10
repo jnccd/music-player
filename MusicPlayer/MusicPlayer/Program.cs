@@ -38,7 +38,7 @@ namespace MusicPlayer
                     }
             } catch
             {
-                Console.WriteLine("I died befroe I could even die...\nPls restart.");
+                Console.WriteLine("Please just start one instance of me at a time!");
                 Thread.Sleep(1000);
                 return;
             }
@@ -113,7 +113,7 @@ namespace MusicPlayer
                     Console.WriteLine("Couldn't set filewatcher! (WRONG SETTINGSPATH: " + SettingsPath + " )");
                 }
             }
-            catch { Console.WriteLine("Couldn't set filewatcher! (ERROR)"); }
+            catch { Console.WriteLine("Couldn't set filewatcher! (UNKNOWN ERROR)"); }
 
 #if DEBUG
             using (XNA game = new XNA())

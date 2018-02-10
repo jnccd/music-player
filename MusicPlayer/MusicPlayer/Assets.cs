@@ -340,6 +340,8 @@ namespace MusicPlayer
                         FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
                         bg = Texture2D.FromStream(GD, Stream);
                         Stream.Dispose();
+
+                        XNA.ForceBackgroundRedraw();
                     }
                     catch { }
                 }
