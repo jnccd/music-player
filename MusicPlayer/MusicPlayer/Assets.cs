@@ -303,8 +303,6 @@ namespace MusicPlayer
                     if (ConsoleOutput)
                     {
                         Console.CursorLeft = 0;
-                        Console.Write("                                                                    ");
-                        Console.CursorLeft = 0;
                         Console.Write("Found " + Playlist.Count.ToString() + " Songs!");
                     }
                 }
