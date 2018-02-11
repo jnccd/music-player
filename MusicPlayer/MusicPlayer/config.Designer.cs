@@ -186,5 +186,17 @@ namespace MusicPlayer {
                 this["SongTotalLikes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoVolume {
+            get {
+                return ((bool)(this["AutoVolume"]));
+            }
+            set {
+                this["AutoVolume"] = value;
+            }
+        }
     }
 }

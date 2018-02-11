@@ -47,6 +47,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.ShowProgramFolder = new System.Windows.Forms.Button();
+            this.cAutoVolume = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -162,14 +163,14 @@
             // 
             // DownloadBox
             // 
-            this.DownloadBox.Location = new System.Drawing.Point(12, 269);
+            this.DownloadBox.Location = new System.Drawing.Point(12, 292);
             this.DownloadBox.Name = "DownloadBox";
             this.DownloadBox.Size = new System.Drawing.Size(328, 20);
             this.DownloadBox.TabIndex = 11;
             // 
             // Download
             // 
-            this.Download.Location = new System.Drawing.Point(346, 267);
+            this.Download.Location = new System.Drawing.Point(344, 290);
             this.Download.Name = "Download";
             this.Download.Size = new System.Drawing.Size(82, 23);
             this.Download.TabIndex = 12;
@@ -191,7 +192,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 253);
+            this.label2.Location = new System.Drawing.Point(9, 276);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(89, 13);
             this.label2.TabIndex = 14;
@@ -224,11 +225,23 @@
             this.ShowProgramFolder.UseVisualStyleBackColor = true;
             this.ShowProgramFolder.Click += new System.EventHandler(this.ShowProgramFolder_Click);
             // 
+            // cAutoVolume
+            // 
+            this.cAutoVolume.AutoSize = true;
+            this.cAutoVolume.Location = new System.Drawing.Point(12, 256);
+            this.cAutoVolume.Name = "cAutoVolume";
+            this.cAutoVolume.Size = new System.Drawing.Size(167, 17);
+            this.cAutoVolume.TabIndex = 17;
+            this.cAutoVolume.Text = "Real Time Volume Adjustment";
+            this.cAutoVolume.UseVisualStyleBackColor = true;
+            this.cAutoVolume.CheckedChanged += new System.EventHandler(this.cAutoVolume_CheckedChanged);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 301);
+            this.ClientSize = new System.Drawing.Size(438, 324);
+            this.Controls.Add(this.cAutoVolume);
             this.Controls.Add(this.ShowProgramFolder);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
@@ -276,5 +289,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button ShowProgramFolder;
+        private System.Windows.Forms.CheckBox cAutoVolume;
     }
 }

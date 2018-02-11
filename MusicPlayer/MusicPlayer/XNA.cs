@@ -535,7 +535,12 @@ namespace MusicPlayer
             //Values.OutputVolumeIncrease = Values.OutputVolume - Values.LastOutputVolume;
 
             if (Assets.Channel32 != null)
-                Assets.Channel32.Volume = Values.TargetVolume - Values.OutputVolume * Values.TargetVolume;
+            {
+                if (config.Default.AutoVolume)
+                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume;
+                else
+                    Assets.Channel32.Volume = Values.TargetVolume;
+            }
             
             UpdateRectangles();
 

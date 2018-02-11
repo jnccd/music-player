@@ -50,6 +50,7 @@ namespace MusicPlayer
                 trackBar1.Enabled = false;
                 label1.Enabled = false;
             }
+            cAutoVolume.Checked = config.Default.AutoVolume;
         }
 
         private void PreloadToggle_Click(object sender, EventArgs e)
@@ -196,6 +197,11 @@ namespace MusicPlayer
         private void ShowProgramFolder_Click(object sender, EventArgs e)
         {
             Process.Start("explorer.exe", "/select, \"" + Values.CurrentExecutablePath + "\"");
+        }
+
+        private void cAutoVolume_CheckedChanged(object sender, EventArgs e)
+        {
+            config.Default.AutoVolume = cAutoVolume.Checked;
         }
     }
 }
