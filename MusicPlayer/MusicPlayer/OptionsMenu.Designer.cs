@@ -48,6 +48,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.ShowProgramFolder = new System.Windows.Forms.Button();
             this.cAutoVolume = new System.Windows.Forms.CheckBox();
+            this.bConsoleThreadRestart = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -163,14 +164,14 @@
             // 
             // DownloadBox
             // 
-            this.DownloadBox.Location = new System.Drawing.Point(12, 292);
+            this.DownloadBox.Location = new System.Drawing.Point(12, 320);
             this.DownloadBox.Name = "DownloadBox";
             this.DownloadBox.Size = new System.Drawing.Size(328, 20);
             this.DownloadBox.TabIndex = 11;
             // 
             // Download
             // 
-            this.Download.Location = new System.Drawing.Point(344, 290);
+            this.Download.Location = new System.Drawing.Point(344, 318);
             this.Download.Name = "Download";
             this.Download.Size = new System.Drawing.Size(82, 23);
             this.Download.TabIndex = 12;
@@ -192,7 +193,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 276);
+            this.label2.Location = new System.Drawing.Point(9, 304);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(89, 13);
             this.label2.TabIndex = 14;
@@ -204,7 +205,7 @@
             this.panel1.Controls.Add(this.PreloadToggle);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.trackBar1);
-            this.panel1.Location = new System.Drawing.Point(7, 158);
+            this.panel1.Location = new System.Drawing.Point(7, 186);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(425, 92);
             this.panel1.TabIndex = 15;
@@ -228,7 +229,7 @@
             // cAutoVolume
             // 
             this.cAutoVolume.AutoSize = true;
-            this.cAutoVolume.Location = new System.Drawing.Point(12, 256);
+            this.cAutoVolume.Location = new System.Drawing.Point(12, 284);
             this.cAutoVolume.Name = "cAutoVolume";
             this.cAutoVolume.Size = new System.Drawing.Size(167, 17);
             this.cAutoVolume.TabIndex = 17;
@@ -236,11 +237,22 @@
             this.cAutoVolume.UseVisualStyleBackColor = true;
             this.cAutoVolume.CheckedChanged += new System.EventHandler(this.cAutoVolume_CheckedChanged);
             // 
+            // bConsoleThreadRestart
+            // 
+            this.bConsoleThreadRestart.Location = new System.Drawing.Point(12, 159);
+            this.bConsoleThreadRestart.Name = "bConsoleThreadRestart";
+            this.bConsoleThreadRestart.Size = new System.Drawing.Size(414, 23);
+            this.bConsoleThreadRestart.TabIndex = 18;
+            this.bConsoleThreadRestart.Text = "Restart Console Input Thread";
+            this.bConsoleThreadRestart.UseVisualStyleBackColor = true;
+            this.bConsoleThreadRestart.Click += new System.EventHandler(this.bConsoleThreadRestart_Click);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 324);
+            this.ClientSize = new System.Drawing.Size(438, 353);
+            this.Controls.Add(this.bConsoleThreadRestart);
             this.Controls.Add(this.cAutoVolume);
             this.Controls.Add(this.ShowProgramFolder);
             this.Controls.Add(this.panel1);
@@ -290,5 +302,6 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button ShowProgramFolder;
         private System.Windows.Forms.CheckBox cAutoVolume;
+        private System.Windows.Forms.Button bConsoleThreadRestart;
     }
 }

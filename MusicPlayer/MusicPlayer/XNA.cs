@@ -79,20 +79,20 @@ namespace MusicPlayer
         static float SecondRowMessageAlpha;
         static string SecondRowMessageText;
         public static float UpvoteSavedAlpha = 0;
-        float UpvoteIconAlpha = 0;
-        List<string> LastConsoleInput = new List<string>();
-        int LastConsoleInputIndex = -1;
-        long CurrentDebugTime = 0;
-        long CurrentDebugTime2 = 0;
-        OptionsMenu optionsMenu;
+        static float UpvoteIconAlpha = 0;
+        static List<string> LastConsoleInput = new List<string>();
+        static int LastConsoleInputIndex = -1;
+        static long CurrentDebugTime = 0;
+        static long CurrentDebugTime2 = 0;
+        static OptionsMenu optionsMenu;
         public static bool FocusWindow = false;
         public static bool Preload;
         public static bool TaskbarHidden = false;
         static int originY;
-        float[] values;
-        bool WasFocusedLastFrame = true;
+        static float[] values;
+        static bool WasFocusedLastFrame = true;
         public static bool PauseConsoleInputThread = false;
-        Task ConsoleManager;
+        public static Task ConsoleManager;
         static Task SongCheckThread;
         const float MaxVolume = 0.75f;
         static int lastSongRequestCheck = -100;
@@ -195,7 +195,7 @@ namespace MusicPlayer
         }
 
         // Console Management
-        void StartSongInputLoop()
+        public static void StartSongInputLoop()
         {
             ConsoleManager = Task.Factory.StartNew(() =>
             {
@@ -537,7 +537,7 @@ namespace MusicPlayer
             if (Assets.Channel32 != null)
             {
                 if (config.Default.AutoVolume)
-                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume;
+                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume; // Null pointer exception? 13.02.18 13:36
                 else
                     Assets.Channel32.Volume = Values.TargetVolume;
             }
@@ -863,7 +863,7 @@ namespace MusicPlayer
             Process.Start(Info);
             Application.Exit();
         }
-        void UpdateGD()
+        public static void UpdateGD()
         {
             //CurrentDebugTime = Stopwatch.GetTimestamp();
             if (Assets.FFToutput != null)
@@ -884,7 +884,7 @@ namespace MusicPlayer
                 //Debug.WriteLine("GD Update 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
         }
-        void UpdateRectangles()
+        public static void UpdateRectangles()
         {
             TargetVolumeBar.X = Values.WindowSize.X - 100;
             TargetVolumeBar.Y = 24;
