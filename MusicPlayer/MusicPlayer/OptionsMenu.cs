@@ -203,5 +203,13 @@ namespace MusicPlayer
         {
             config.Default.AutoVolume = cAutoVolume.Checked;
         }
+
+        private void bConsoleThreadRestart_Click(object sender, EventArgs e)
+        {
+            if (XNA.ConsoleManager.IsCanceled || XNA.ConsoleManager.IsCompleted || XNA.ConsoleManager.IsFaulted)
+            {
+                XNA.StartSongInputLoop();
+            }
+        }
     }
 }
