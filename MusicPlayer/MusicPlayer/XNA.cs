@@ -722,6 +722,10 @@ namespace MusicPlayer
                 BgModes++;
                 if ((int)BgModes > Enum.GetNames(typeof(BackGroundModes)).Length - 1)
                     BgModes = 0;
+                if (BgModes == BackGroundModes.None)
+                    Shadow.Opacity = 0;
+                else
+                    Shadow.Opacity = 1;
                 ForceBackgroundRedraw();
             }
 
@@ -1087,18 +1091,21 @@ namespace MusicPlayer
                     spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
 
                 // Borders
-                DrawRect.X = Values.WindowSize.X - 1;
-                DrawRect.Y = 0;
-                DrawRect.Width = 1;
-                DrawRect.Height = Values.WindowSize.Y;
-                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-                DrawRect.X = 0;
-                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-                DrawRect.Width = Values.WindowSize.X;
-                DrawRect.Height = 1;
-                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
-                DrawRect.Y = Values.WindowSize.Y - 1;
-                spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                if (BgModes != BackGroundModes.None)
+                {
+                    DrawRect.X = Values.WindowSize.X - 1;
+                    DrawRect.Y = 0;
+                    DrawRect.Width = 1;
+                    DrawRect.Height = Values.WindowSize.Y;
+                    spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                    DrawRect.X = 0;
+                    spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                    DrawRect.Width = Values.WindowSize.X;
+                    DrawRect.Height = 1;
+                    spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                    DrawRect.Y = Values.WindowSize.Y - 1;
+                    spriteBatch.Draw(Assets.White, DrawRect, Color.Gray * 0.25f);
+                }
 
                 spriteBatch.End();
             }
