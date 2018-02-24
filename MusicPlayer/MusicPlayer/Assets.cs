@@ -273,6 +273,7 @@ namespace MusicPlayer
             else
             {
                 XNA.primaryColor = SystemDefaultColor;
+                if (XNA.primaryColor.A != 255) XNA.primaryColor.A = 255;
                 XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
             }
 
@@ -300,6 +301,7 @@ namespace MusicPlayer
                 if (s.EndsWith(".mp3"))
                 {
                     Playlist.Add(s);
+                    AddSongToListIfNotDoneSoFar(s);
                     if (ConsoleOutput)
                     {
                         Console.CursorLeft = 0;
@@ -804,40 +806,44 @@ namespace MusicPlayer
             if (IsCurrentSongUpvoted)
             {
                 XNA.UpvoteSavedAlpha = 1.4f;
-                if (UpvotedSongNames.Contains(currentlyPlayingSongName))
-                {
-                    int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
-                    double percentage;
-                    if (Channel32 == null)
-                        percentage = 1;
-                    else
-                        percentage = (Channel32.Position / (double)Channel32.Length);
 
-                    if (UpvotedSongScores[index] > 120)
-                        UpvotedSongScores[index] = 120;
-                    if (UpvotedSongScores[index] < -1)
-                        UpvotedSongScores[index] = -1;
+                AddSongToListIfNotDoneSoFar(currentlyPlayingSongName);
 
-                    if (UpvotedSongStreaks[index] < 1)
-                        UpvotedSongStreaks[index] = 1;
-                    else if (Channel32 != null && Channel32.Position > Channel32.Length - bufferLength / 2)
-                        UpvotedSongStreaks[index]++;
-                    if (UpvotedSongScores[index] < 0)
-                        UpvotedSongScores[index] = 0;
-
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
-                    LastUpvotedSongStreak = UpvotedSongStreaks[index];
-                    UpvotedSongTotalLikes[index]++;
-                }
+                int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
+                double percentage;
+                if (Channel32 == null)
+                    percentage = 1;
                 else
-                {
-                    UpvotedSongNames.Add(currentlyPlayingSongName);
-                    UpvotedSongScores.Add(1);
-                    UpvotedSongStreaks.Add(1);
-                    UpvotedSongTotalLikes.Add(1);
-                }
+                    percentage = (Channel32.Position / (double)Channel32.Length);
+
+                if (UpvotedSongScores[index] > 120)
+                    UpvotedSongScores[index] = 120;
+                if (UpvotedSongScores[index] < -1)
+                    UpvotedSongScores[index] = -1;
+
+                if (UpvotedSongStreaks[index] < 1)
+                    UpvotedSongStreaks[index] = 1;
+                else if (Channel32 != null && Channel32.Position > Channel32.Length - bufferLength / 2)
+                    UpvotedSongStreaks[index]++;
+                if (UpvotedSongScores[index] < 0)
+                    UpvotedSongScores[index] = 0;
+
+                UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
+                LastUpvotedSongStreak = UpvotedSongStreaks[index];
+                UpvotedSongTotalLikes[index]++;
             }
             IsCurrentSongUpvoted = false;
+        }
+        public static void AddSongToListIfNotDoneSoFar(string Song)
+        {
+            Song = Song.Split('\\').Last();
+            if (!UpvotedSongNames.Contains(Song))
+            {
+                UpvotedSongNames.Add(Song);
+                UpvotedSongScores.Add(0);
+                UpvotedSongStreaks.Add(0);
+                UpvotedSongTotalLikes.Add(0);
+            }
         }
         // For Statistics
         public static float SongAge(string SongPath)
@@ -859,7 +865,7 @@ namespace MusicPlayer
         }
         public static object[,] GetSongInformationList()
         {
-            object[,] SongInformationArray = new object[Playlist.Count, 6];
+            object[,] SongInformationArray = new object[UpvotedSongNames.Count, 6];
 
             List<string> SongChoosingList = GetSongChoosingList(false);
 
