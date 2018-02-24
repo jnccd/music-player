@@ -1350,7 +1350,7 @@ namespace MusicPlayer
 
             //FPSCounter.Draw(spriteBatch);
 
-            spriteBatch.End();
+            spriteBatch.End(); // crash again: conat access disposed object, 14.02.18 13:54, 17.02.18 12:07
 
             // Title
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
