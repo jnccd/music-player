@@ -793,7 +793,7 @@ namespace MusicPlayer
                     else
                         UpvotedSongStreaks[index] -= 2;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 4 * (1 - percentage);
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 16 * (1 - percentage);
 
                     XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                 }
@@ -825,7 +825,7 @@ namespace MusicPlayer
                     if (UpvotedSongScores[index] < 0)
                         UpvotedSongScores[index] = 0;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 4;
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
                     LastUpvotedSongStreak = UpvotedSongStreaks[index];
                     UpvotedSongTotalLikes[index]++;
                 }

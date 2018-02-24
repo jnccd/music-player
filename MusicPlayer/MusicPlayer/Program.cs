@@ -126,10 +126,10 @@ namespace MusicPlayer
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".")
+                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".\n")
                     MessageBox.Show("I got brutally murdered by another Program. Please restart me.");
                 else
-                    MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: \n" + ex.InnerException + "\n\nSource: " + ex.Source);
+                    MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source);
                 
                 string strPath = Values.CurrentExecutablePath + @"\Log.txt";
                 if (!File.Exists(strPath))
