@@ -9,7 +9,7 @@
       <Value Profile="(Default)">0.215</Value>
     </Setting>
     <Setting Name="Background" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="Vis" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
@@ -33,10 +33,10 @@
       <Value Profile="(Default)">Transparent</Value>
     </Setting>
     <Setting Name="AntiAliasing" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="Preload" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SongUpvoteStreak" Type="System.Int32[]" Scope="User">
       <Value Profile="(Default)" />
