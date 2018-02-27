@@ -678,6 +678,7 @@ namespace MusicPlayer
                         }
                         else
                         {
+                            optionsMenu.Show();
                             optionsMenu.BringToFront();
                         }
                     }
@@ -728,6 +729,7 @@ namespace MusicPlayer
                 }
                 else
                 {
+                    optionsMenu.Show();
                     optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     optionsMenu.BringToFront();
                 }
