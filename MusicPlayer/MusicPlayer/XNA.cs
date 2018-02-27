@@ -113,7 +113,6 @@ namespace MusicPlayer
         Rectangle CloseButton = new Rectangle(Values.WindowSize.X - 43, Values.WindowSize.Y - 34, 18, 18);
         Rectangle OptionsButton = new Rectangle(Values.WindowSize.X - 71, Values.WindowSize.Y - 34, 19, 19);
 
-        // Shadows
         Rectangle DurationBarShadow;
         Rectangle VolumeIconShadow;
         Rectangle VolumeBarShadow;
@@ -131,20 +130,19 @@ namespace MusicPlayer
         
         public XNA()
         {
-            // Shadows
             DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
             VolumeIconShadow = new Rectangle(VolumeIcon.X + 5, VolumeIcon.Y + 5, VolumeIcon.Width, VolumeIcon.Height);
             VolumeBarShadow = new Rectangle(VolumeBar.X + 5, VolumeBar.Y + 5, VolumeBar.Width, VolumeBar.Height);
             PlayPauseButtonShadow = new Rectangle(PlayPauseButton.X + 5, PlayPauseButton.Y + 5, PlayPauseButton.Width, PlayPauseButton.Height);
             UpvoteShadow = new Rectangle(Upvote.X + 5, Upvote.Y + 5, Upvote.Width, Upvote.Height);
+            UpvoteButtonShadow = new Rectangle(UpvoteButton.X + 5, UpvoteButton.Y + 5, UpvoteButton.Width, UpvoteButton.Height);
             CloseButtonShadow = new Rectangle(CloseButton.X + 5, CloseButton.Y + 5, CloseButton.Width, CloseButton.Height);
             OptionsButtonShadow = new Rectangle(OptionsButton.X + 5, OptionsButton.Y + 5, OptionsButton.Width, OptionsButton.Height);
-            // Hitbox Rectangles
+
             DurationBarHitbox = new Rectangle(DurationBar.X, DurationBar.Y - 10, DurationBar.Width, 23);
             VolumeBarHitbox = new Rectangle(Values.WindowSize.X - 100, 20, 110, 16);
             PlayPauseButtonHitbox = new Rectangle(14, Values.WindowSize.Y - 39, 26, 26);
             UpvoteButtonHitbox = new Rectangle(UpvoteButton.X, UpvoteButton.Y, 20, 20);
-            
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
