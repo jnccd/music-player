@@ -38,7 +38,7 @@ namespace MusicPlayer
         private void OptionsMenu_Load(object sender, EventArgs e)
         {
             trackBar1.Value = config.Default.WavePreload;
-            if (XNA.Preload)
+            if (Program.game.Preload)
             {
                 PreloadToggle.Text = "Disable Preload";
                 trackBar1.Enabled = true;
@@ -57,11 +57,11 @@ namespace MusicPlayer
         {
             if (DoesPreloadActuallyWork)
             {
-                XNA.Preload = !XNA.Preload;
+                Program.game.Preload = !Program.game.Preload;
 
-                XNA.ShowSecondRowMessage("Preload was set to " + XNA.Preload + " \nThis setting will be applied when the next song starts", 1);
+                Program.game.ShowSecondRowMessage("Preload was set to " + Program.game.Preload + " \nThis setting will be applied when the next song starts", 1);
 
-                if (XNA.Preload)
+                if (Program.game.Preload)
                 {
                     PreloadToggle.Text = "Disable Preload";
                     trackBar1.Enabled = true;
@@ -81,7 +81,7 @@ namespace MusicPlayer
         }
         private void ColorChange_Click(object sender, EventArgs e)
         {
-            XNA.ShowColorDialog();
+            Program.game.ShowColorDialog();
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -96,7 +96,7 @@ namespace MusicPlayer
         }
         private void Reset_Click_1(object sender, EventArgs e)
         {
-            XNA.ResetMusicSourcePath();
+            Program.game.ResetMusicSourcePath();
         }
         private void ShowStatistics_Click(object sender, EventArgs e)
         {
@@ -135,19 +135,19 @@ namespace MusicPlayer
         }
         private void SwapVisualisations_Click(object sender, EventArgs e)
         {
-            XNA.VisSetting++;
-            if ((int)XNA.VisSetting > Enum.GetNames(typeof(Visualizations)).Length - 1)
-                XNA.VisSetting = 0;
+            Program.game.VisSetting++;
+            if ((int)Program.game.VisSetting > Enum.GetNames(typeof(Visualizations)).Length - 1)
+                Program.game.VisSetting = 0;
 
-            if (XNA.VisSetting == Visualizations.dynamicline)
-                XNA.VisSetting = Visualizations.fft;
+            if (Program.game.VisSetting == Visualizations.dynamicline)
+                Program.game.VisSetting = Visualizations.fft;
         }
         private void SwapBackgrounds_Click(object sender, EventArgs e)
         {
-            XNA.BgModes++;
-            if ((int)XNA.BgModes > Enum.GetNames(typeof(BackGroundModes)).Length - 1)
-                XNA.BgModes = 0;
-            XNA.ForceBackgroundRedraw();
+            Program.game.BgModes++;
+            if ((int)Program.game.BgModes > Enum.GetNames(typeof(BackGroundModes)).Length - 1)
+                Program.game.BgModes = 0;
+            Program.game.ForceBackgroundRedraw();
         }
 
         private void Download_Click(object sender, EventArgs e) // WIP
@@ -156,7 +156,7 @@ namespace MusicPlayer
             Download.Text = "Downloading...";
             Download.Enabled = false;
             DownloadBox.Enabled = false;
-            XNA.PauseConsoleInputThread = true;
+            Program.game.PauseConsoleInputThread = true;
 
             Task.Factory.StartNew(() =>
             {
@@ -166,7 +166,7 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        XNA.Download(download);
+                        Program.game.Download(download);
                     }
                     catch (Exception ex)
                     {
@@ -190,7 +190,7 @@ namespace MusicPlayer
                 Download.Enabled = true;
                 DownloadBox.Enabled = true;
                 DownloadFinished = false;
-                XNA.PauseConsoleInputThread = false;
+                Program.game.PauseConsoleInputThread = false;
             }
         }
 
@@ -206,9 +206,9 @@ namespace MusicPlayer
 
         private void bConsoleThreadRestart_Click(object sender, EventArgs e)
         {
-            if (XNA.ConsoleManager.IsCanceled || XNA.ConsoleManager.IsCompleted || XNA.ConsoleManager.IsFaulted)
+            if (Program.game.ConsoleManager.IsCanceled || Program.game.ConsoleManager.IsCompleted || Program.game.ConsoleManager.IsFaulted)
             {
-                XNA.StartSongInputLoop();
+                Program.game.StartSongInputLoop();
             }
         }
     }

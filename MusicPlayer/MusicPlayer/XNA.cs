@@ -53,81 +53,99 @@ namespace MusicPlayer
     public class XNA : Game
     {
         // Graphics
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        public static Form gameWindowForm;
-        RenderTarget2D TempBlur;
-        RenderTarget2D BlurredTex;
-        static RenderTarget2D TitleTarget;
-        static RenderTarget2D BackgroundTarget;
+        public GraphicsDeviceManager graphics;
+        public SpriteBatch spriteBatch;
+        public Form gameWindowForm;
+        public RenderTarget2D TempBlur;
+        public RenderTarget2D BlurredTex;
+        public RenderTarget2D TitleTarget;
+        public RenderTarget2D BackgroundTarget;
 
         // Visualization
-        public static Visualizations VisSetting = (Visualizations)config.Default.Vis;
-        public static BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
-        public static Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
-        public static Color secondaryColor = Color.Green;
-        public static GaussianDiagram GauD = null;
-        public static DynamicGrid DG;
-        static ColorDialog LeDialog;
-        static bool ShowingColorDialog = false;
+        public Visualizations VisSetting = (Visualizations)config.Default.Vis;
+        public BackGroundModes BgModes = (BackGroundModes)config.Default.Background;
+        public Color primaryColor = Color.FromNonPremultiplied(25, 75, 255, 255);
+        public Color secondaryColor = Color.Green;
+        public GaussianDiagram GauD = null;
+        public DynamicGrid DG;
+        public ColorDialog LeDialog;
+        public bool ShowingColorDialog = false;
         DropShadow Shadow;
 
         // Stuff
         System.Drawing.Point MouseClickedPos = new System.Drawing.Point();
         System.Drawing.Point WindowLocation = new System.Drawing.Point();
         SelectedControl selectedControl = SelectedControl.None;
-        static float SecondRowMessageAlpha;
-        static string SecondRowMessageText;
-        public static float UpvoteSavedAlpha = 0;
-        static float UpvoteIconAlpha = 0;
-        static List<string> LastConsoleInput = new List<string>();
-        static int LastConsoleInputIndex = -1;
-        static long CurrentDebugTime = 0;
-        static long CurrentDebugTime2 = 0;
-        static OptionsMenu optionsMenu;
-        public static bool FocusWindow = false;
-        public static bool Preload;
-        public static bool TaskbarHidden = false;
-        static int originY;
-        static float[] values;
-        static bool WasFocusedLastFrame = true;
-        public static bool PauseConsoleInputThread = false;
-        public static Task ConsoleManager;
-        static Task SongCheckThread;
+        float SecondRowMessageAlpha;
+        string SecondRowMessageText;
+        public float UpvoteSavedAlpha = 0;
+        float UpvoteIconAlpha = 0;
+        List<string> LastConsoleInput = new List<string>();
+        int LastConsoleInputIndex = -1;
+        long CurrentDebugTime = 0;
+        long CurrentDebugTime2 = 0;
+        OptionsMenu optionsMenu;
+        public bool FocusWindow = false;
+        public bool Preload;
+        public bool TaskbarHidden = false;
+        int originY;
+        float[] values;
+        bool WasFocusedLastFrame = true;
+        public bool PauseConsoleInputThread = false;
+        public Task ConsoleManager;
+        Task SongCheckThread;
         const float MaxVolume = 0.75f;
-        static int lastSongRequestCheck = -100;
+        int lastSongRequestCheck = -100;
+        long SkipStartPosition = 0;
+        long SongTimeSkipped = 0;
 
         // Draw
-        static Vector2 DrawVector = new Vector2(1, 1);
-        static Rectangle DrawRect = new Rectangle(1, 1, 1, 1);
-        static Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 157, 3);
-        static Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
-        static Rectangle VolumeBar = new Rectangle(Values.WindowSize.X - 100, 24, 75, 8);
-        static Rectangle PlayPauseButton = new Rectangle(24, Values.WindowSize.Y - 34, 16, 16);
-        static Rectangle Upvote = new Rectangle(24, 43, 20, 20);
-        static Rectangle TargetVolumeBar = new Rectangle(); // needs Updates
-        static Rectangle ActualVolumeBar = new Rectangle(); // needs Updates
-        static Rectangle UpvoteButton = new Rectangle(Values.WindowSize.X - 98, Values.WindowSize.Y - 35, 19, 19);
-        static Rectangle CloseButton = new Rectangle(Values.WindowSize.X - 43, Values.WindowSize.Y - 34, 18, 18);
-        static Rectangle OptionsButton = new Rectangle(Values.WindowSize.X - 71, Values.WindowSize.Y - 34, 19, 19);
+        Vector2 DrawVector = new Vector2(1, 1);
+        Rectangle DrawRect = new Rectangle(1, 1, 1, 1);
+        Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 157, 3);
+        Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
+        Rectangle VolumeBar = new Rectangle(Values.WindowSize.X - 100, 24, 75, 8);
+        Rectangle PlayPauseButton = new Rectangle(24, Values.WindowSize.Y - 34, 16, 16);
+        Rectangle Upvote = new Rectangle(24, 43, 20, 20);
+        Rectangle TargetVolumeBar = new Rectangle(); // needs Updates
+        Rectangle ActualVolumeBar = new Rectangle(); // needs Updates
+        Rectangle UpvoteButton = new Rectangle(Values.WindowSize.X - 98, Values.WindowSize.Y - 35, 19, 19);
+        Rectangle CloseButton = new Rectangle(Values.WindowSize.X - 43, Values.WindowSize.Y - 34, 18, 18);
+        Rectangle OptionsButton = new Rectangle(Values.WindowSize.X - 71, Values.WindowSize.Y - 34, 19, 19);
 
-        static Rectangle DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
-        static Rectangle VolumeIconShadow = new Rectangle(VolumeIcon.X + 5, VolumeIcon.Y + 5, VolumeIcon.Width, VolumeIcon.Height);
-        static Rectangle VolumeBarShadow = new Rectangle(VolumeBar.X + 5, VolumeBar.Y + 5, VolumeBar.Width, VolumeBar.Height);
-        static Rectangle PlayPauseButtonShadow = new Rectangle(PlayPauseButton.X + 5, PlayPauseButton.Y + 5, PlayPauseButton.Width, PlayPauseButton.Height);
-        static Rectangle UpvoteShadow = new Rectangle(Upvote.X + 5, Upvote.Y + 5, Upvote.Width, Upvote.Height);
-        static Rectangle UpvoteButtonShadow = new Rectangle(UpvoteButton.X + 5, UpvoteButton.Y + 5, UpvoteButton.Width, UpvoteButton.Height);
-        static Rectangle CloseButtonShadow = new Rectangle(CloseButton.X + 5, CloseButton.Y + 5, CloseButton.Width, CloseButton.Height);
-        static Rectangle OptionsButtonShadow = new Rectangle(OptionsButton.X + 5, OptionsButton.Y + 5, OptionsButton.Width, OptionsButton.Height);
+        // Shadows
+        Rectangle DurationBarShadow;
+        Rectangle VolumeIconShadow;
+        Rectangle VolumeBarShadow;
+        Rectangle PlayPauseButtonShadow;
+        Rectangle UpvoteShadow;
+        Rectangle UpvoteButtonShadow;
+        Rectangle CloseButtonShadow;
+        Rectangle OptionsButtonShadow;
 
         // Hitbox Rectangles
-        Rectangle DurationBarHitbox = new Rectangle(DurationBar.X, DurationBar.Y - 10, DurationBar.Width, 23);
-        Rectangle VolumeBarHitbox = new Rectangle(Values.WindowSize.X - 100, 20, 110, 16);
-        Rectangle PlayPauseButtonHitbox = new Rectangle(14, Values.WindowSize.Y - 39, 26, 26);
-        Rectangle UpvoteButtonHitbox = new Rectangle(UpvoteButton.X, UpvoteButton.Y, 20, 20);
+        Rectangle DurationBarHitbox;
+        Rectangle VolumeBarHitbox;
+        Rectangle PlayPauseButtonHitbox;
+        Rectangle UpvoteButtonHitbox;
         
         public XNA()
         {
+            // Shadows
+            DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
+            VolumeIconShadow = new Rectangle(VolumeIcon.X + 5, VolumeIcon.Y + 5, VolumeIcon.Width, VolumeIcon.Height);
+            VolumeBarShadow = new Rectangle(VolumeBar.X + 5, VolumeBar.Y + 5, VolumeBar.Width, VolumeBar.Height);
+            PlayPauseButtonShadow = new Rectangle(PlayPauseButton.X + 5, PlayPauseButton.Y + 5, PlayPauseButton.Width, PlayPauseButton.Height);
+            UpvoteShadow = new Rectangle(Upvote.X + 5, Upvote.Y + 5, Upvote.Width, Upvote.Height);
+            CloseButtonShadow = new Rectangle(CloseButton.X + 5, CloseButton.Y + 5, CloseButton.Width, CloseButton.Height);
+            OptionsButtonShadow = new Rectangle(OptionsButton.X + 5, OptionsButton.Y + 5, OptionsButton.Width, OptionsButton.Height);
+            // Hitbox Rectangles
+            DurationBarHitbox = new Rectangle(DurationBar.X, DurationBar.Y - 10, DurationBar.Width, 23);
+            VolumeBarHitbox = new Rectangle(Values.WindowSize.X - 100, 20, 110, 16);
+            PlayPauseButtonHitbox = new Rectangle(14, Values.WindowSize.Y - 39, 26, 26);
+            UpvoteButtonHitbox = new Rectangle(UpvoteButton.X, UpvoteButton.Y, 20, 20);
+            
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferWidth = Values.WindowSize.X;
@@ -195,7 +213,7 @@ namespace MusicPlayer
         }
 
         // Console Management
-        public static void StartSongInputLoop()
+        public void StartSongInputLoop()
         {
             ConsoleManager = Task.Factory.StartNew(() =>
             {
@@ -362,7 +380,7 @@ namespace MusicPlayer
                 }
             });
         }
-        public static void Download(string download)
+        public void Download(string download)
         {
             PauseConsoleInputThread = true;
             Values.ShowConsole();
@@ -553,7 +571,7 @@ namespace MusicPlayer
             //base.Update(gameTime);
             //Debug.WriteLine("Update + base: " + (Stopwatch.GetTimestamp() - CurrentDebugTime).ToString());
         }
-        public static void CheckForRequestedSongs()
+        public void CheckForRequestedSongs()
         {
             if (lastSongRequestCheck < Values.Timer - 15)
             {
@@ -591,6 +609,7 @@ namespace MusicPlayer
                 !WasFocusedLastFrame && gameWindowForm.Focused &&
                 Control.GetMouseRect().Intersects(Values.WindowRect))
             {
+                ReHookGlobalKeyHooks();
                 MouseClickedPos = new System.Drawing.Point(Control.CurMS.X, Control.CurMS.Y);
                 WindowLocation = gameWindowForm.Location;
 
@@ -601,7 +620,10 @@ namespace MusicPlayer
                 }
 
                 if (Control.GetMouseRect().Intersects(DurationBarHitbox))
+                {
                     selectedControl = SelectedControl.DurationBar;
+                    SkipStartPosition = Assets.Channel32.Position;
+                }
                 else if (Control.GetMouseRect().Intersects(VolumeBarHitbox))
                     selectedControl = SelectedControl.VolumeSlider;
                 else if (Control.GetMouseRect().Intersects(UpvoteButtonHitbox))
@@ -618,7 +640,10 @@ namespace MusicPlayer
             if (Control.WasLMBJustReleased())
             {
                 if (selectedControl == SelectedControl.DurationBar)
+                {
+                    SongTimeSkipped = Assets.Channel32.Position - SkipStartPosition;
                     Assets.output.Play();
+                }
                 selectedControl = SelectedControl.None;
             }
             if (Control.CurMS.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
@@ -805,7 +830,7 @@ namespace MusicPlayer
                     optionsMenu.S.BringToFront();
             }
         }
-        public static void ShowColorDialog()
+        public void ShowColorDialog()
         {
             Task.Factory.StartNew(() =>
             {
@@ -853,7 +878,7 @@ namespace MusicPlayer
                 }
             });
         }
-        public static void ResetMusicSourcePath()
+        public void ResetMusicSourcePath()
         {
             DialogResult DR = MessageBox.Show("Are you sure you want to reset the music source path?", "Source Path Reset", MessageBoxButtons.YesNo);
 
@@ -870,7 +895,7 @@ namespace MusicPlayer
             Process.Start(Info);
             Application.Exit();
         }
-        public static void UpdateGD()
+        public void UpdateGD()
         {
             //CurrentDebugTime = Stopwatch.GetTimestamp();
             if (Assets.FFToutput != null)
@@ -891,7 +916,7 @@ namespace MusicPlayer
                 //Debug.WriteLine("GD Update 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
         }
-        public static void UpdateRectangles()
+        public void UpdateRectangles()
         {
             TargetVolumeBar.X = Values.WindowSize.X - 100;
             TargetVolumeBar.Y = 24;
@@ -906,7 +931,7 @@ namespace MusicPlayer
                 ActualVolumeBar.Height = 8;
             }
         }
-        public static void KeepWindowInScreen()
+        public void KeepWindowInScreen()
         {
             Rectangle VirtualWindow = new Rectangle(config.Default.WindowPos.X, config.Default.WindowPos.Y, 
                 gameWindowForm.Bounds.Width, gameWindowForm.Bounds.Height);
@@ -973,12 +998,12 @@ namespace MusicPlayer
                 return r;
             }
         }
-        public static void ReHookGlobalKeyHooks()
+        public void ReHookGlobalKeyHooks()
         {
             InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
         }
-        public static void ShowSecondRowMessage(string Message, float StartingAlpha)
+        public void ShowSecondRowMessage(string Message, float StartingAlpha)
         {
             SecondRowMessageAlpha = StartingAlpha;
             SecondRowMessageText = Message;
@@ -1385,12 +1410,12 @@ namespace MusicPlayer
 
             //Debug.WriteLine("Draw: " + (Stopwatch.GetTimestamp() - CurrentDebugTime).ToString());
         }
-        public static void ForceTitleRedraw()
+        public void ForceTitleRedraw()
         {
             if (TitleTarget != null)
                 TitleTarget.Dispose();
         }
-        public static void ForceBackgroundRedraw()
+        public void ForceBackgroundRedraw()
         {
             if (BackgroundTarget != null)
                 BackgroundTarget.Dispose();

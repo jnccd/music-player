@@ -214,7 +214,7 @@ namespace MusicPlayer
             FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
             bg = Texture2D.FromStream(GD, Stream);
             Stream.Dispose();
-            XNA.TaskbarHidden = new Taskbar().AutoHide;
+            Program.game.TaskbarHidden = new Taskbar().AutoHide;
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => {
                 RefreshBGtex(GD);
                 // System Default Color
@@ -224,20 +224,20 @@ namespace MusicPlayer
 
                 var tb = new Taskbar();
 
-                if (XNA.TaskbarHidden == true && tb.AutoHide == false)
+                if (Program.game.TaskbarHidden == true && tb.AutoHide == false)
                 {
-                    XNA.TaskbarHidden = tb.AutoHide;
-                    XNA.KeepWindowInScreen();
+                    Program.game.TaskbarHidden = tb.AutoHide;
+                    Program.game.KeepWindowInScreen();
                 }
-                else if (XNA.TaskbarHidden == false && tb.AutoHide == true)
+                else if (Program.game.TaskbarHidden == false && tb.AutoHide == true)
                 {
-                    config.Default.WindowPos = new System.Drawing.Point(XNA.gameWindowForm.Location.X, XNA.gameWindowForm.Location.Y + 38);
-                    XNA.gameWindowForm.Location = new System.Drawing.Point(XNA.gameWindowForm.Location.X, XNA.gameWindowForm.Location.Y + 38);
-                    XNA.TaskbarHidden = tb.AutoHide;
-                    XNA.KeepWindowInScreen();
+                    config.Default.WindowPos = new System.Drawing.Point(Program.game.gameWindowForm.Location.X, Program.game.gameWindowForm.Location.Y + 38);
+                    Program.game.gameWindowForm.Location = new System.Drawing.Point(Program.game.gameWindowForm.Location.X, Program.game.gameWindowForm.Location.Y + 38);
+                    Program.game.TaskbarHidden = tb.AutoHide;
+                    Program.game.KeepWindowInScreen();
                 }
                 else
-                    XNA.TaskbarHidden = tb.AutoHide;
+                    Program.game.TaskbarHidden = tb.AutoHide;
             });
             // System Default Color
             try
@@ -267,14 +267,14 @@ namespace MusicPlayer
 
             if (config.Default.Col != System.Drawing.Color.Transparent)
             {
-                XNA.primaryColor = Color.FromNonPremultiplied(config.Default.Col.R, config.Default.Col.G, config.Default.Col.B, config.Default.Col.A);
-                XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
+                Program.game.primaryColor = Color.FromNonPremultiplied(config.Default.Col.R, config.Default.Col.G, config.Default.Col.B, config.Default.Col.A);
+                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, Color.White, 0.4f);
             }
             else
             {
-                XNA.primaryColor = SystemDefaultColor;
-                if (XNA.primaryColor.A != 255) XNA.primaryColor.A = 255;
-                XNA.secondaryColor = Color.Lerp(XNA.primaryColor, Color.White, 0.4f);
+                Program.game.primaryColor = SystemDefaultColor;
+                if (Program.game.primaryColor.A != 255) Program.game.primaryColor.A = 255;
+                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, Color.White, 0.4f);
             }
 
             Console.WriteLine("Starting first Song...");
@@ -341,7 +341,7 @@ namespace MusicPlayer
                         bg = Texture2D.FromStream(GD, Stream);
                         Stream.Dispose();
 
-                        XNA.ForceBackgroundRedraw();
+                        Program.game.ForceBackgroundRedraw();
                     }
                     catch { }
                 }
@@ -542,7 +542,6 @@ namespace MusicPlayer
         // Music Player Managment
         public static void PlayPause()
         {
-            XNA.ReHookGlobalKeyHooks();
             if (output != null)
             {
                 if (output.PlaybackState == PlaybackState.Playing) output.Pause();
@@ -684,8 +683,8 @@ namespace MusicPlayer
         }
         private static void PlaySongByPath(string PathString)
         {
-            config.Default.Preload = XNA.Preload;
-            XNA.ReHookGlobalKeyHooks();
+            config.Default.Preload = Program.game.Preload;
+            Program.game.ReHookGlobalKeyHooks();
             if (T != null && T.Status == TaskStatus.Running)
             {
                 AbortAbort = true;
@@ -695,9 +694,9 @@ namespace MusicPlayer
             SaveCurrentSongToHistoryFile();
 
             DisposeNAudioData();
-            XNA.ForceTitleRedraw();
-            if (XNA.DG != null)
-                XNA.DG.Clear();
+            Program.game.ForceTitleRedraw();
+            if (Program.game.DG != null)
+                Program.game.DG.Clear();
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' '});
@@ -760,10 +759,10 @@ namespace MusicPlayer
             config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
             config.Default.SongTotalLikes = UpvotedSongTotalLikes.ToArray();
 
-            config.Default.Background = (int)XNA.BgModes;
-            config.Default.Vis = (int)XNA.VisSetting;
+            config.Default.Background = (int)Program.game.BgModes;
+            config.Default.Vis = (int)Program.game.VisSetting;
 
-            config.Default.Col = System.Drawing.Color.FromArgb(XNA.primaryColor.R, XNA.primaryColor.G, XNA.primaryColor.B);
+            config.Default.Col = System.Drawing.Color.FromArgb(Program.game.primaryColor.R, Program.game.primaryColor.G, Program.game.primaryColor.B);
 
             config.Default.Save();
         }
@@ -797,7 +796,7 @@ namespace MusicPlayer
 
                     UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 16 * (1 - percentage);
 
-                    XNA.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+                    Program.game.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                 }
             }
         }
@@ -805,7 +804,7 @@ namespace MusicPlayer
         {
             if (IsCurrentSongUpvoted)
             {
-                XNA.UpvoteSavedAlpha = 1.4f;
+                Program.game.UpvoteSavedAlpha = 1.4f;
 
                 AddSongToListIfNotDoneSoFar(currentlyPlayingSongName);
 

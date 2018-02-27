@@ -434,13 +434,13 @@ namespace MusicPlayer
                 DrawRect.Y = P.Y;
                 DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
                 DrawRect.Height = 8;
-                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+                spriteBatch.Draw(Assets.White, DrawRect, Program.game.primaryColor);
 
                 DrawRect.Width = (int)((Length / 2) * (Values.Timer / 40f));
                 DrawRect.Height = 8;
                 DrawRect.X = P.X + Length - DrawRect.Width;
                 DrawRect.Y = P.Y;
-                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+                spriteBatch.Draw(Assets.White, DrawRect, Program.game.primaryColor);
             }
             else if (Values.Timer < 50)
             { }
@@ -461,7 +461,7 @@ namespace MusicPlayer
                 DrawRect.Y = P.Y;
                 DrawRect.Width = Length - 1;
                 DrawRect.Height = 8;
-                spriteBatch.Draw(Assets.White, DrawRect, XNA.primaryColor);
+                spriteBatch.Draw(Assets.White, DrawRect, Program.game.primaryColor);
             }
 
             // Drawing the Target
@@ -477,7 +477,7 @@ namespace MusicPlayer
             DrawRect.Y = (int)(Values.WindowSize.Y / 2 + (0 - Values.WindowSize.Y / 2) * DiagramSize);
             DrawRect.Width = (int)(Values.WindowSize.X * DiagramSize);
             DrawRect.Height = (int)(Values.WindowSize.Y * DiagramSize);
-            spriteBatch.Draw(ShadowTarget, DrawRect, XNA.primaryColor);
+            spriteBatch.Draw(ShadowTarget, DrawRect, Program.game.primaryColor);
         }
 
         public void DrawAsBars(SpriteBatch spriteBatch)
@@ -506,7 +506,7 @@ namespace MusicPlayer
                     for (int j = 0; j < (int)(Width / 1.2f); j++)
                         Assets.DrawLine(new Vector2(i * Width + j + P.X, P.Y - H),
                                         new Vector2(i * Width + j + P.X, P.Y + (int)(Width / 1.2f)),
-                                        1, Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / values.Length), spriteBatch);
+                                        1, Color.Lerp(Program.game.primaryColor, Program.game.secondaryColor, i / values.Length), spriteBatch);
                 }
             }
         }
@@ -538,7 +538,7 @@ namespace MusicPlayer
 
                     Assets.DrawLine(new Vector2(i + P.X, P.Y - (int)(value * Height)),
                                     new Vector2(i + P.X, P.Y + 10),
-                                    1, Color.Lerp(XNA.primaryColor, XNA.secondaryColor, i / values.Length), spriteBatch);
+                                    1, Color.Lerp(Program.game.primaryColor, Program.game.secondaryColor, i / values.Length), spriteBatch);
                 }
             }
         }

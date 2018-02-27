@@ -45,7 +45,7 @@ namespace MusicPlayer
             {
                 lock (End2)
                 {
-                    Assets.DrawLine(End1.Pos, End2.Pos, 1, XNA.primaryColor, SB);
+                    Assets.DrawLine(End1.Pos, End2.Pos, 1, Program.game.primaryColor, SB);
                 }
             }
             //SB.DrawString(Assets.Font, ((int)(End1.Pos - End2.Pos).Length()).ToString(), (End1.Pos + End2.Pos) / 2, Color.Blue);
