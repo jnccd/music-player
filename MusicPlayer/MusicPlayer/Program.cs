@@ -17,6 +17,7 @@ namespace MusicPlayer
     public static class Program
     {
         public static string[] args;
+        public static XNA game;
 
         [STAThread]
         static void Main(string[] args)
@@ -104,7 +105,7 @@ namespace MusicPlayer
                     weightwatchers.Path = SettingsPath;
                     weightwatchers.Changed += ((object source, FileSystemEventArgs e) =>
                     {
-                        XNA.CheckForRequestedSongs();
+                        game.CheckForRequestedSongs();
                     });
                     weightwatchers.EnableRaisingEvents = true;
                 }
@@ -116,13 +117,13 @@ namespace MusicPlayer
             catch { Console.WriteLine("Couldn't set filewatcher! (UNKNOWN ERROR)"); }
 
 #if DEBUG
-            using (XNA game = new XNA())
-                game.Run();
+            game = new XNA();
+            game.Run();
 #else
             try
             {
-                using (XNA game = new XNA())
-                    game.Run();
+                game = new XNA();
+                game.Run();
             }
             catch (Exception ex)
             {
