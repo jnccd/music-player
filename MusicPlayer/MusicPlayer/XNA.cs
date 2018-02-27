@@ -1241,131 +1241,134 @@ namespace MusicPlayer
             #endregion
 
             // HUD
-            #region HUD
-            // Duration Bar
-            spriteBatch.Draw(Assets.White, DurationBarShadow, Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.White, DurationBar, Color.White);
-            if (Assets.Channel32 != null)
+            lock (GauD)
             {
-                lock (Assets.Channel32)
+                #region HUD
+                // Duration Bar
+                spriteBatch.Draw(Assets.White, DurationBarShadow, Color.Black * 0.6f);
+                spriteBatch.Draw(Assets.White, DurationBar, Color.White);
+                if (Assets.Channel32 != null)
                 {
-                    float PlayPercetage = (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
-                        ((float)Assets.Channel32.TotalTime.TotalSeconds));
-                    DrawRect.X = DurationBar.X;
-                    DrawRect.Y = DurationBar.Y;
-                    DrawRect.Width = (int)(DurationBar.Width * PlayPercetage);
-                    DrawRect.Height = 3;
-                    spriteBatch.Draw(Assets.White, DrawRect, primaryColor);
-                    if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
+                    lock (Assets.Channel32)
                     {
-                        double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
-                        if (LoadPercetage < 1)
+                        float PlayPercetage = (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
+                            ((float)Assets.Channel32.TotalTime.TotalSeconds));
+                        DrawRect.X = DurationBar.X;
+                        DrawRect.Y = DurationBar.Y;
+                        DrawRect.Width = (int)(DurationBar.Width * PlayPercetage);
+                        DrawRect.Height = 3;
+                        spriteBatch.Draw(Assets.White, DrawRect, primaryColor);
+                        if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
                         {
-                            DrawRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
-                            DrawRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
-                            spriteBatch.Draw(Assets.White, DrawRect, secondaryColor);
+                            double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
+                            if (LoadPercetage < 1)
+                            {
+                                DrawRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
+                                DrawRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
+                                spriteBatch.Draw(Assets.White, DrawRect, secondaryColor);
+                            }
+                        }
+                        if (config.Default.AntiAliasing)
+                        {
+                            DrawRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
+                            DrawRect.Width = 1;
+                            float AAPercentage = (PlayPercetage * DurationBar.Width) % 1;
+                            spriteBatch.Draw(Assets.White, DrawRect, primaryColor * AAPercentage);
                         }
                     }
-                    if (config.Default.AntiAliasing)
-                    {
-                        DrawRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
-                        DrawRect.Width = 1;
-                        float AAPercentage = (PlayPercetage * DurationBar.Width) % 1;
-                        spriteBatch.Draw(Assets.White, DrawRect, primaryColor * AAPercentage);
-                    }
                 }
-            }
 
-            // Second Row
-            if (UpvoteSavedAlpha > 0)
-            {
-                spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteSavedAlpha);
+                // Second Row
+                if (UpvoteSavedAlpha > 0)
+                {
+                    spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteSavedAlpha);
 
-                DrawVector.X = Upvote.X + Upvote.Width + 3;
-                DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 8;
-                spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.White * UpvoteSavedAlpha);
-            }
-            else if (SecondRowMessageAlpha > 0)
-            {
-                DrawVector.X = 24;
-                DrawVector.Y = 45;
-                if (SecondRowMessageAlpha > 1)
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White);
+                    DrawVector.X = Upvote.X + Upvote.Width + 3;
+                    DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 8;
+                    spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.White * UpvoteSavedAlpha);
+                }
+                else if (SecondRowMessageAlpha > 0)
+                {
+                    DrawVector.X = 24;
+                    DrawVector.Y = 45;
+                    if (SecondRowMessageAlpha > 1)
+                        spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White);
+                    else
+                        spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White * SecondRowMessageAlpha);
+                }
+
+                // PlayPause Button
+                if (Assets.IsPlaying())
+                {
+                    spriteBatch.Draw(Assets.Pause, PlayPauseButtonShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Pause, PlayPauseButton, Color.White);
+                }
                 else
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White * SecondRowMessageAlpha);
+                {
+                    spriteBatch.Draw(Assets.Play, PlayPauseButtonShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Play, PlayPauseButton, Color.White);
+                }
+
+                // Volume
+                if (Values.TargetVolume > MaxVolume * 0.9f)
+                {
+                    spriteBatch.Draw(Assets.Volume, VolumeIconShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Volume, VolumeIcon, Color.White);
+                }
+                else if (Values.TargetVolume > MaxVolume * 0.3f)
+                {
+                    spriteBatch.Draw(Assets.Volume2, VolumeIconShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Volume2, VolumeIcon, Color.White);
+                }
+                else if (Values.TargetVolume > 0f)
+                {
+                    spriteBatch.Draw(Assets.Volume3, VolumeIconShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Volume3, VolumeIcon, Color.White);
+                }
+                else
+                {
+                    spriteBatch.Draw(Assets.Volume4, VolumeIconShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Volume4, VolumeIcon, Color.White);
+                }
+
+                spriteBatch.Draw(Assets.White, VolumeBarShadow, Color.Black * 0.6f);
+                spriteBatch.Draw(Assets.White, VolumeBar, Color.White);
+                spriteBatch.Draw(Assets.White, TargetVolumeBar, secondaryColor);
+                spriteBatch.Draw(Assets.White, ActualVolumeBar, primaryColor);
+
+                // UpvoteButton
+                spriteBatch.Draw(Assets.Upvote, UpvoteButtonShadow, Color.Black * 0.6f);
+                spriteBatch.Draw(Assets.Upvote, UpvoteButton, Color.Lerp(Color.White, primaryColor, UpvoteIconAlpha));
+
+                // CloseButton
+                spriteBatch.Draw(Assets.Close, CloseButtonShadow, Color.Black * 0.6f);
+                spriteBatch.Draw(Assets.Close, CloseButton, Color.White);
+
+                // OptionsButton
+                spriteBatch.Draw(Assets.Options, OptionsButtonShadow, Color.Black * 0.6f);
+                spriteBatch.Draw(Assets.Options, OptionsButton, Color.White);
+
+                // Catalyst Grid
+                //for (int x = 1; x < Values.WindowSize.X; x += 2)
+                //    for (int y = 1; y < Values.WindowSize.Y; y += 2)
+                //        spriteBatch.Draw(Assets.White, new Rectangle(x, y, 1, 1), Color.LightGray * 0.2f);
+
+                //FPSCounter.Draw(spriteBatch);
+
+                spriteBatch.End(); // crash again: conat access disposed object, 14.02.18 13:54, 17.02.18 12:07
+
+                // Title
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
+                    RasterizerState.CullNone, Assets.TitleFadeout);
+                if (TitleTarget != null)
+                {
+                    DrawVector.X = 24;
+                    DrawVector.Y = 13;
+                    spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+                }
+                spriteBatch.End();
+                #endregion
             }
-
-            // PlayPause Button
-            if (Assets.IsPlaying())
-            {
-                spriteBatch.Draw(Assets.Pause, PlayPauseButtonShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Pause, PlayPauseButton, Color.White);
-            }
-            else
-            {
-                spriteBatch.Draw(Assets.Play, PlayPauseButtonShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Play, PlayPauseButton, Color.White);
-            }
-
-            // Volume
-            if (Values.TargetVolume > MaxVolume * 0.9f)
-            {
-                spriteBatch.Draw(Assets.Volume, VolumeIconShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Volume, VolumeIcon, Color.White);
-            }
-            else if (Values.TargetVolume > MaxVolume * 0.3f)
-            {
-                spriteBatch.Draw(Assets.Volume2, VolumeIconShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Volume2, VolumeIcon, Color.White);
-            }
-            else if (Values.TargetVolume > 0f)
-            {
-                spriteBatch.Draw(Assets.Volume3, VolumeIconShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Volume3, VolumeIcon, Color.White);
-            }
-            else
-            {
-                spriteBatch.Draw(Assets.Volume4, VolumeIconShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Volume4, VolumeIcon, Color.White);
-            }
-
-            spriteBatch.Draw(Assets.White, VolumeBarShadow, Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.White, VolumeBar, Color.White);
-            spriteBatch.Draw(Assets.White, TargetVolumeBar, secondaryColor);
-            spriteBatch.Draw(Assets.White, ActualVolumeBar, primaryColor);
-
-            // UpvoteButton
-            spriteBatch.Draw(Assets.Upvote, UpvoteButtonShadow, Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.Upvote, UpvoteButton, Color.Lerp(Color.White, primaryColor, UpvoteIconAlpha));
-
-            // CloseButton
-            spriteBatch.Draw(Assets.Close, CloseButtonShadow, Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.Close, CloseButton, Color.White);
-
-            // OptionsButton
-            spriteBatch.Draw(Assets.Options, OptionsButtonShadow, Color.Black * 0.6f);
-            spriteBatch.Draw(Assets.Options, OptionsButton, Color.White);
-
-            // Catalyst Grid
-            //for (int x = 1; x < Values.WindowSize.X; x += 2)
-            //    for (int y = 1; y < Values.WindowSize.Y; y += 2)
-            //        spriteBatch.Draw(Assets.White, new Rectangle(x, y, 1, 1), Color.LightGray * 0.2f);
-
-            //FPSCounter.Draw(spriteBatch);
-
-            spriteBatch.End(); // crash again: conat access disposed object, 14.02.18 13:54, 17.02.18 12:07
-
-            // Title
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
-                RasterizerState.CullNone, Assets.TitleFadeout);
-            if (TitleTarget != null)
-            {
-                DrawVector.X = 24;
-                DrawVector.Y = 13;
-                spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
-            }
-            spriteBatch.End();
-            #endregion
 
             /*
             VertexPositionColor[] VPC = new VertexPositionColor[3];
