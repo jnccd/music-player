@@ -692,6 +692,7 @@ namespace MusicPlayer
             }
             
             SaveCurrentSongToHistoryFile();
+            Program.game.SongTimeSkipped = 0;
 
             DisposeNAudioData();
             Program.game.ForceTitleRedraw();
@@ -782,7 +783,7 @@ namespace MusicPlayer
 
                 if (index > -1 && DownVoteCurrentSongForUserSkip && PlayerHistoryIndex == PlayerHistory.Count - 1 && !IsCurrentSongUpvoted)
                 {
-                    float percentage = Channel32.Position / (float)Channel32.Length;
+                    float percentage = (Channel32.Position - Program.game.SongTimeSkipped) / (float)Channel32.Length;
 
                     if (UpvotedSongScores[index] > 120)
                         UpvotedSongScores[index] = 120;
@@ -813,7 +814,7 @@ namespace MusicPlayer
                 if (Channel32 == null)
                     percentage = 1;
                 else
-                    percentage = (Channel32.Position / (double)Channel32.Length);
+                    percentage = (Channel32.Position - Program.game.SongTimeSkipped) / (double)Channel32.Length;
 
                 if (UpvotedSongScores[index] > 120)
                     UpvotedSongScores[index] = 120;
