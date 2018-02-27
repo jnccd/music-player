@@ -536,10 +536,13 @@ namespace MusicPlayer
 
             if (Assets.Channel32 != null)
             {
-                if (config.Default.AutoVolume)
-                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume; // Null pointer exception? 13.02.18 13:36
-                else
-                    Assets.Channel32.Volume = Values.TargetVolume;
+                try
+                {
+                    if (config.Default.AutoVolume)
+                        Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume; // Null pointer exception? 13.02.18 13:36 / 27.02.18 01:35
+                    else
+                        Assets.Channel32.Volume = Values.TargetVolume;
+                } catch { }
             }
             
             UpdateRectangles();
