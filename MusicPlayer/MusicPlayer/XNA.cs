@@ -96,8 +96,8 @@ namespace MusicPlayer
         Task SongCheckThread;
         const float MaxVolume = 0.75f;
         int lastSongRequestCheck = -100;
-        long SkipStartPosition = 0;
-        long SongTimeSkipped = 0;
+        public long SkipStartPosition = 0;
+        public long SongTimeSkipped = 0;
 
         // Draw
         Vector2 DrawVector = new Vector2(1, 1);
@@ -113,6 +113,7 @@ namespace MusicPlayer
         Rectangle CloseButton = new Rectangle(Values.WindowSize.X - 43, Values.WindowSize.Y - 34, 18, 18);
         Rectangle OptionsButton = new Rectangle(Values.WindowSize.X - 71, Values.WindowSize.Y - 34, 19, 19);
 
+        // Shadows
         Rectangle DurationBarShadow;
         Rectangle VolumeIconShadow;
         Rectangle VolumeBarShadow;
