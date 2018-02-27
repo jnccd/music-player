@@ -184,6 +184,7 @@ namespace MusicPlayer
                     originY++;
                 }
                 Console.WriteLine("Canceled by user!");
+                Program.game.PauseConsoleInputThread = false;
                 originY++;
             });
 

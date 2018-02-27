@@ -206,6 +206,7 @@ namespace MusicPlayer
 
         private void bConsoleThreadRestart_Click(object sender, EventArgs e)
         {
+            Program.game.PauseConsoleInputThread = false;
             if (Program.game.ConsoleManager.IsCanceled || Program.game.ConsoleManager.IsCompleted || Program.game.ConsoleManager.IsFaulted)
             {
                 Program.game.StartSongInputLoop();
