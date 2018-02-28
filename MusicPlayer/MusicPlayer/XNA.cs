@@ -128,7 +128,7 @@ namespace MusicPlayer
         Rectangle VolumeBarHitbox;
         Rectangle PlayPauseButtonHitbox;
         Rectangle UpvoteButtonHitbox;
-        
+
         public XNA()
         {
             DurationBarShadow = new Rectangle(DurationBar.X + 5, DurationBar.Y + 5, DurationBar.Width, DurationBar.Height);
@@ -151,7 +151,8 @@ namespace MusicPlayer
             graphics.PreferredBackBufferHeight = Values.WindowSize.Y;
             gameWindowForm = (Form)System.Windows.Forms.Control.FromHandle(Window.Handle);
             gameWindowForm.FormBorderStyle = FormBorderStyle.None;
-            gameWindowForm.Move += ((object sender, EventArgs e) => {
+            gameWindowForm.Move += ((object sender, EventArgs e) =>
+            {
                 gameWindowForm.Location = new System.Drawing.Point(config.Default.WindowPos.X, config.Default.WindowPos.Y);
             });
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 120.0f);
@@ -169,7 +170,8 @@ namespace MusicPlayer
         }
         protected override void LoadContent()
         {
-            gameWindowForm.FormClosing += (object sender, FormClosingEventArgs e) => {
+            gameWindowForm.FormClosing += (object sender, FormClosingEventArgs e) =>
+            {
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 Assets.DisposeNAudioData();
                 Assets.SaveUserSettings();
@@ -194,7 +196,7 @@ namespace MusicPlayer
 
             Assets.LoadLoadingScreen(Content, GraphicsDevice);
             Assets.Load(Content, GraphicsDevice);
-            
+
             BlurredTex = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
             TempBlur = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
 
@@ -292,9 +294,11 @@ namespace MusicPlayer
                                 LastConsoleInput.Add(Path);
                                 Path = Path.Remove(0, "/settime ".Length);
 
-                                try {
+                                try
+                                {
                                     Assets.Channel32.Position = (long)(Convert.ToInt32(Path) * (Assets.Channel32.Length / Assets.Channel32.TotalTime.TotalSeconds));
-                                } catch (Exception ex) { Console.WriteLine(ex.ToString()); }
+                                }
+                                catch (Exception ex) { Console.WriteLine(ex.ToString()); }
 
                                 Path = "";
                                 originY = Console.CursorTop + 1;
@@ -369,7 +373,7 @@ namespace MusicPlayer
                             if (Path.Length > 0)
                                 Path = Path.Remove(Path.Length - 1);
                         }
-                        else if (e.Key >= (ConsoleKey)48 && e.Key <= (ConsoleKey)90 || 
+                        else if (e.Key >= (ConsoleKey)48 && e.Key <= (ConsoleKey)90 ||
                                  e.Key >= (ConsoleKey)186 && e.Key <= (ConsoleKey)226 ||
                                  e.Key == ConsoleKey.Spacebar)
                             Path += e.KeyChar;
@@ -447,13 +451,13 @@ namespace MusicPlayer
             };
 
             P.Start();
-            
+
             foreach (char c in Path.GetInvalidFileNameChars())
                 VideoTitle = VideoTitle.Replace(c, '-');
             VideoTitle = VideoTitle.Replace('.', '-');
 
             P.WaitForExit();
-            
+
             // Convert Video File to mp3 and put it into the default folder
             Console.WriteLine("Converting to mp3...");
             MediaFile input = new MediaFile { Filename = videofile };
@@ -512,7 +516,7 @@ namespace MusicPlayer
 
                 if (Values.OutputVolume < 0.0001f)
                     Values.OutputVolume = 0.0001f;
-                
+
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length - Assets.bufferLength / 2)
                     Assets.GetNextSong(false, false);
 
@@ -560,9 +564,10 @@ namespace MusicPlayer
                         Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume; // Null pointer exception? 13.02.18 13:36 / 27.02.18 01:35
                     else
                         Assets.Channel32.Volume = Values.TargetVolume;
-                } catch { }
+                }
+                catch { }
             }
-            
+
             UpdateRectangles();
 
             WasFocusedLastFrame = gameWindowForm.Focused;
@@ -886,7 +891,7 @@ namespace MusicPlayer
 
             if (DR != DialogResult.Yes)
                 return;
-            
+
             config.Default.MusicPath = "";
             config.Default.Save();
             ProcessStartInfo Info = new ProcessStartInfo();
@@ -935,12 +940,12 @@ namespace MusicPlayer
         }
         public void KeepWindowInScreen()
         {
-            Rectangle VirtualWindow = new Rectangle(config.Default.WindowPos.X, config.Default.WindowPos.Y, 
+            Rectangle VirtualWindow = new Rectangle(config.Default.WindowPos.X, config.Default.WindowPos.Y,
                 gameWindowForm.Bounds.Width, gameWindowForm.Bounds.Height);
             Rectangle[] ScreenBoxes = new Rectangle[Screen.AllScreens.Length];
 
             for (int i = 0; i < ScreenBoxes.Length; i++)
-                ScreenBoxes[i] = new Rectangle(Screen.AllScreens[i].Bounds.X, Screen.AllScreens[i].Bounds.Y, 
+                ScreenBoxes[i] = new Rectangle(Screen.AllScreens[i].Bounds.X, Screen.AllScreens[i].Bounds.Y,
                     Screen.AllScreens[i].Bounds.Width, Screen.AllScreens[i].Bounds.Height - 56);
 
             Point[] WindowPoints = new Point[4];
@@ -948,7 +953,7 @@ namespace MusicPlayer
             WindowPoints[1] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y);
             WindowPoints[2] = new Point(VirtualWindow.X, VirtualWindow.Y + VirtualWindow.Height);
             WindowPoints[3] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y + VirtualWindow.Height);
-            
+
             for (int i = 0; i < WindowPoints.Length; i++)
                 if (!RectanglesContainPoint(WindowPoints[i], ScreenBoxes))
                 {
@@ -960,7 +965,7 @@ namespace MusicPlayer
                         Diff = PointRectDiff(WindowPoints[i], new Rectangle(Main.Bounds.X, Main.Bounds.Y, Main.Bounds.Width, Main.Bounds.Height - 2));
                     else
                         Diff = PointRectDiff(WindowPoints[i], new Rectangle(Main.Bounds.X, Main.Bounds.Y, Main.Bounds.Width, Main.Bounds.Height - 40));
-                    
+
                     if (Diff != new Point(0, 0))
                     {
                         VirtualWindow = new Rectangle(VirtualWindow.X + Diff.X, VirtualWindow.Y + Diff.Y, VirtualWindow.Width, VirtualWindow.Height);
@@ -1056,7 +1061,7 @@ namespace MusicPlayer
 
                 spriteBatch.End();
             }
-            
+
             // FFT Diagram
             if (VisSetting == Visualizations.fft && Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing || Assets.output != null && GauD.WasRenderTargetContentLost())
             {
@@ -1140,264 +1145,267 @@ namespace MusicPlayer
                 spriteBatch.End();
             }
             #endregion
-            
+
             base.Draw(gameTime);
 
             GraphicsDevice.SetRenderTarget(null);
 
-            spriteBatch.Begin();
-
-            spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
-
-            #region Second Row HUD Shadows
-            if (UpvoteSavedAlpha > 0)
-            {
-                DrawVector.X = Upvote.X + Upvote.Width + 8;
-                DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 3;
-                spriteBatch.Draw(Assets.Upvote, UpvoteShadow, Color.Black * 0.6f * UpvoteSavedAlpha);
-                //spriteBatch.DrawString(Assets.Font, "Upvote saved! (" + Assets.LastUpvotedSongStreak.ToString() + " points)", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteSavedAlpha);
-                spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.Black * 0.6f * UpvoteSavedAlpha);
-            }
-            else if (SecondRowMessageAlpha > 0)
-            {
-                DrawVector.X = 29;
-                DrawVector.Y = 50;
-                if (SecondRowMessageAlpha > 1)
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f);
-                else
-                    spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f * SecondRowMessageAlpha);
-            }
-            #endregion
-
-            // Visualizations
-            #region Line graph
-            // Line Graph
-            if (VisSetting == Visualizations.line && Assets.Channel32 != null)
-            {
-                float Height = Values.WindowSize.Y / 1.96f;
-                int StepLength = Assets.WaveBuffer.Length / 512;
-
-                // Shadow
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
-
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
-
-                                    2, Color.Black * 0.6f, spriteBatch);
-                }
-
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
-
-                                    new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
-
-                                    2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
-                }
-            }
-            #endregion
-            #region Dynamic Line graph
-            // Line Graph
-            if (VisSetting == Visualizations.dynamicline && Assets.Channel32 != null)
-            {
-                float Height = Values.WindowSize.Y / 1.96f;
-                int StepLength = Assets.WaveBuffer.Length / 512;
-                float MostUsedFrequency = Array.IndexOf(Assets.RawFFToutput, Assets.RawFFToutput.Max());
-                float MostUsedWaveLength = 10000;
-                if (MostUsedFrequency != 0)
-                    MostUsedWaveLength = 1 / MostUsedFrequency;
-                float[] MostUsedFrequencyMultiplications = new float[100];
-                for (int i = 1; i <= 100; i++)
-                    MostUsedFrequencyMultiplications[i - 1] = MostUsedFrequency * i;
-                //Debug.WriteLine((MostUsedFrequency / Assets.Channel32.WaveFormat.SampleRate * Assets.RawFFToutput.Length) + " ::: " + MostUsedFrequency);
-
-                // Shadow
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512) + 5,
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
-
-                                    new Vector2(i * Values.WindowSize.X / (512) + 5,
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
-
-                                    2, Color.Black * 0.6f, spriteBatch);
-                }
-
-                for (int i = 1; i < 512; i++)
-                {
-                    Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512),
-                                    Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
-
-                                    new Vector2(i * Values.WindowSize.X / (512),
-                                    Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
-
-                                    2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
-                }
-            }
-            #endregion
-            #region FFT Graph
-            // FFT Graph
-            if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
-                GauD.DrawRenderTarget(spriteBatch);
-            #endregion
-            #region Raw FFT Graph
-            if (VisSetting == Visualizations.rawfft && Assets.Channel32 != null && Assets.FFToutput != null)
-            {
-                GauD.DrawInputData(spriteBatch);
-            }
-            #endregion
-            #region FFT Bars
-            // FFT Bars
-            if (VisSetting == Visualizations.barchart)
-            {
-                GauD.DrawAsBars(spriteBatch);
-            }
-            #endregion
-            #region Grid
-            // Grid
-            if (VisSetting == Visualizations.grid)
-            {
-                DG.DrawShadow(spriteBatch);
-                DG.Draw(spriteBatch);
-            }
-            #endregion
-
-            // HUD
             lock (GauD)
             {
-                #region HUD
-                // Duration Bar
-                spriteBatch.Draw(Assets.White, DurationBarShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.White, DurationBar, Color.White);
-                if (Assets.Channel32 != null)
+                lock (BackgroundTarget)
                 {
-                    lock (Assets.Channel32)
+                    spriteBatch.Begin();
+
+                    spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
+
+                    #region Second Row HUD Shadows
+                    if (UpvoteSavedAlpha > 0)
                     {
-                        float PlayPercetage = (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
-                            ((float)Assets.Channel32.TotalTime.TotalSeconds));
-                        DrawRect.X = DurationBar.X;
-                        DrawRect.Y = DurationBar.Y;
-                        DrawRect.Width = (int)(DurationBar.Width * PlayPercetage);
-                        DrawRect.Height = 3;
-                        spriteBatch.Draw(Assets.White, DrawRect, primaryColor);
-                        if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
+                        DrawVector.X = Upvote.X + Upvote.Width + 8;
+                        DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 3;
+                        spriteBatch.Draw(Assets.Upvote, UpvoteShadow, Color.Black * 0.6f * UpvoteSavedAlpha);
+                        //spriteBatch.DrawString(Assets.Font, "Upvote saved! (" + Assets.LastUpvotedSongStreak.ToString() + " points)", new Vector2(Upvote.X + Upvote.Width + 8, Upvote.Y + Upvote.Height / 2 - 3), Color.Black * 0.6f * UpvoteSavedAlpha);
+                        spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.Black * 0.6f * UpvoteSavedAlpha);
+                    }
+                    else if (SecondRowMessageAlpha > 0)
+                    {
+                        DrawVector.X = 29;
+                        DrawVector.Y = 50;
+                        if (SecondRowMessageAlpha > 1)
+                            spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f);
+                        else
+                            spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.Black * 0.6f * SecondRowMessageAlpha);
+                    }
+                    #endregion
+
+                    // Visualizations
+                    #region Line graph
+                    // Line Graph
+                    if (VisSetting == Visualizations.line && Assets.Channel32 != null)
+                    {
+                        float Height = Values.WindowSize.Y / 1.96f;
+                        int StepLength = Assets.WaveBuffer.Length / 512;
+
+                        // Shadow
+                        for (int i = 1; i < 512; i++)
                         {
-                            double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
-                            if (LoadPercetage < 1)
+                            Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                            Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
+
+                                            new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength) + 5,
+                                            Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
+
+                                            2, Color.Black * 0.6f, spriteBatch);
+                        }
+
+                        for (int i = 1; i < 512; i++)
+                        {
+                            Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                            Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
+
+                                            new Vector2(i * Values.WindowSize.X / (Assets.WaveBuffer.Length / StepLength),
+                                            Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
+
+                                            2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
+                        }
+                    }
+                    #endregion
+                    #region Dynamic Line graph
+                    // Line Graph
+                    if (VisSetting == Visualizations.dynamicline && Assets.Channel32 != null)
+                    {
+                        float Height = Values.WindowSize.Y / 1.96f;
+                        int StepLength = Assets.WaveBuffer.Length / 512;
+                        float MostUsedFrequency = Array.IndexOf(Assets.RawFFToutput, Assets.RawFFToutput.Max());
+                        float MostUsedWaveLength = 10000;
+                        if (MostUsedFrequency != 0)
+                            MostUsedWaveLength = 1 / MostUsedFrequency;
+                        float[] MostUsedFrequencyMultiplications = new float[100];
+                        for (int i = 1; i <= 100; i++)
+                            MostUsedFrequencyMultiplications[i - 1] = MostUsedFrequency * i;
+                        //Debug.WriteLine((MostUsedFrequency / Assets.Channel32.WaveFormat.SampleRate * Assets.RawFFToutput.Length) + " ::: " + MostUsedFrequency);
+
+                        // Shadow
+                        for (int i = 1; i < 512; i++)
+                        {
+                            Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512) + 5,
+                                            Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100) + 5),
+
+                                            new Vector2(i * Values.WindowSize.X / (512) + 5,
+                                            Height + (int)(Assets.WaveBuffer[i * StepLength] * 100) + 5),
+
+                                            2, Color.Black * 0.6f, spriteBatch);
+                        }
+
+                        for (int i = 1; i < 512; i++)
+                        {
+                            Assets.DrawLine(new Vector2((i - 1) * Values.WindowSize.X / (512),
+                                            Height + (int)(Assets.WaveBuffer[(i - 1) * StepLength] * 100)),
+
+                                            new Vector2(i * Values.WindowSize.X / (512),
+                                            Height + (int)(Assets.WaveBuffer[i * StepLength] * 100)),
+
+                                            2, Color.Lerp(primaryColor, secondaryColor, i / 512), spriteBatch);
+                        }
+                    }
+                    #endregion
+                    #region FFT Graph
+                    // FFT Graph
+                    if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
+                        GauD.DrawRenderTarget(spriteBatch);
+                    #endregion
+                    #region Raw FFT Graph
+                    if (VisSetting == Visualizations.rawfft && Assets.Channel32 != null && Assets.FFToutput != null)
+                    {
+                        GauD.DrawInputData(spriteBatch);
+                    }
+                    #endregion
+                    #region FFT Bars
+                    // FFT Bars
+                    if (VisSetting == Visualizations.barchart)
+                    {
+                        GauD.DrawAsBars(spriteBatch);
+                    }
+                    #endregion
+                    #region Grid
+                    // Grid
+                    if (VisSetting == Visualizations.grid)
+                    {
+                        DG.DrawShadow(spriteBatch);
+                        DG.Draw(spriteBatch);
+                    }
+                    #endregion
+
+                    // HUD
+                    #region HUD
+                    // Duration Bar
+                    spriteBatch.Draw(Assets.White, DurationBarShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.White, DurationBar, Color.White);
+                    if (Assets.Channel32 != null)
+                    {
+                        lock (Assets.Channel32)
+                        {
+                            float PlayPercetage = (Assets.Channel32.Position / (float)Assets.Channel32.WaveFormat.AverageBytesPerSecond /
+                                ((float)Assets.Channel32.TotalTime.TotalSeconds));
+                            DrawRect.X = DurationBar.X;
+                            DrawRect.Y = DurationBar.Y;
+                            DrawRect.Width = (int)(DurationBar.Width * PlayPercetage);
+                            DrawRect.Height = 3;
+                            spriteBatch.Draw(Assets.White, DrawRect, primaryColor);
+                            if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
                             {
-                                DrawRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
-                                DrawRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
-                                spriteBatch.Draw(Assets.White, DrawRect, secondaryColor);
+                                double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
+                                if (LoadPercetage < 1)
+                                {
+                                    DrawRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
+                                    DrawRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
+                                    spriteBatch.Draw(Assets.White, DrawRect, secondaryColor);
+                                }
+                            }
+                            if (config.Default.AntiAliasing)
+                            {
+                                DrawRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
+                                DrawRect.Width = 1;
+                                float AAPercentage = (PlayPercetage * DurationBar.Width) % 1;
+                                spriteBatch.Draw(Assets.White, DrawRect, primaryColor * AAPercentage);
                             }
                         }
-                        if (config.Default.AntiAliasing)
-                        {
-                            DrawRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
-                            DrawRect.Width = 1;
-                            float AAPercentage = (PlayPercetage * DurationBar.Width) % 1;
-                            spriteBatch.Draw(Assets.White, DrawRect, primaryColor * AAPercentage);
-                        }
                     }
-                }
 
-                // Second Row
-                if (UpvoteSavedAlpha > 0)
-                {
-                    spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteSavedAlpha);
+                    // Second Row
+                    if (UpvoteSavedAlpha > 0)
+                    {
+                        spriteBatch.Draw(Assets.Upvote, Upvote, Color.White * UpvoteSavedAlpha);
 
-                    DrawVector.X = Upvote.X + Upvote.Width + 3;
-                    DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 8;
-                    spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.White * UpvoteSavedAlpha);
-                }
-                else if (SecondRowMessageAlpha > 0)
-                {
-                    DrawVector.X = 24;
-                    DrawVector.Y = 45;
-                    if (SecondRowMessageAlpha > 1)
-                        spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White);
-                    else
-                        spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White * SecondRowMessageAlpha);
-                }
-
-                // PlayPause Button
-                if (Assets.IsPlaying())
-                {
-                    spriteBatch.Draw(Assets.Pause, PlayPauseButtonShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Pause, PlayPauseButton, Color.White);
-                }
-                else
-                {
-                    spriteBatch.Draw(Assets.Play, PlayPauseButtonShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Play, PlayPauseButton, Color.White);
-                }
-
-                // Volume
-                if (Values.TargetVolume > MaxVolume * 0.9f)
-                {
-                    spriteBatch.Draw(Assets.Volume, VolumeIconShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Volume, VolumeIcon, Color.White);
-                }
-                else if (Values.TargetVolume > MaxVolume * 0.3f)
-                {
-                    spriteBatch.Draw(Assets.Volume2, VolumeIconShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Volume2, VolumeIcon, Color.White);
-                }
-                else if (Values.TargetVolume > 0f)
-                {
-                    spriteBatch.Draw(Assets.Volume3, VolumeIconShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Volume3, VolumeIcon, Color.White);
-                }
-                else
-                {
-                    spriteBatch.Draw(Assets.Volume4, VolumeIconShadow, Color.Black * 0.6f);
-                    spriteBatch.Draw(Assets.Volume4, VolumeIcon, Color.White);
-                }
-
-                spriteBatch.Draw(Assets.White, VolumeBarShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.White, VolumeBar, Color.White);
-                spriteBatch.Draw(Assets.White, TargetVolumeBar, secondaryColor);
-                spriteBatch.Draw(Assets.White, ActualVolumeBar, primaryColor);
-
-                // UpvoteButton
-                spriteBatch.Draw(Assets.Upvote, UpvoteButtonShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Upvote, UpvoteButton, Color.Lerp(Color.White, primaryColor, UpvoteIconAlpha));
-
-                // CloseButton
-                spriteBatch.Draw(Assets.Close, CloseButtonShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Close, CloseButton, Color.White);
-
-                // OptionsButton
-                spriteBatch.Draw(Assets.Options, OptionsButtonShadow, Color.Black * 0.6f);
-                spriteBatch.Draw(Assets.Options, OptionsButton, Color.White);
-
-                // Catalyst Grid
-                //for (int x = 1; x < Values.WindowSize.X; x += 2)
-                //    for (int y = 1; y < Values.WindowSize.Y; y += 2)
-                //        spriteBatch.Draw(Assets.White, new Rectangle(x, y, 1, 1), Color.LightGray * 0.2f);
-
-                //FPSCounter.Draw(spriteBatch);
-
-                spriteBatch.End();
-
-                // Title
-                lock (TitleTarget)
-                {
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
-                    RasterizerState.CullNone, Assets.TitleFadeout);
-                    if (TitleTarget != null)
+                        DrawVector.X = Upvote.X + Upvote.Width + 3;
+                        DrawVector.Y = Upvote.Y + Upvote.Height / 2 - 8;
+                        spriteBatch.DrawString(Assets.Font, "Upvote saved!", DrawVector, Color.White * UpvoteSavedAlpha);
+                    }
+                    else if (SecondRowMessageAlpha > 0)
                     {
                         DrawVector.X = 24;
-                        DrawVector.Y = 13;
-                        spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+                        DrawVector.Y = 45;
+                        if (SecondRowMessageAlpha > 1)
+                            spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White);
+                        else
+                            spriteBatch.DrawString(Assets.Font, SecondRowMessageText, DrawVector, Color.White * SecondRowMessageAlpha);
                     }
-                    spriteBatch.End(); // crash 28.02.18 4:28 (ich geh ja gleich zu bett)
+
+                    // PlayPause Button
+                    if (Assets.IsPlaying())
+                    {
+                        spriteBatch.Draw(Assets.Pause, PlayPauseButtonShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Pause, PlayPauseButton, Color.White);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(Assets.Play, PlayPauseButtonShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Play, PlayPauseButton, Color.White);
+                    }
+
+                    // Volume
+                    if (Values.TargetVolume > MaxVolume * 0.9f)
+                    {
+                        spriteBatch.Draw(Assets.Volume, VolumeIconShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Volume, VolumeIcon, Color.White);
+                    }
+                    else if (Values.TargetVolume > MaxVolume * 0.3f)
+                    {
+                        spriteBatch.Draw(Assets.Volume2, VolumeIconShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Volume2, VolumeIcon, Color.White);
+                    }
+                    else if (Values.TargetVolume > 0f)
+                    {
+                        spriteBatch.Draw(Assets.Volume3, VolumeIconShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Volume3, VolumeIcon, Color.White);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(Assets.Volume4, VolumeIconShadow, Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.Volume4, VolumeIcon, Color.White);
+                    }
+
+                    spriteBatch.Draw(Assets.White, VolumeBarShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.White, VolumeBar, Color.White);
+                    spriteBatch.Draw(Assets.White, TargetVolumeBar, secondaryColor);
+                    spriteBatch.Draw(Assets.White, ActualVolumeBar, primaryColor);
+
+                    // UpvoteButton
+                    spriteBatch.Draw(Assets.Upvote, UpvoteButtonShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Upvote, UpvoteButton, Color.Lerp(Color.White, primaryColor, UpvoteIconAlpha));
+
+                    // CloseButton
+                    spriteBatch.Draw(Assets.Close, CloseButtonShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Close, CloseButton, Color.White);
+
+                    // OptionsButton
+                    spriteBatch.Draw(Assets.Options, OptionsButtonShadow, Color.Black * 0.6f);
+                    spriteBatch.Draw(Assets.Options, OptionsButton, Color.White);
+
+                    // Catalyst Grid
+                    //for (int x = 1; x < Values.WindowSize.X; x += 2)
+                    //    for (int y = 1; y < Values.WindowSize.Y; y += 2)
+                    //        spriteBatch.Draw(Assets.White, new Rectangle(x, y, 1, 1), Color.LightGray * 0.2f);
+
+                    //FPSCounter.Draw(spriteBatch);
+
+                    spriteBatch.End();
+
+                    // Title
+                    lock (TitleTarget)
+                    {
+                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
+                        RasterizerState.CullNone, Assets.TitleFadeout);
+                        if (TitleTarget != null)
+                        {
+                            DrawVector.X = 24;
+                            DrawVector.Y = 13;
+                            spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+                        }
+                        spriteBatch.End(); // crash 28.02.18 4:28 (ich geh ja gleich zu bett)
+                    }
+                    #endregion
                 }
-                #endregion
             }
 
             /*
