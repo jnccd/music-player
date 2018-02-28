@@ -1382,18 +1382,21 @@ namespace MusicPlayer
 
                 //FPSCounter.Draw(spriteBatch);
 
-                spriteBatch.End(); // crash again: conat access disposed object, 14.02.18 13:54, 17.02.18 12:07
+                spriteBatch.End();
 
                 // Title
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
-                    RasterizerState.CullNone, Assets.TitleFadeout);
-                if (TitleTarget != null)
+                lock (TitleTarget)
                 {
-                    DrawVector.X = 24;
-                    DrawVector.Y = 13;
-                    spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
+                    RasterizerState.CullNone, Assets.TitleFadeout);
+                    if (TitleTarget != null)
+                    {
+                        DrawVector.X = 24;
+                        DrawVector.Y = 13;
+                        spriteBatch.Draw(TitleTarget, DrawVector, Color.White);
+                    }
+                    spriteBatch.End(); // crash 28.02.18 4:28 (ich geh ja gleich zu bett)
                 }
-                spriteBatch.End();
                 #endregion
             }
 
