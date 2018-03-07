@@ -920,7 +920,10 @@ namespace MusicPlayer
                 //Debug.WriteLine("GD Update 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 GauD.Update(values);
-                GauD.NewSmoothen();
+                if (config.Default.OldSmooth)
+                    GauD.Smoothen();
+                else
+                    GauD.NewSmoothen(config.Default.Smoothness);
                 //Debug.WriteLine("New Smooth " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
         }
