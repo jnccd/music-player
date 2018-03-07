@@ -84,6 +84,7 @@ namespace MusicPlayer
         int LastConsoleInputIndex = -1;
         long CurrentDebugTime = 0;
         long CurrentDebugTime2 = 0;
+        List<float> DebugPercentages = new List<float>();
         OptionsMenu optionsMenu;
         public bool FocusWindow = false;
         public bool Preload;
@@ -919,8 +920,8 @@ namespace MusicPlayer
                 //Debug.WriteLine("GD Update 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 GauD.Update(values);
-                GauD.Smoothen();
-                //Debug.WriteLine("GD Update 2 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+                GauD.NewSmoothen();
+                //Debug.WriteLine("New Smooth " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
             }
         }
         public void UpdateRectangles()
@@ -1389,7 +1390,7 @@ namespace MusicPlayer
 
                     //FPSCounter.Draw(spriteBatch);
 
-                    spriteBatch.End();
+                    spriteBatch.End(); // CRAHES AGAIN, IDK MAN, 05.03.18 22:18 (just after boot)
 
                     // Title
                     lock (TitleTarget)
