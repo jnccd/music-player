@@ -51,6 +51,17 @@ namespace MusicPlayer
                 label1.Enabled = false;
             }
             cAutoVolume.Checked = config.Default.AutoVolume;
+            tSmoothness.Value = (int)(config.Default.Smoothness * 100);
+            if (config.Default.OldSmooth)
+            {
+                tSmoothness.Enabled = false;
+                cOldSmooth.Checked = true;
+            }
+            else
+            {
+                tSmoothness.Enabled = true;
+                cOldSmooth.Checked = false;
+            }
         }
 
         private void PreloadToggle_Click(object sender, EventArgs e)
@@ -211,6 +222,17 @@ namespace MusicPlayer
             {
                 Program.game.StartSongInputLoop();
             }
+        }
+
+        private void tSmoothness_Scroll(object sender, EventArgs e)
+        {
+            config.Default.Smoothness = tSmoothness.Value / 100f;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            config.Default.OldSmooth = cOldSmooth.Checked;
+            tSmoothness.Enabled = !cOldSmooth.Checked;
         }
     }
 }

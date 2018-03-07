@@ -198,5 +198,29 @@ namespace MusicPlayer {
                 this["AutoVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
+        public float Smoothness {
+            get {
+                return ((float)(this["Smoothness"]));
+            }
+            set {
+                this["Smoothness"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OldSmooth {
+            get {
+                return ((bool)(this["OldSmooth"]));
+            }
+            set {
+                this["OldSmooth"] = value;
+            }
+        }
     }
 }

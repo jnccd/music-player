@@ -49,8 +49,12 @@
             this.ShowProgramFolder = new System.Windows.Forms.Button();
             this.cAutoVolume = new System.Windows.Forms.CheckBox();
             this.bConsoleThreadRestart = new System.Windows.Forms.Button();
+            this.tSmoothness = new System.Windows.Forms.TrackBar();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cOldSmooth = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
             // 
             // ColorChange
@@ -247,11 +251,46 @@
             this.bConsoleThreadRestart.UseVisualStyleBackColor = true;
             this.bConsoleThreadRestart.Click += new System.EventHandler(this.bConsoleThreadRestart_Click);
             // 
+            // tSmoothness
+            // 
+            this.tSmoothness.LargeChange = 1;
+            this.tSmoothness.Location = new System.Drawing.Point(12, 363);
+            this.tSmoothness.Maximum = 200;
+            this.tSmoothness.Minimum = 10;
+            this.tSmoothness.Name = "tSmoothness";
+            this.tSmoothness.Size = new System.Drawing.Size(413, 45);
+            this.tSmoothness.TabIndex = 19;
+            this.tSmoothness.Value = 50;
+            this.tSmoothness.Scroll += new System.EventHandler(this.tSmoothness_Scroll);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(13, 347);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(110, 13);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "Diagram Smoothness:";
+            // 
+            // cOldSmooth
+            // 
+            this.cOldSmooth.AutoSize = true;
+            this.cOldSmooth.Location = new System.Drawing.Point(330, 347);
+            this.cOldSmooth.Name = "cOldSmooth";
+            this.cOldSmooth.Size = new System.Drawing.Size(95, 17);
+            this.cOldSmooth.TabIndex = 21;
+            this.cOldSmooth.Text = "Old Smoothing";
+            this.cOldSmooth.UseVisualStyleBackColor = true;
+            this.cOldSmooth.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 353);
+            this.ClientSize = new System.Drawing.Size(438, 418);
+            this.Controls.Add(this.cOldSmooth);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.tSmoothness);
             this.Controls.Add(this.bConsoleThreadRestart);
             this.Controls.Add(this.cAutoVolume);
             this.Controls.Add(this.ShowProgramFolder);
@@ -276,6 +315,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -303,5 +343,8 @@
         private System.Windows.Forms.Button ShowProgramFolder;
         private System.Windows.Forms.CheckBox cAutoVolume;
         private System.Windows.Forms.Button bConsoleThreadRestart;
+        private System.Windows.Forms.TrackBar tSmoothness;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox cOldSmooth;
     }
 }

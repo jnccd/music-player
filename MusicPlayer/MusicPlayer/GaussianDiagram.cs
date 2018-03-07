@@ -263,20 +263,22 @@ namespace MusicPlayer
                 }
             }
         }
-        public void NewSmoothen()
+        public void NewSmoothen(float Smoothness)
         {
             if (Diagram != null)
             {
+                int width = (int)(6 * Smoothness);
+
                 for (int d = 1; d <= 6; d++)
                 {
                     for (int i = 0; i < Diagram.Length - d; i++)
                     {
-                        Diagram[i] += (Diagram[i + d] - Diagram[i]) / d / 2;
+                        Diagram[i] += (Diagram[i + d] - Diagram[i]) / d * Smoothness;
                     }
                     
                     for (int i = Diagram.Length - 1; i >= d; i--)
                     {
-                        Diagram[i] += (Diagram[i - d] - Diagram[i]) / d / 2;
+                        Diagram[i] += (Diagram[i - d] - Diagram[i]) / d * Smoothness;
                     }
                 }
             }
