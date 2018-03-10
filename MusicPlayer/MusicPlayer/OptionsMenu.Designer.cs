@@ -310,7 +310,7 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "OptionsMenu";
-            this.Text = "OptionsMenu";
+            this.Text = "OptionsMenu (looks like garbage, ill fix this later)";
             this.Load += new System.EventHandler(this.OptionsMenu_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.panel1.ResumeLayout(false);

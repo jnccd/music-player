@@ -309,6 +309,25 @@ namespace MusicPlayer
         {
             return (float)((Math.Pow(2, -1.5 * (x - 1) * (x - 1)) / 10f + 1) * (-Math.Pow(5, -x) + 1));
         }
+        public static string AsTime(double seconds)
+        {
+            int s = (int)(seconds % 60);
+            int m = (int)(seconds / 60);
+            int h = m / 60;
+            int d = h / 24;
+            int y = d / 365;
+
+            if (m == 0)
+                return s.ToString();
+            else if (h == 0)
+                return m + ":" + s;
+            else if (d == 0)
+                return h + ":" + m + ":" + s;
+            else if (y == 0)
+                return d + ":" + h + ":" + m + ":" + s;
+            else
+                return y + ":" + d + ":" + h + ":" + m + ":" + s;
+        }
 
         public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
         {

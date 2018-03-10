@@ -287,7 +287,8 @@ namespace MusicPlayer
                                 originY++;
                                 Path = "";
                                 Console.SetCursorPosition(0, originY);
-                                Console.WriteLine(Math.Round(Assets.Channel32.Position / (Assets.Channel32.Length / Assets.Channel32.TotalTime.TotalSeconds), 2) + "s");
+                                Console.WriteLine(Values.AsTime((Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds)
+                                    + " / " + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds));
                                 originY++;
                             }
                             else if (Path.StartsWith("/settime "))
