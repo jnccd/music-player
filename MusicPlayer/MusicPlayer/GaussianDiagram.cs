@@ -268,17 +268,29 @@ namespace MusicPlayer
             if (Diagram != null)
             {
                 int width = (int)(6 * Smoothness);
+                if (width > 12)
+                    width = 12;
 
                 for (int d = 1; d <= 6; d++)
                 {
                     for (int i = 0; i < Diagram.Length - d; i++)
                     {
-                        Diagram[i] += (Diagram[i + d] - Diagram[i]) / d * Smoothness;
+                        float Mult = Smoothness / d;
+
+                        if (Mult > 1)
+                            Mult = 1;
+
+                        Diagram[i] += (Diagram[i + d] - Diagram[i]) * Mult;
                     }
                     
                     for (int i = Diagram.Length - 1; i >= d; i--)
                     {
-                        Diagram[i] += (Diagram[i - d] - Diagram[i]) / d * Smoothness;
+                        float Mult = Smoothness / d;
+
+                        if (Mult > 1)
+                            Mult = 1;
+
+                        Diagram[i] += (Diagram[i - d] - Diagram[i]) * Mult;
                     }
                 }
             }
