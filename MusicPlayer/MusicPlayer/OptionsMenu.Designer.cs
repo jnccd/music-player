@@ -255,8 +255,7 @@
             // 
             this.tSmoothness.LargeChange = 1;
             this.tSmoothness.Location = new System.Drawing.Point(12, 363);
-            this.tSmoothness.Maximum = 200;
-            this.tSmoothness.Minimum = 10;
+            this.tSmoothness.Maximum = 500;
             this.tSmoothness.Name = "tSmoothness";
             this.tSmoothness.Size = new System.Drawing.Size(413, 45);
             this.tSmoothness.TabIndex = 19;
