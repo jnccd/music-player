@@ -145,11 +145,13 @@ namespace MusicPlayer
         //public const int bufferLength = 262144;
         public static GigaFloatList EntireSongWaveBuffer;
         public static byte[] buffer = new byte[bufferLength];
+        public static LinkedList<float> WaveList = new LinkedList<float>();
         public static float[] WaveBuffer = new float[bufferLength / 4];
         public static float[] FFToutput;
         public static float[] RawFFToutput;
         public static Complex[] tempbuffer = null;
         static int TempBufferLengthLog2;
+        static long LastChannel32Postion = -1000000000;
 
         // Debug
         public static long CurrentDebugTime = 0;
@@ -404,6 +406,57 @@ namespace MusicPlayer
                     WaveBuffer[i] = BitConverter.ToSingle(buffer, i * 4);
             }
         }
+        public static void UpdateWaveList()
+        {
+            if (Channel32 != null && Channel32Reader != null && Channel32Reader.CanRead)
+            {
+                Channel32Reader.Position = Channel32.Position;
+                int length = (int)(Channel32.Position - LastChannel32Postion);
+                if (length < bufferLength && length > 0)
+                {
+                    byte[] buff = new byte[length];
+
+                    while (true)
+                    {
+                        try
+                        {
+                            int Read = Channel32Reader.Read(buff, bufferLength - length, length);
+                            break;
+                        }
+                        catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
+                    }
+
+                    // Converting the byte buffer in readable data
+                    for (int i = 0; i < length / 4; i++)
+                        WaveList.AddLast(BitConverter.ToSingle(buff, i * 4));
+
+                    while (WaveList.Count > bufferLength)
+                        WaveList.RemoveFirst();
+                }
+                else
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            int Read = Channel32Reader.Read(buffer, 0, bufferLength);
+                            break;
+                        }
+                        catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
+                    }
+
+                    // Converting the byte buffer in readable data
+                    for (int i = 0; i < bufferLength / 4; i++)
+                        WaveList.AddLast(BitConverter.ToSingle(buffer, i * 4));
+
+                    while (WaveList.Count > bufferLength)
+                        WaveList.RemoveFirst();
+                }
+
+                WaveBuffer = WaveList.ToArray();
+                LastChannel32Postion = Channel32.Position;
+            }
+        } // eh
         public static void UpdateFFTbuffer()
         {
             lock (Channel32)
