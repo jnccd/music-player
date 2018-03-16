@@ -19,7 +19,7 @@ namespace MusicPlayer
     {
         public Statistics S = null;
         bool DownloadFinished;
-        bool DoesPreloadActuallyWork = false;
+        bool DoesPreloadActuallyWork = true;
 
         public OptionsMenu()
         {
