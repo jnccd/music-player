@@ -13,8 +13,9 @@ namespace MusicPlayer
         public GigaFloatList()
         {
             List = new List<float>[1000];
+            List[0] = new List<float>(67108863);
             for (int i = 0; i < List.Length; i++)
-                List[i] = new List<float>(67108863);
+                List[i] = new List<float>(1);
         }
 
         public void Add(float item)

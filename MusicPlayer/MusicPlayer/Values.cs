@@ -18,7 +18,7 @@ namespace MusicPlayer
     {
         public static Random RDM = new Random();
 
-        public static Point WindowSize = new Point(500, 300);
+        public static Point WindowSize = new Point(500, 300); // 500, 300 default; 1360, 768 - 40 fullscreen left
         public static Rectangle WindowRect
         {
             get

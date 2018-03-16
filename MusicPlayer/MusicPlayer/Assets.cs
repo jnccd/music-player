@@ -411,10 +411,7 @@ namespace MusicPlayer
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 if (tempbuffer == null)
                 {
-                    int complexLength = Channel32.WaveFormat.SampleRate / 2;
-                    if (complexLength > WaveBuffer.Length)
-                        complexLength = WaveBuffer.Length;
-                    tempbuffer = new Complex[complexLength];
+                    tempbuffer = new Complex[WaveBuffer.Length];
                     TempBufferLengthLog2 = (int)Math.Log(tempbuffer.Length, 2.0);
                 }
                 //Debug.WriteLine("UpdateFFTbuffer 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
