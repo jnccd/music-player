@@ -124,6 +124,7 @@ namespace MusicPlayer
         public static List<float> UpvotedSongScores;
         public static List<int> UpvotedSongStreaks;
         public static List<int> UpvotedSongTotalLikes;
+        public static List<long> UpvotedSongAddingDates;
 
         // MultiThreading
         public static Task T = null;
@@ -155,7 +156,6 @@ namespace MusicPlayer
 
         // Debug
         public static long CurrentDebugTime = 0;
-        //static List<int> SegmentLengths = new List<int>();
 
         // Loading / Disposing Data
         public static void LoadLoadingScreen(ContentManager Content, GraphicsDevice GD)
@@ -304,6 +304,7 @@ namespace MusicPlayer
                 {
                     Playlist.Add(s);
                     AddSongToListIfNotDoneSoFar(s);
+                    UpdateSongDate(s);
                     if (ConsoleOutput)
                     {
                         Console.CursorLeft = 0;
@@ -781,6 +782,7 @@ namespace MusicPlayer
             float Swapi;
             int Swapi2;
             int Swapi3;
+            long Swapi4;
             string SwapS;
             for (int i = 1; i < UpvotedSongNames.Count; i++)
             {
@@ -789,16 +791,19 @@ namespace MusicPlayer
                     Swapi = UpvotedSongScores[i];
                     Swapi2 = UpvotedSongStreaks[i];
                     Swapi3 = UpvotedSongTotalLikes[i];
+                    Swapi4 = UpvotedSongAddingDates[i];
                     SwapS = UpvotedSongNames[i];
 
                     UpvotedSongScores[i] = UpvotedSongScores[i - 1];
                     UpvotedSongStreaks[i] = UpvotedSongStreaks[i - 1];
                     UpvotedSongTotalLikes[i] = UpvotedSongTotalLikes[i - 1];
                     UpvotedSongNames[i] = UpvotedSongNames[i - 1];
+                    UpvotedSongAddingDates[i] = UpvotedSongAddingDates[i - 1];
 
                     UpvotedSongScores[i - 1] = Swapi;
                     UpvotedSongStreaks[i - 1] = Swapi2;
                     UpvotedSongTotalLikes[i - 1] = Swapi3;
+                    UpvotedSongAddingDates[i - 1] = Swapi4;
                     UpvotedSongNames[i - 1] = SwapS;
 
                     i = 1;
@@ -809,6 +814,7 @@ namespace MusicPlayer
             config.Default.SongScores = UpvotedSongScores.ToArray();
             config.Default.SongUpvoteStreak = UpvotedSongStreaks.ToArray();
             config.Default.SongTotalLikes = UpvotedSongTotalLikes.ToArray();
+            config.Default.SongDate = UpvotedSongAddingDates.ToArray();
 
             config.Default.Background = (int)Program.game.BgModes;
             config.Default.Vis = (int)Program.game.VisSetting;
@@ -857,7 +863,7 @@ namespace MusicPlayer
             {
                 Program.game.UpvoteSavedAlpha = 1.4f;
 
-                AddSongToListIfNotDoneSoFar(currentlyPlayingSongName);
+                AddSongToListIfNotDoneSoFar(currentlyPlayingSongPath);
 
                 int index = UpvotedSongNames.IndexOf(currentlyPlayingSongName);
                 double percentage;
@@ -886,20 +892,35 @@ namespace MusicPlayer
         }
         public static void AddSongToListIfNotDoneSoFar(string Song)
         {
-            Song = Song.Split('\\').Last();
-            if (!UpvotedSongNames.Contains(Song))
+            if (!UpvotedSongNames.Contains(Song.Split('\\').Last()))
             {
-                UpvotedSongNames.Add(Song);
+                UpvotedSongNames.Add(Song.Split('\\').Last());
                 UpvotedSongScores.Add(0);
                 UpvotedSongStreaks.Add(0);
                 UpvotedSongTotalLikes.Add(0);
+                UpvotedSongAddingDates.Add(GetSongFileCreationDate(Song));
             }
         }
         // For Statistics
+        public static long GetSongFileCreationDate(string SongPath)
+        {
+            if (File.Exists(SongPath))
+                return File.GetCreationTime(SongPath).ToBinary();
+            else
+                return 0;
+        }
+        public static void UpdateSongDate(string SongPath)
+        {
+            int index = UpvotedSongNames.IndexOf(SongPath.Split('\\').Last());
+            long OriginalSongBinary = UpvotedSongAddingDates[index];
+            DateTime OriginalSongCreationDate = DateTime.FromBinary(OriginalSongBinary);
+            if (OriginalSongBinary == 0 || File.Exists(SongPath) && DateTime.Compare(OriginalSongCreationDate, File.GetCreationTime(SongPath)) > 0)
+                UpvotedSongAddingDates[index] = File.GetCreationTime(SongPath).ToBinary();
+        }
         public static float SongAge(string SongPath)
         {
             if (File.Exists(SongPath))
-                return (float)Math.Round(DateTime.Today.Subtract(File.GetCreationTime(SongPath)).TotalHours / 24.0, 2);
+                return (float)Math.Round(DateTime.Today.Subtract(DateTime.FromBinary(UpvotedSongAddingDates[UpvotedSongNames.IndexOf(SongPath.Split('\\').Last())])).TotalHours / 24.0, 2);
             else
                 return 0;
         }

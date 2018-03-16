@@ -222,5 +222,16 @@ namespace MusicPlayer {
                 this["OldSmooth"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public long[] SongDate {
+            get {
+                return ((long[])(this["SongDate"]));
+            }
+            set {
+                this["SongDate"] = value;
+            }
+        }
     }
 }

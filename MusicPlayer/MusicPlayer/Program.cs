@@ -78,8 +78,16 @@ namespace MusicPlayer
             }
             else
                 Assets.UpvotedSongTotalLikes = config.Default.SongTotalLikes.ToList();
-
-
+            // SongDate
+            if (config.Default.SongDate == null || config.Default.SongDate.Length != Assets.UpvotedSongScores.Count)
+            {
+                Assets.UpvotedSongAddingDates = new List<long>(Assets.UpvotedSongScores.Count);
+                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
+                    Assets.UpvotedSongAddingDates.Add(0);
+            }
+            else
+                Assets.UpvotedSongAddingDates = config.Default.SongDate.ToList();
+            
             Console.Clear();
 
             // Actual start

@@ -82,8 +82,6 @@ namespace MusicPlayer
         float UpvoteIconAlpha = 0;
         List<string> LastConsoleInput = new List<string>();
         int LastConsoleInputIndex = -1;
-        long CurrentDebugTime = 0;
-        long CurrentDebugTime2 = 0;
         List<float> DebugPercentages = new List<float>();
         OptionsMenu optionsMenu;
         public bool FocusWindow = false;
