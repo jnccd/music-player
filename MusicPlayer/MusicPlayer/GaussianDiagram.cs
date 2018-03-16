@@ -45,7 +45,8 @@ namespace MusicPlayer
         float[] Diagram;
         float theta;
         bool WithShadow;
-        public int Height;
+        int Height;
+        int TargetHeight;
         float NullGaussian;
         RenderTarget2D ShadowTarget;
         Rectangle DrawRect;
@@ -70,6 +71,7 @@ namespace MusicPlayer
             this.theta = theta;
             this.WithShadow = WithShadow;
             this.Height = Height;
+            TargetHeight = Height;
 
             DiagramSize = 1;
             DrawRect = new Rectangle(0, 0, 1, 0);
@@ -479,7 +481,7 @@ namespace MusicPlayer
             else if (Values.Timer < 300)
             {
                 DiagramSize = 1;
-                Height = (int)(175 * Values.AnimationFunction(((Values.Timer - 50) / 50f)));
+                Height = (int)(TargetHeight * Values.AnimationFunction(((Values.Timer - 50) / 50f)));
 
                 // Shadow
                 DrawRect.X = P.X + 5;

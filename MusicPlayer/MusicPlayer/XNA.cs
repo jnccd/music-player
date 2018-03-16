@@ -167,7 +167,7 @@ namespace MusicPlayer
             values = new float[Values.WindowSize.X - 70];
             for (int i = 0; i < values.Length; i++)
                 values[i] = 0;
-            GauD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y / 1.25f)), 175, true, 3, GraphicsDevice);
+            GauD = new GaussianDiagram(values, new Point(35, (int)(Values.WindowSize.Y - 60)), (int)(Values.WindowSize.Y - 125), true, 3, GraphicsDevice);
         }
         protected override void LoadContent()
         {
