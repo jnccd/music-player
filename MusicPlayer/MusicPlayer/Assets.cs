@@ -53,6 +53,17 @@ namespace MusicPlayer
         public int SongIndex;
         public float SongDifference;
     }
+    public struct SongActionStruct
+    {
+        public SongActionStruct(string SongName, bool hasUpvoted)
+        {
+            this.SongName = SongName;
+            this.hasUpvoted = hasUpvoted;
+        }
+
+        public string SongName;
+        public bool hasUpvoted;
+    }
 
     public static class Assets
     {
@@ -113,6 +124,7 @@ namespace MusicPlayer
         }
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
+        public static LinkedList<SongActionStruct> PlayerUpvoteHistory = new LinkedList<SongActionStruct>();
         public static int PlayerHistoryIndex = 0;
         public static int SongChangedTickTime = -100000;
         public static int SongStartTime;
@@ -146,7 +158,6 @@ namespace MusicPlayer
         //public const int bufferLength = 262144;
         public static GigaFloatList EntireSongWaveBuffer;
         public static byte[] buffer = new byte[bufferLength];
-        public static LinkedList<float> WaveList = new LinkedList<float>();
         public static float[] WaveBuffer = new float[bufferLength / 4];
         public static float[] FFToutput;
         public static float[] RawFFToutput;
@@ -407,57 +418,6 @@ namespace MusicPlayer
                     WaveBuffer[i] = BitConverter.ToSingle(buffer, i * 4);
             }
         }
-        public static void UpdateWaveList()
-        {
-            if (Channel32 != null && Channel32Reader != null && Channel32Reader.CanRead)
-            {
-                Channel32Reader.Position = Channel32.Position;
-                int length = (int)(Channel32.Position - LastChannel32Postion);
-                if (length < bufferLength && length > 0)
-                {
-                    byte[] buff = new byte[length];
-
-                    while (true)
-                    {
-                        try
-                        {
-                            int Read = Channel32Reader.Read(buff, bufferLength - length, length);
-                            break;
-                        }
-                        catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
-                    }
-
-                    // Converting the byte buffer in readable data
-                    for (int i = 0; i < length / 4; i++)
-                        WaveList.AddLast(BitConverter.ToSingle(buff, i * 4));
-
-                    while (WaveList.Count > bufferLength)
-                        WaveList.RemoveFirst();
-                }
-                else
-                {
-                    while (true)
-                    {
-                        try
-                        {
-                            int Read = Channel32Reader.Read(buffer, 0, bufferLength);
-                            break;
-                        }
-                        catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
-                    }
-
-                    // Converting the byte buffer in readable data
-                    for (int i = 0; i < bufferLength / 4; i++)
-                        WaveList.AddLast(BitConverter.ToSingle(buffer, i * 4));
-
-                    while (WaveList.Count > bufferLength)
-                        WaveList.RemoveFirst();
-                }
-
-                WaveBuffer = WaveList.ToArray();
-                LastChannel32Postion = Channel32.Position;
-            }
-        } // eh
         public static void UpdateFFTbuffer()
         {
             lock (Channel32)
@@ -853,6 +813,7 @@ namespace MusicPlayer
 
                     UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 16 * (1 - percentage);
 
+                    PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, false));
                     Program.game.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                 }
             }
@@ -862,6 +823,7 @@ namespace MusicPlayer
             if (IsCurrentSongUpvoted)
             {
                 Program.game.UpvoteSavedAlpha = 1.4f;
+                PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, true));
 
                 AddSongToListIfNotDoneSoFar(currentlyPlayingSongPath);
 
@@ -917,10 +879,14 @@ namespace MusicPlayer
             if (OriginalSongBinary == 0 || File.Exists(SongPath) && DateTime.Compare(OriginalSongCreationDate, File.GetCreationTime(SongPath)) > 0)
                 UpvotedSongAddingDates[index] = File.GetCreationTime(SongPath).ToBinary();
         }
+        private static float SongAge(int indexInUpvotedSongNames)
+        {
+            return (float)Math.Round(DateTime.Today.Subtract(DateTime.FromBinary(UpvotedSongAddingDates[indexInUpvotedSongNames])).TotalHours / 24.0, 2);
+        }
         public static float SongAge(string SongPath)
         {
             if (File.Exists(SongPath))
-                return (float)Math.Round(DateTime.Today.Subtract(DateTime.FromBinary(UpvotedSongAddingDates[UpvotedSongNames.IndexOf(SongPath.Split('\\').Last())])).TotalHours / 24.0, 2);
+                return SongAge(UpvotedSongNames.IndexOf(SongPath.Split('\\').Last()));
             else
                 return 0;
         }
@@ -968,7 +934,7 @@ namespace MusicPlayer
         private static List<string> GetSongChoosingList(bool ForNextSongChoosing) // This determines the song chances
         {
             List<string> SongChoosingList = new List<string>();
-            int ChanceIncreasePerUpvote = Playlist.Count / 80;
+            int ChanceIncreasePerUpvote = Playlist.Count / 140;
             if (ChanceIncreasePerUpvote < 1)
                 ChanceIncreasePerUpvote = 1;
             for (int i = 0; i < Playlist.Count; i++)
@@ -982,14 +948,16 @@ namespace MusicPlayer
 
                     int amount = 0;
 
-                    if (UpvotedSongNames.Contains(Playlist[i].Split('\\').Last()))
-                        amount += (int)(UpvotedSongScores[UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last())])
-                            * ChanceIncreasePerUpvote;
+                    int index = UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last());
+                    if (index >= 0)
+                    {
+                        amount += (int)(UpvotedSongScores[index]) * ChanceIncreasePerUpvote;
 
-                    if (DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days < 30)
-                        amount += (int)((float)(30 - DateTime.Today.Subtract(File.GetCreationTime(Playlist[i])).Days) *
-                                Playlist.Count / 23f);
-
+                        float age = SongAge(index);
+                        if (age < 14)
+                            amount += (int)((14 - age) * Playlist.Count / 150f);
+                    }
+                    
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
                 }
