@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.SongName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongScore = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -38,6 +39,7 @@
             this.bRefresh = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.bSearch = new System.Windows.Forms.Button();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,6 +129,12 @@
             this.bSearch.UseVisualStyleBackColor = true;
             this.bSearch.Click += new System.EventHandler(this.bSearch_Click);
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 26);
+            this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
+            // 
             // Statistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -157,5 +165,6 @@
         private System.Windows.Forms.Button bRefresh;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button bSearch;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
     }
 }
