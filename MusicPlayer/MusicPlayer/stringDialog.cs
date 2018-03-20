@@ -26,9 +26,9 @@ namespace MusicPlayer
             Close();
         }
 
-        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == '\n')
+            if (e.KeyCode == Keys.Enter)
                 done_Click(this, EventArgs.Empty);
         }
     }
