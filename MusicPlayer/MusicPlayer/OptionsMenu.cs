@@ -114,7 +114,7 @@ namespace MusicPlayer
             if (S == null || S.IsDisposed)
             {
                 S = new Statistics();
-                S.Show();
+                Task.Factory.StartNew(() => { S.ShowDialog(); });
             }
             else
                 S.BringToFront();

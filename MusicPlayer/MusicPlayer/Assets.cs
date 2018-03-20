@@ -163,7 +163,6 @@ namespace MusicPlayer
         public static float[] RawFFToutput;
         public static Complex[] tempbuffer = null;
         static int TempBufferLengthLog2;
-        static long LastChannel32Postion = -1000000000;
 
         // Debug
         public static long CurrentDebugTime = 0;
