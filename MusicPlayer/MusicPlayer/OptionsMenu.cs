@@ -113,7 +113,7 @@ namespace MusicPlayer
         {
             if (S == null || S.IsDisposed)
             {
-                S = new Statistics();
+                S = new Statistics(this);
                 Task.Factory.StartNew(() => { S.ShowDialog(); });
             }
             else

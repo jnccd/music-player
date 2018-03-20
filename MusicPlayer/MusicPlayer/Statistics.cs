@@ -12,9 +12,10 @@ namespace MusicPlayer
 {
     public partial class Statistics : Form
     {
+        OptionsMenu parent;
         int currentMouseOverRow;
 
-        public Statistics()
+        public Statistics(OptionsMenu parent)
         {
             /*
             this.EnableBlur();
@@ -25,6 +26,7 @@ namespace MusicPlayer
             TransparencyKey = Color.LimeGreen;
             */
             InitializeComponent();
+            this.parent = parent;
         }
 
         private void Statistics_Load(object sender, EventArgs e)
@@ -170,6 +172,11 @@ namespace MusicPlayer
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void Statistics_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            parent.S = null;
         }
     }
 }

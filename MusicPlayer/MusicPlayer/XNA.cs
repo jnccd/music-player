@@ -812,13 +812,13 @@ namespace MusicPlayer
                 if (optionsMenu == null || optionsMenu.IsDisposed)
                 {
                     optionsMenu = new OptionsMenu();
-                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                 }
                 else
                 {
                     Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
-                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     optionsMenu.BringToFront();
                 }
             }
@@ -908,12 +908,12 @@ namespace MusicPlayer
                 if (optionsMenu == null || optionsMenu.IsDisposed)
                 {
                     optionsMenu = new OptionsMenu();
-                    optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
+                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                 }
 
                 if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
                 {
-                    optionsMenu.S = new Statistics();
+                    optionsMenu.S = new Statistics(optionsMenu);
                     Task.Factory.StartNew(() => { optionsMenu.S.ShowDialog(); });
                 }
                 else
