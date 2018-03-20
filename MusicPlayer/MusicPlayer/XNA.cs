@@ -432,13 +432,20 @@ namespace MusicPlayer
             req.KeepAlive = false;
             W = req.GetResponse();
             string VideoTitle;
+            string VideoThumbnailURL;
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
             {
+                // Extract info from HTMP string
                 string html = sr.ReadToEnd();
                 int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
                 string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
                 index = startcuthtml.IndexOf('"');
                 VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
+
+                index = html.IndexOf("<link itemprop=\"thumbnailUrl\" href=\"");
+                startcuthtml = html.Remove(0, index + "<link itemprop=\"thumbnailUrl\" href=\"".Length);
+                index = startcuthtml.IndexOf('"');
+                VideoThumbnailURL = startcuthtml.Remove(index, startcuthtml.Length - index);
 
                 // Decode the encoded string.
                 StringWriter myWriter = new StringWriter();
@@ -482,18 +489,66 @@ namespace MusicPlayer
 
             // Convert Video File to mp3 and put it into the default folder
             Console.WriteLine("Converting to mp3...");
-            MediaFile input = new MediaFile { Filename = videofile };
-            MediaFile output = new MediaFile { Filename = config.Default.MusicPath + "\\" + VideoTitle + ".mp3" };
+
+            string input = videofile;
+            string output = config.Default.MusicPath + "\\" + VideoTitle + ".mp3";
+
+            MediaFile inM = new MediaFile { Filename = input };
+            MediaFile outM = new MediaFile { Filename = output };
 
             using (var engine = new Engine())
             {
-                engine.GetMetadata(input);
-                engine.Convert(input, output);
+                engine.GetMetadata(inM);
+                engine.Convert(inM, outM);
             }
 
+            if (!File.Exists(output))
+                throw new Exception("Couldn't convert to mp3!");
+
+            // edit mp3 metadata using taglib
+            HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
+            HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            Stream stream = httpWebReponse.GetResponseStream();
+            System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
+            TagLib.File file = TagLib.File.Create(output);
+            TagLib.Picture pic = new TagLib.Picture();
+            pic.Type = TagLib.PictureType.FrontCover;
+            pic.Description = "Cover";
+            pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+            MemoryStream ms = new MemoryStream();
+            im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            ms.Position = 0;
+            pic.Data = TagLib.ByteVector.FromStream(ms);
+            file.Tag.Pictures = new TagLib.IPicture[] { pic };
+
+            stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle);
+            Question.ShowDialog();
+            file.Tag.Performers = new string[] { Question.result };
+            file.Tag.Comment = "Downloaded using MusicPlayer";
+            file.Tag.Album = "MusicPlayer Songs";
+            file.Tag.AlbumArtists = new string[] { Question.result };
+            file.Tag.Artists = new string[] { Question.result };
+            file.Tag.AmazonId = "AmazonIsShit";
+            file.Tag.Composers = new string[] { Question.result };
+            file.Tag.Copyright = "None";
+            file.Tag.Disc = 0;
+            file.Tag.DiscCount = 0;
+            file.Tag.Genres = new string[] { "good music" };
+            file.Tag.Grouping = "None";
+            file.Tag.Lyrics = "You expected lyrics, but it was me dio";
+            file.Tag.MusicIpId = "wubbel";
+            file.Tag.Title = VideoTitle;
+            file.Tag.Track = 0;
+            file.Tag.TrackCount = 0;
+            file.Tag.Year = 1982;
+
+            file.Save();
+            ms.Close();
+
+            // finishing touches
             File.Delete(videofile);
             Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
-            Assets.PlayNewSong(output.Filename);
+            Assets.PlayNewSong(outM.Filename);
             Assets.SaveUserSettings();
             originY = Console.CursorTop;
 
