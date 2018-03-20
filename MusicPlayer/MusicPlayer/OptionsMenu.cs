@@ -17,11 +17,12 @@ namespace MusicPlayer
 {
     public partial class OptionsMenu : Form
     {
+        public XNA parent;
         public Statistics S = null;
         bool DownloadFinished;
         bool DoesPreloadActuallyWork = true;
 
-        public OptionsMenu()
+        public OptionsMenu(XNA parent)
         {
             /*
             this.EnableBlur();
@@ -33,6 +34,7 @@ namespace MusicPlayer
             */
             InitializeComponent();
             //FormBorderStyle = FormBorderStyle.None;
+            this.parent = parent;
         }
 
         private void OptionsMenu_Load(object sender, EventArgs e)
@@ -233,6 +235,25 @@ namespace MusicPlayer
         {
             config.Default.OldSmooth = cOldSmooth.Checked;
             tSmoothness.Enabled = !cOldSmooth.Checked;
+        }
+
+        private void OptionsMenu_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            parent.optionsMenu = null;
+        }
+
+        delegate void toFrontDelegate();
+        public new void BringToFront()
+        {
+            if (InvokeRequired)
+            {
+                toFrontDelegate d = new toFrontDelegate(BringToFront);
+                Invoke(d);
+            }
+            else
+            {
+                base.BringToFront();
+            }
         }
     }
 }

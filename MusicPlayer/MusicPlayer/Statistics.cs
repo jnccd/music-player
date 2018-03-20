@@ -178,5 +178,19 @@ namespace MusicPlayer
         {
             parent.S = null;
         }
+
+        delegate void toFrontDelegate();
+        public new void BringToFront()
+        {
+            if (InvokeRequired)
+            {
+                toFrontDelegate d = new toFrontDelegate(BringToFront);
+                Invoke(d);
+            }
+            else
+            {
+                base.BringToFront();
+            }
+        }
     }
 }
