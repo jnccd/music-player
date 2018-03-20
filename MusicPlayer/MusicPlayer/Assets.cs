@@ -901,6 +901,7 @@ namespace MusicPlayer
         }
         public static void QueueSong(string Song)
         {
+            Program.game.ShowSecondRowMessage("Added  a  song  to  the  queue!", 1f);
             PlayerHistory.Add(Song);
         }
         // For Statistics

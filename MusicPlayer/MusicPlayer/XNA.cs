@@ -97,6 +97,7 @@ namespace MusicPlayer
         int lastSongRequestCheck = -100;
         public long SkipStartPosition = 0;
         public long SongTimeSkipped = 0;
+        string lastQuestionResult = null;
 
         // Draw
         Vector2 DrawVector = new Vector2(1, 1);
@@ -521,8 +522,12 @@ namespace MusicPlayer
             pic.Data = TagLib.ByteVector.FromStream(ms);
             file.Tag.Pictures = new TagLib.IPicture[] { pic };
 
-            stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle);
+            if (lastQuestionResult == null)
+                lastQuestionResult = VideoTitle.Split('-').First().Trim();
+
+            stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", lastQuestionResult);
             Question.ShowDialog();
+            lastQuestionResult = Question.result;
             file.Tag.Performers = new string[] { Question.result };
             file.Tag.Comment = "Downloaded using MusicPlayer";
             file.Tag.Album = "MusicPlayer Songs";

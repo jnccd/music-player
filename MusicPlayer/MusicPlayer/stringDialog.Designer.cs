@@ -38,18 +38,19 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(12, 12);
+            this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(187, 20);
+            this.textBox1.Size = new System.Drawing.Size(298, 22);
             this.textBox1.TabIndex = 0;
-            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // done
             // 
             this.done.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.done.Location = new System.Drawing.Point(205, 10);
+            this.done.Location = new System.Drawing.Point(316, 10);
             this.done.Name = "done";
-            this.done.Size = new System.Drawing.Size(75, 23);
+            this.done.Size = new System.Drawing.Size(75, 25);
             this.done.TabIndex = 1;
             this.done.Text = "Done";
             this.done.UseVisualStyleBackColor = true;
@@ -59,7 +60,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 43);
+            this.ClientSize = new System.Drawing.Size(403, 45);
             this.Controls.Add(this.done);
             this.Controls.Add(this.textBox1);
             this.Name = "stringDialog";

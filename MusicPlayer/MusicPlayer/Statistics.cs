@@ -102,6 +102,8 @@ namespace MusicPlayer
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
             dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
+
+            dataGridView1.Refresh();
         }
 
         private void bSearch_Click(object sender, EventArgs e)
@@ -163,6 +165,11 @@ namespace MusicPlayer
 
                 m.Show(dataGridView1, new Point(e.X + dataGridView1.GetColumnDisplayRectangle(e.ColumnIndex, true).X, e.Y + dataGridView1.GetRowDisplayRectangle(e.RowIndex, true).Y));
             }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
