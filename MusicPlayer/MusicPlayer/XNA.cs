@@ -83,7 +83,7 @@ namespace MusicPlayer
         List<string> LastConsoleInput = new List<string>();
         int LastConsoleInputIndex = -1;
         List<float> DebugPercentages = new List<float>();
-        OptionsMenu optionsMenu;
+        public OptionsMenu optionsMenu;
         public bool FocusWindow = false;
         public bool Preload;
         public bool TaskbarHidden = false;
@@ -761,12 +761,11 @@ namespace MusicPlayer
                     {
                         if (optionsMenu == null || optionsMenu.IsDisposed)
                         {
-                            optionsMenu = new OptionsMenu();
+                            optionsMenu = new OptionsMenu(this);
                             Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                         }
                         else
                         {
-                            Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                             optionsMenu.BringToFront();
                         }
                     }
@@ -811,7 +810,7 @@ namespace MusicPlayer
             {
                 if (optionsMenu == null || optionsMenu.IsDisposed)
                 {
-                    optionsMenu = new OptionsMenu();
+                    optionsMenu = new OptionsMenu(this);
                     //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                 }
@@ -907,7 +906,7 @@ namespace MusicPlayer
             {
                 if (optionsMenu == null || optionsMenu.IsDisposed)
                 {
-                    optionsMenu = new OptionsMenu();
+                    optionsMenu = new OptionsMenu(this);
                     //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                 }
 
