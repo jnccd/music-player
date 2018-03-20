@@ -362,6 +362,28 @@ namespace MusicPlayer
 
                                 originY = Console.CursorTop;
                             }
+                            else if (Path.StartsWith("/q"))
+                            {
+                                try
+                                {
+                                    Console.WriteLine();
+                                    LastConsoleInput.Add(Path);
+                                    string queue;
+                                    if (Path.StartsWith("/queue"))
+                                        queue = Path.Remove(0, "/queue".Length + 1);
+                                    else
+                                        queue = Path.Remove(0, "/q".Length + 1);
+                                    Path = "";
+
+                                    Assets.QueueNewSong(Path);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.ToString());
+                                }
+
+                                originY = Console.CursorTop;
+                            }
                             else
                                 break;
 
@@ -470,6 +492,7 @@ namespace MusicPlayer
             }
 
             File.Delete(videofile);
+            Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
             Assets.PlayNewSong(output.Filename);
             Assets.SaveUserSettings();
             originY = Console.CursorTop;
