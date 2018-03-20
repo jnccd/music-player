@@ -39,8 +39,8 @@ namespace MusicPlayer
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
 
-                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                    dataGridView1.Rows.Add(o);
+                //if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
+                dataGridView1.Rows.Add(o);
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
@@ -59,13 +59,6 @@ namespace MusicPlayer
             dataGridView1.Columns[3].Width = 80;
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
-
-            bRefresh.Width = this.Width / 895 * 147;
-            textBox1.Width = this.Width / 895 * 547;
-            bSearch.Width = this.Width / 895 * 147;
-
-            textBox1.Location = new Point(bRefresh.Bounds.X + bRefresh.Bounds.Width + 7, textBox1.Location.Y);
-            bSearch.Location = new Point(textBox1.Bounds.X + textBox1.Bounds.Width + 7, bSearch.Location.Y);
         }
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -93,8 +86,8 @@ namespace MusicPlayer
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
 
-                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                    dataGridView1.Rows.Add(o);
+                //if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
+                dataGridView1.Rows.Add(o);
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
@@ -138,14 +131,22 @@ namespace MusicPlayer
                 bSearch_Click(this, EventArgs.Empty);
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void playToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        private void queueToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Statistics_Resize(object sender, EventArgs e)
+        {
+            if (Size.Width < 684)
+                Size = new Size(684, Size.Height);
+            if (Size.Height < 127)
+                Size = new Size(Size.Width, 127);
         }
     }
 }
