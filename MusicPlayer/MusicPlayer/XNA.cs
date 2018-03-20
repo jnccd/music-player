@@ -702,11 +702,11 @@ namespace MusicPlayer
                         if (optionsMenu == null || optionsMenu.IsDisposed)
                         {
                             optionsMenu = new OptionsMenu();
-                            optionsMenu.Show();
+                            Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                         }
                         else
                         {
-                            optionsMenu.Show();
+                            Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                             optionsMenu.BringToFront();
                         }
                     }
@@ -753,11 +753,11 @@ namespace MusicPlayer
                 {
                     optionsMenu = new OptionsMenu();
                     optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
-                    optionsMenu.Show();
+                    Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                 }
                 else
                 {
-                    optionsMenu.Show();
+                    Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                     optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     optionsMenu.BringToFront();
                 }
@@ -854,7 +854,7 @@ namespace MusicPlayer
                 if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
                 {
                     optionsMenu.S = new Statistics();
-                    optionsMenu.S.Show();
+                    Task.Factory.StartNew(() => { optionsMenu.S.ShowDialog(); });
                 }
                 else
                     optionsMenu.S.BringToFront();
