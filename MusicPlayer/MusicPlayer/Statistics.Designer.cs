@@ -140,6 +140,7 @@
             this.MinimumSize = new System.Drawing.Size(684, 127);
             this.Name = "Statistics";
             this.Text = "Statistics";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Statistics_FormClosed);
             this.Load += new System.EventHandler(this.Statistics_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
