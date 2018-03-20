@@ -863,6 +863,48 @@ namespace MusicPlayer
                 UpvotedSongAddingDates.Add(GetSongFileCreationDate(Song));
             }
         }
+        public static void QueueNewSong(string Song)
+        {
+            if (!File.Exists(Song))
+            {
+                DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
+                for (int i = 0; i < LDistances.Length; i++)
+                {
+                    LDistances[i].SongDifference = Values.OwnDistanceWrapper(Song, Playlist[i].Split('\\').Last().Split('.').First());
+                    LDistances[i].SongIndex = i;
+                }
+
+                LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
+                int NonWorkingIndexes = 0;
+                Song = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                while (!File.Exists(Song))
+                {
+                    NonWorkingIndexes++;
+                    Song = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(">Queued one matching song: \"" + Song.Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                    Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
+
+                for (int i = 1; i <= 5; i++)
+                {
+                    if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
+                        break;
+                    if (i == 1)
+                        Console.WriteLine("Other well fitting songs were:");
+                    Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                        Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
+                }
+            }
+
+            QueueSong(Song);
+        }
+        public static void QueueSong(string Song)
+        {
+            PlayerHistoryIndex--;
+            PlayerHistory.Add(Song);
+        }
         // For Statistics
         public static long GetSongFileCreationDate(string SongPath)
         {
