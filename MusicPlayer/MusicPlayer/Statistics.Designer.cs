@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.SongName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongScore = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -39,11 +38,7 @@
             this.bRefresh = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.bSearch = new System.Windows.Forms.Button();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.playToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.queueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -65,8 +60,9 @@
             this.Chance});
             this.dataGridView1.Location = new System.Drawing.Point(13, 41);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(808, 492);
+            this.dataGridView1.Size = new System.Drawing.Size(798, 405);
             this.dataGridView1.TabIndex = 2;
+            this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
             this.dataGridView1.Resize += new System.EventHandler(this.dataGridView1_Resize);
             // 
@@ -116,14 +112,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(167, 14);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(501, 20);
+            this.textBox1.Size = new System.Drawing.Size(491, 20);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // bSearch
             // 
             this.bSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bSearch.Location = new System.Drawing.Point(674, 12);
+            this.bSearch.Location = new System.Drawing.Point(664, 12);
             this.bSearch.Name = "bSearch";
             this.bSearch.Size = new System.Drawing.Size(147, 23);
             this.bSearch.TabIndex = 3;
@@ -131,43 +127,20 @@
             this.bSearch.UseVisualStyleBackColor = true;
             this.bSearch.Click += new System.EventHandler(this.bSearch_Click);
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.playToolStripMenuItem,
-            this.queueToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(110, 48);
-            // 
-            // playToolStripMenuItem
-            // 
-            this.playToolStripMenuItem.Name = "playToolStripMenuItem";
-            this.playToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
-            this.playToolStripMenuItem.Text = "Play";
-            this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
-            // 
-            // queueToolStripMenuItem
-            // 
-            this.queueToolStripMenuItem.Name = "queueToolStripMenuItem";
-            this.queueToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
-            this.queueToolStripMenuItem.Text = "Queue";
-            this.queueToolStripMenuItem.Click += new System.EventHandler(this.queueToolStripMenuItem_Click);
-            // 
             // Statistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(833, 545);
+            this.ClientSize = new System.Drawing.Size(823, 458);
             this.Controls.Add(this.bSearch);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.bRefresh);
             this.Controls.Add(this.dataGridView1);
+            this.MinimumSize = new System.Drawing.Size(684, 127);
             this.Name = "Statistics";
             this.Text = "Statistics";
             this.Load += new System.EventHandler(this.Statistics_Load);
-            this.Resize += new System.EventHandler(this.Statistics_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -185,8 +158,5 @@
         private System.Windows.Forms.Button bRefresh;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button bSearch;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem playToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem queueToolStripMenuItem;
     }
 }

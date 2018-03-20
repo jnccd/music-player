@@ -12,6 +12,8 @@ namespace MusicPlayer
 {
     public partial class Statistics : Form
     {
+        int currentMouseOverRow;
+
         public Statistics()
         {
             /*
@@ -63,11 +65,14 @@ namespace MusicPlayer
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            try
+            if (e.Button == MouseButtons.Left)
             {
-                Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                try
+                {
+                    Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                }
+                catch { }
             }
-            catch { }
         }
 
         private void bRefresh_Click(object sender, EventArgs e)
@@ -131,22 +136,33 @@ namespace MusicPlayer
                 bSearch_Click(this, EventArgs.Empty);
         }
 
-        private void playToolStripMenuItem_Click(object sender, EventArgs e)
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                ContextMenu m = new ContextMenu();
+                m.MenuItems.Add(new MenuItem("Play"));
+                m.MenuItems.Add(new MenuItem("Queue"));
 
-        }
+                m.MenuItems[0].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        Assets.PlayPlaylistSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                    }
+                    catch { }
+                });
+                m.MenuItems[1].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                    }
+                    catch { }
+                });
 
-        private void queueToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+                currentMouseOverRow = e.RowIndex;
 
-        }
-
-        private void Statistics_Resize(object sender, EventArgs e)
-        {
-            if (Size.Width < 684)
-                Size = new Size(684, Size.Height);
-            if (Size.Height < 127)
-                Size = new Size(Size.Width, 127);
+                m.Show(dataGridView1, new Point(e.X + dataGridView1.GetColumnDisplayRectangle(e.ColumnIndex, true).X, e.Y + dataGridView1.GetRowDisplayRectangle(e.RowIndex, true).Y));
+            }
         }
     }
 }

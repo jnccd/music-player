@@ -902,7 +902,6 @@ namespace MusicPlayer
         }
         public static void QueueSong(string Song)
         {
-            PlayerHistoryIndex--;
             PlayerHistory.Add(Song);
         }
         // For Statistics
