@@ -922,7 +922,7 @@ namespace MusicPlayer
         }
         private static float SongAge(int indexInUpvotedSongNames)
         {
-            return (float)Math.Round(DateTime.Today.Subtract(DateTime.FromBinary(UpvotedSongAddingDates[indexInUpvotedSongNames])).TotalHours / 24.0, 2);
+            return (float)Math.Round(DateTime.Today.Subtract(DateTime.FromBinary(UpvotedSongAddingDates[indexInUpvotedSongNames])).TotalHours / 24.0, 2) + 0.08f;
         }
         public static float SongAge(string SongPath)
         {
