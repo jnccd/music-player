@@ -43,8 +43,8 @@ namespace MusicPlayer
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
 
-                //if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                dataGridView1.Rows.Add(o);
+                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
+                    dataGridView1.Rows.Add(o);
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
@@ -93,8 +93,8 @@ namespace MusicPlayer
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
 
-                //if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                dataGridView1.Rows.Add(o);
+                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
+                    dataGridView1.Rows.Add(o);
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
