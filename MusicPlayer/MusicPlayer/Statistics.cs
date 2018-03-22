@@ -158,7 +158,7 @@ namespace MusicPlayer
                 m.MenuItems[1].Click += ((object s, EventArgs ev) => {
                     try
                     {
-                        Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString(), false);
                     }
                     catch { }
                 });

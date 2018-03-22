@@ -47,7 +47,6 @@ namespace MusicPlayer
         private static float[] HammingWindow;
         public static int Length;
     }
-
     public struct DistancePerSong
     {
         public int SongIndex;
@@ -92,7 +91,7 @@ namespace MusicPlayer
         public static Effect PixelBlur;
         public static Effect TitleFadeout;
         public static BasicEffect basicEffect;
-        
+
         // Music Player Manager Values
         public static string currentlyPlayingSongName
         {
@@ -198,7 +197,7 @@ namespace MusicPlayer
             for (int i = 0; i < Col.Length; i++)
                 Col[i] = Color.FromNonPremultiplied(255, 255, 255, (int)(i / (float)res * 255));
             ColorFade.SetData(Col);
-            
+
             Volume = Content.Load<Texture2D>("volume");
             Volume2 = Content.Load<Texture2D>("volume2");
             Volume3 = Content.Load<Texture2D>("volume3");
@@ -227,7 +226,8 @@ namespace MusicPlayer
             bg = Texture2D.FromStream(GD, Stream);
             Stream.Dispose();
             Program.game.TaskbarHidden = new Taskbar().AutoHide;
-            SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) => {
+            SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) =>
+            {
                 RefreshBGtex(GD);
                 // System Default Color
                 int argbColorRefresh = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
@@ -257,7 +257,9 @@ namespace MusicPlayer
                 int argbColor = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
                 System.Drawing.Color temp = System.Drawing.Color.FromArgb(argbColor);
                 SystemDefaultColor = Color.FromNonPremultiplied(temp.R, temp.G, temp.B, temp.A);
-            } catch {
+            }
+            catch
+            {
                 Console.WriteLine("Couldn't find System Default Color!");
                 SystemDefaultColor = Color.White;
             }
@@ -382,7 +384,8 @@ namespace MusicPlayer
                 try
                 {
                     Channel32Reader.Dispose();
-                } catch { Debug.WriteLine("Couldn't dispose the reader"); }
+                }
+                catch { Debug.WriteLine("Couldn't dispose the reader"); }
                 Channel32Reader = null;
             }
             if (mp3 != null)
@@ -492,7 +495,9 @@ namespace MusicPlayer
                     Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                     AbortAbort = false;
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
@@ -527,7 +532,7 @@ namespace MusicPlayer
 
             for (int i = from; i < to; i++)
                 temp += array[i];
-            
+
             return temp / array.Length;
         }
         public static float GetMaxHeight(float[] array, int from, int to)
@@ -592,9 +597,9 @@ namespace MusicPlayer
                     }
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(">Found one matching song: \"" + Path.Split('\\').Last().Split('.').First() + "\" with a difference of " + 
+                    Console.WriteLine(">Found one matching song: \"" + Path.Split('\\').Last().Split('.').First() + "\" with a difference of " +
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
-                    
+
                     for (int i = 1; i <= 5; i++)
                     {
                         if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
@@ -647,7 +652,7 @@ namespace MusicPlayer
         }
         public static void GetNextSong(bool forced, bool DownVoteCurrentSongForUserSkip)
         {
-            if (config.Default.MultiThreading || forced || 
+            if (config.Default.MultiThreading || forced ||
                 Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
                 DownvoteCurrentSongIfNeccesary(DownVoteCurrentSongForUserSkip);
@@ -700,7 +705,7 @@ namespace MusicPlayer
                 AbortAbort = true;
                 T.Wait();
             }
-            
+
             SaveCurrentSongToHistoryFile();
             Program.game.SongTimeSkipped = 0;
 
@@ -710,7 +715,7 @@ namespace MusicPlayer
                 Program.game.DG.Clear();
 
             if (PathString.Contains("\""))
-                PathString = PathString.Trim(new char[] { '"', ' '});
+                PathString = PathString.Trim(new char[] { '"', ' ' });
 
             mp3 = new Mp3FileReader(PathString);
             mp3Reader = new Mp3FileReader(PathString);
@@ -862,7 +867,7 @@ namespace MusicPlayer
                 UpvotedSongAddingDates.Add(GetSongFileCreationDate(Song));
             }
         }
-        public static void QueueNewSong(string Song)
+        public static void QueueNewSong(string Song, bool ConsoleOutput)
         {
             if (!File.Exists(Song))
             {
@@ -881,19 +886,23 @@ namespace MusicPlayer
                     NonWorkingIndexes++;
                     Song = Playlist[LDistances[NonWorkingIndexes].SongIndex];
                 }
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(">Queued one matching song: \"" + Song.Split('\\').Last().Split('.').First() + "\" with a difference of " +
-                    Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
-
-                for (int i = 1; i <= 5; i++)
+                
+                if (ConsoleOutput)
                 {
-                    if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
-                        break;
-                    if (i == 1)
-                        Console.WriteLine("Other well fitting songs were:");
-                    Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
-                        Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(">Queued one matching song: \"" + Song.Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                        Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
+
+
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
+                            break;
+                        if (i == 1)
+                            Console.WriteLine("Other well fitting songs were:");
+                        Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                            Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
+                    }
                 }
             }
 
@@ -962,7 +971,7 @@ namespace MusicPlayer
                         TargetTickets++;
                 SongInformationArray[i, 5] = TargetTickets / (float)SongChoosingList.Count * 100;
             }
-            
+
             return SongInformationArray;
         }
         public static string GetSongPathFromSongName(string SongName)
@@ -983,7 +992,7 @@ namespace MusicPlayer
             {
                 if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
                     Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) ||
-                    Playlist.Count < 2) || 
+                    Playlist.Count < 2) ||
                     !ForNextSongChoosing && (File.Exists(Playlist[i])))
                 {
                     SongChoosingList.Add(Playlist[i]);
@@ -1006,7 +1015,7 @@ namespace MusicPlayer
                                 amount += (int)((50 - UpvotedSongScores[index]) * 4);
                         }
                     }
-                    
+
                     for (int k = 0; k < amount; k++)
                         SongChoosingList.Add(Playlist[i]);
                 }
@@ -1076,8 +1085,8 @@ namespace MusicPlayer
         public static void DrawRoundedRectangle(Rectangle Rect, float PercentageOfRounding, Color Col, SpriteBatch SB)
         {
             float Rounding = PercentageOfRounding / 100;
-            Rectangle RHorz = new Rectangle(Rect.X, (int)(Rect.Y + Rect.Height * (Rounding / 2)), Rect.Width, (int)(Rect.Height * (1-Rounding)));
-            Rectangle RVert = new Rectangle((int)(Rect.X + Rect.Width * (Rounding / 2)), Rect.Y, (int)(Rect.Width * (1-Rounding)), (int)(Rect.Height * 0.999f));
+            Rectangle RHorz = new Rectangle(Rect.X, (int)(Rect.Y + Rect.Height * (Rounding / 2)), Rect.Width, (int)(Rect.Height * (1 - Rounding)));
+            Rectangle RVert = new Rectangle((int)(Rect.X + Rect.Width * (Rounding / 2)), Rect.Y, (int)(Rect.Width * (1 - Rounding)), (int)(Rect.Height * 0.999f));
 
             int RadiusHorz = (int)(Rect.Width * (Rounding / 2));
             int RadiusVert = (int)(Rect.Height * (Rounding / 2));
@@ -1094,7 +1103,7 @@ namespace MusicPlayer
                 DrawCircle(new Vector2(Rect.X + RadiusHorz, Rect.Y + RadiusVert + (int)(Rect.Height * (1 - Rounding))), RadiusHorz, RadiusVert / (float)RadiusHorz, Col, SB);
 
                 // Bottom-Right
-                DrawCircle(new Vector2(Rect.X + Rect.Width - RadiusHorz -1, Rect.Y + RadiusVert + (int)(Rect.Height * (1 - Rounding))), RadiusHorz, RadiusVert / (float)RadiusHorz, Col, SB);
+                DrawCircle(new Vector2(Rect.X + Rect.Width - RadiusHorz - 1, Rect.Y + RadiusVert + (int)(Rect.Height * (1 - Rounding))), RadiusHorz, RadiusVert / (float)RadiusHorz, Col, SB);
             }
 
             SB.Draw(White, RHorz, Col);
