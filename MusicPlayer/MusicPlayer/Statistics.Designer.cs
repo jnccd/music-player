@@ -60,7 +60,7 @@
             this.Chance});
             this.dataGridView1.Location = new System.Drawing.Point(13, 41);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(798, 405);
+            this.dataGridView1.Size = new System.Drawing.Size(750, 401);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
@@ -112,7 +112,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(167, 14);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(491, 20);
+            this.textBox1.Size = new System.Drawing.Size(443, 20);
             this.textBox1.TabIndex = 0;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
@@ -120,7 +120,7 @@
             // bSearch
             // 
             this.bSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bSearch.Location = new System.Drawing.Point(664, 12);
+            this.bSearch.Location = new System.Drawing.Point(616, 12);
             this.bSearch.Name = "bSearch";
             this.bSearch.Size = new System.Drawing.Size(147, 23);
             this.bSearch.TabIndex = 3;
@@ -132,7 +132,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(823, 458);
+            this.ClientSize = new System.Drawing.Size(775, 454);
             this.Controls.Add(this.bSearch);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.bRefresh);
