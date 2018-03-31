@@ -241,10 +241,15 @@ namespace MusicPlayer
         {
             parent.optionsMenu = null;
         }
-
+        
         private void bExport_Click(object sender, EventArgs e)
         {
-
+            FolderBrowserDialog choose = new FolderBrowserDialog();
+            DialogResult result = choose.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                Console.WriteLine(base.GetHashCode());
+            }
         }
     }
 }

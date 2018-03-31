@@ -34,28 +34,7 @@ namespace MusicPlayer
 
         private void Statistics_Load(object sender, EventArgs e)
         {
-            object[] o = new object[6];
-            object[,] SongInfo = Assets.GetSongInformationList();
-
-            for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
-            {
-                o[0] = SongInfo[i, 0];
-                o[1] = SongInfo[i, 1];
-                o[2] = SongInfo[i, 2];
-                o[3] = SongInfo[i, 3];
-                o[4] = SongInfo[i, 4];
-                o[5] = SongInfo[i, 5];
-
-                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                    dataGridView1.Rows.Add(o);
-            }
-
-            dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
-            dataGridView1.Columns[1].Width = 80;
-            dataGridView1.Columns[2].Width = 80;
-            dataGridView1.Columns[3].Width = 80;
-            dataGridView1.Columns[4].Width = 80;
-            dataGridView1.Columns[5].Width = 80;
+            bRefresh_Click(this, EventArgs.Empty);
         }
 
         private void dataGridView1_Resize(object sender, EventArgs e)
@@ -106,7 +85,19 @@ namespace MusicPlayer
             dataGridView1.Columns[3].Width = 80;
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
-            dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
+            if (RowIndex != -1)
+                dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
+
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                if (Assets.currentlyPlayingSongName.Equals(dataGridView1.Rows[i].Cells[0].Value))
+                {
+                    dataGridView1.Rows[i].Selected = true;
+                    int heightInRows = dataGridView1.Height / dataGridView1.Rows[0].Height;
+                    int index = i - heightInRows / 2 + 2;
+                    if (index < 0)
+                        index = 0;
+                    dataGridView1.FirstDisplayedScrollingRowIndex = index;
+                }
 
             dataGridView1.Refresh();
         }
