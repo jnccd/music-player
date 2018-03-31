@@ -98,6 +98,8 @@ namespace MusicPlayer
         public long SkipStartPosition = 0;
         public long SongTimeSkipped = 0;
         string lastQuestionResult = null;
+        bool ForcedTitleRedraw = false;
+        bool ForcedBackgroundRedraw = false;
 
         // Draw
         Vector2 DrawVector = new Vector2(1, 1);
@@ -762,7 +764,10 @@ namespace MusicPlayer
                         if (optionsMenu == null || optionsMenu.IsDisposed)
                         {
                             optionsMenu = new OptionsMenu(this);
-                            Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
+                            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+                            Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
+                            //Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                         }
                         else
                             optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
@@ -1098,7 +1103,7 @@ namespace MusicPlayer
             // RenderTargets
             #region RT
             // Song Title
-            if (TitleTarget == null || TitleTarget.IsContentLost || TitleTarget.IsDisposed)
+            if (ForcedTitleRedraw || TitleTarget == null || TitleTarget.IsContentLost || TitleTarget.IsDisposed)
             {
                 string Title;
                 if (Assets.currentlyPlayingSongName.Contains(".mp3"))
@@ -1150,7 +1155,7 @@ namespace MusicPlayer
             }
 
             // Background
-            if (BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed)
+            if (ForcedBackgroundRedraw || BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed)
             {
                 if (BgModes == BackGroundModes.Blur)
                 {
@@ -1500,13 +1505,11 @@ namespace MusicPlayer
         }
         public void ForceTitleRedraw()
         {
-            if (TitleTarget != null)
-                TitleTarget.Dispose();
+            ForcedTitleRedraw = true;
         }
         public void ForceBackgroundRedraw()
         {
-            if (BackgroundTarget != null)
-                BackgroundTarget.Dispose();
+            ForcedBackgroundRedraw = true;
         }
         void BeginBlur()
         {
