@@ -65,6 +65,7 @@
             this.Controls.Add(this.textBox1);
             this.Name = "stringDialog";
             this.Text = "Question";
+            this.Load += new System.EventHandler(this.stringDialog_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

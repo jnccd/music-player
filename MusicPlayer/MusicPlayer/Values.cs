@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Collections;
+using System.ComponentModel;
 
 namespace MusicPlayer
 {
@@ -472,6 +473,22 @@ namespace MusicPlayer
         WCA_ACCENT_POLICY = 19
     }
 
+    public static class FormExtensions
+    {
+        public static void InvokeIfRequired(this ISynchronizeInvoke obj,
+                                         MethodInvoker action)
+        {
+            if (obj.InvokeRequired)
+            {
+                var args = new object[0];
+                obj.Invoke(action, args);
+            }
+            else
+            {
+                action();
+            }
+        }
+    }
     public static class StringExtensions
     {
         public static bool Contains(this String str, String substring,

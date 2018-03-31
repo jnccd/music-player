@@ -187,8 +187,7 @@ namespace MusicPlayer
             basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), Vector3.Zero, Vector3.Up);
             basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, GD.Viewport.Width, GD.Viewport.Height, 0, 1.0f, 1000.0f);
             basicEffect.VertexColorEnabled = true;
-
-
+            
             Console.WriteLine("Loading Textures...");
             Color[] Col = new Color[1];
             int res = 8;

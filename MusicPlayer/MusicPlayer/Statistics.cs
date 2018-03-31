@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MusicPlayer
@@ -147,6 +150,7 @@ namespace MusicPlayer
                 ContextMenu m = new ContextMenu();
                 m.MenuItems.Add(new MenuItem("Play"));
                 m.MenuItems.Add(new MenuItem("Queue"));
+                m.MenuItems.Add(new MenuItem("Open in Browser"));
 
                 m.MenuItems[0].Click += ((object s, EventArgs ev) => {
                     try
@@ -161,6 +165,22 @@ namespace MusicPlayer
                         Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString(), false);
                     }
                     catch { }
+                });
+                m.MenuItems[2].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            // Use the I'm Feeling Lucky URL
+                            string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Path.GetFileNameWithoutExtension(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()));
+                            url = url.Replace(' ', '+');
+                            WebRequest req = HttpWebRequest.Create(url);
+                            Uri U = req.GetResponse().ResponseUri;
+
+                            Process.Start(U.ToString());
+                        });
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 });
 
                 currentMouseOverRow = e.RowIndex;
@@ -179,18 +199,9 @@ namespace MusicPlayer
             parent.S = null;
         }
 
-        delegate void toFrontDelegate();
-        public new void BringToFront()
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (InvokeRequired)
-            {
-                toFrontDelegate d = new toFrontDelegate(BringToFront);
-                Invoke(d);
-            }
-            else
-            {
-                base.BringToFront();
-            }
+
         }
     }
 }
