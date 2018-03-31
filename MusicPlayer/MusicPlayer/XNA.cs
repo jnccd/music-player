@@ -765,7 +765,7 @@ namespace MusicPlayer
                             Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                         }
                         else
-                            optionsMenu.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.Handle); });
+                            optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
                     }
                     break;
 
@@ -812,7 +812,7 @@ namespace MusicPlayer
                     Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                 }
                 else
-                    optionsMenu.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.Handle); });
+                    optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
             }
 
             // Swap Visualisations [V]
@@ -906,7 +906,7 @@ namespace MusicPlayer
                     Task.Factory.StartNew(() => { optionsMenu.S.ShowDialog(); });
                 }
                 else
-                    optionsMenu.S.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.S.Handle); });
+                    optionsMenu.S.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu.S); Values.SetForegroundWindow(optionsMenu.S.Handle); });
             }
         }
         public void ShowColorDialog()

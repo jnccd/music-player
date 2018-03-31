@@ -119,7 +119,7 @@ namespace MusicPlayer
                 Task.Factory.StartNew(() => { S.ShowDialog(); });
             }
             else
-                S.InvokeIfRequired(() => { Values.SetForegroundWindow(S.Handle); });
+                S.InvokeIfRequired(() => { Values.RestoreFromMinimzied(S); Values.SetForegroundWindow(S.Handle); });
         }
         private void ShowConsole_Click(object sender, EventArgs e)
         {

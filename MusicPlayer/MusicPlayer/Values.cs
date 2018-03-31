@@ -397,7 +397,33 @@ namespace MusicPlayer
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindowVisible(IntPtr hWnd);
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+        
+        private struct WINDOWPLACEMENT
+        {
+            public int length;
+            public int flags;
+            public int showCmd;
+            public System.Drawing.Point ptMinPosition;
+            public System.Drawing.Point ptMaxPosition;
+            public System.Drawing.Rectangle rcNormalPosition;
+        }
 
+        public static void RestoreFromMinimzied(Form form)
+        {
+            const int WPF_RESTORETOMAXIMIZED = 0x2;
+            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+            placement.length = Marshal.SizeOf(placement);
+            GetWindowPlacement(form.Handle, ref placement);
+
+            if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
+                form.WindowState = FormWindowState.Maximized;
+            else
+                form.WindowState = FormWindowState.Normal;
+        }
+        
         const int MF_BYCOMMAND = 0x00000000;
         const int SC_CLOSE = 0xF060;
         const int SC_MINIMIZE = 0xF020;
