@@ -119,7 +119,7 @@ namespace MusicPlayer
                 Task.Factory.StartNew(() => { S.ShowDialog(); });
             }
             else
-                S.BringToFront();
+                S.InvokeIfRequired(() => { Values.SetForegroundWindow(S.Handle); });
         }
         private void ShowConsole_Click(object sender, EventArgs e)
         {
@@ -242,18 +242,9 @@ namespace MusicPlayer
             parent.optionsMenu = null;
         }
 
-        delegate void toFrontDelegate();
-        public new void BringToFront()
+        private void bExport_Click(object sender, EventArgs e)
         {
-            if (InvokeRequired)
-            {
-                toFrontDelegate d = new toFrontDelegate(BringToFront);
-                Invoke(d);
-            }
-            else
-            {
-                base.BringToFront();
-            }
+
         }
     }
 }

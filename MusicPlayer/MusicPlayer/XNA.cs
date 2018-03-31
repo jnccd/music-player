@@ -765,9 +765,7 @@ namespace MusicPlayer
                             Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                         }
                         else
-                        {
-                            optionsMenu.BringToFront();
-                        }
+                            optionsMenu.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.Handle); });
                     }
                     break;
 
@@ -811,15 +809,10 @@ namespace MusicPlayer
                 if (optionsMenu == null || optionsMenu.IsDisposed)
                 {
                     optionsMenu = new OptionsMenu(this);
-                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
                     Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
                 }
                 else
-                {
-                    Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
-                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
-                    optionsMenu.BringToFront();
-                }
+                    optionsMenu.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.Handle); });
             }
 
             // Swap Visualisations [V]
@@ -905,10 +898,7 @@ namespace MusicPlayer
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
             {
                 if (optionsMenu == null || optionsMenu.IsDisposed)
-                {
                     optionsMenu = new OptionsMenu(this);
-                    //optionsMenu.SetDesktopBounds(gameWindowForm.Bounds.Right, gameWindowForm.Bounds.Top - optionsMenu.Height + gameWindowForm.Height, optionsMenu.Width, optionsMenu.Height);
-                }
 
                 if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
                 {
@@ -916,7 +906,7 @@ namespace MusicPlayer
                     Task.Factory.StartNew(() => { optionsMenu.S.ShowDialog(); });
                 }
                 else
-                    optionsMenu.S.BringToFront();
+                    optionsMenu.S.InvokeIfRequired(() => { Values.SetForegroundWindow(optionsMenu.S.Handle); });
             }
         }
         public void ShowColorDialog()

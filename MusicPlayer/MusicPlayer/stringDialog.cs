@@ -31,5 +31,10 @@ namespace MusicPlayer
             if (e.KeyCode == Keys.Enter)
                 done_Click(this, EventArgs.Empty);
         }
+
+        private void stringDialog_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -52,6 +52,7 @@
             this.tSmoothness = new System.Windows.Forms.TrackBar();
             this.label3 = new System.Windows.Forms.Label();
             this.cOldSmooth = new System.Windows.Forms.CheckBox();
+            this.bExport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
@@ -282,11 +283,22 @@
             this.cOldSmooth.UseVisualStyleBackColor = true;
             this.cOldSmooth.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // bExport
+            // 
+            this.bExport.Location = new System.Drawing.Point(227, 284);
+            this.bExport.Name = "bExport";
+            this.bExport.Size = new System.Drawing.Size(205, 23);
+            this.bExport.TabIndex = 22;
+            this.bExport.Text = "Export Music Library";
+            this.bExport.UseVisualStyleBackColor = true;
+            this.bExport.Click += new System.EventHandler(this.bExport_Click);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(438, 418);
+            this.Controls.Add(this.bExport);
             this.Controls.Add(this.cOldSmooth);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tSmoothness);
@@ -346,5 +358,6 @@
         private System.Windows.Forms.TrackBar tSmoothness;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox cOldSmooth;
+        private System.Windows.Forms.Button bExport;
     }
 }
