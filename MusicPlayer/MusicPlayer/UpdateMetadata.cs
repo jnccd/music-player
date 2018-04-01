@@ -15,6 +15,7 @@ namespace MusicPlayer
     public partial class UpdateMetadata : Form
     {
         string[] SongPaths;
+        bool closing = false;
 
         public UpdateMetadata(string[] SongPaths)
         {
@@ -128,7 +129,14 @@ namespace MusicPlayer
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            closing = true;
             this.Close();
+        }
+
+        private void UpdateMetadata_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (closing == false)
+                e.Cancel = true;
         }
     }
 }

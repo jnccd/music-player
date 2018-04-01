@@ -83,7 +83,6 @@ namespace MusicPlayer
         List<string> LastConsoleInput = new List<string>();
         int LastConsoleInputIndex = -1;
         List<float> DebugPercentages = new List<float>();
-        public OptionsMenu optionsMenu;
         public bool FocusWindow = false;
         public bool Preload;
         public bool TaskbarHidden = false;
@@ -102,6 +101,8 @@ namespace MusicPlayer
         bool ForcedTitleRedraw = false;
         bool ForcedBackgroundRedraw = false;
 
+        public OptionsMenu optionsMenu;
+        public Statistics statistics;
 
         // Draw
         Vector2 DrawVector = new Vector2(1, 1);
@@ -770,18 +771,7 @@ namespace MusicPlayer
 
                 case SelectedControl.OptionsButton:
                     if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
-                    {
-                        if (optionsMenu == null || optionsMenu.IsDisposed)
-                        {
-                            optionsMenu = new OptionsMenu(this);
-                            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
-                            Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
-                            //Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
-                        }
-                        else
-                            optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
-                    }
+                        ShowOptions();
                     break;
 
                 case SelectedControl.UpvoteButton:
@@ -820,18 +810,10 @@ namespace MusicPlayer
             // Open OptionsMenu [O / F1]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.O) ||
                 Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.F1))
-            {
-                if (optionsMenu == null || optionsMenu.IsDisposed)
-                {
-                    optionsMenu = new OptionsMenu(this);
-                    Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
-                }
-                else
-                    optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
-            }
+                ShowOptions();
 
             // Swap Visualisations [V]
-            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.V))
+                if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.V))
             {
                 VisSetting++;
                 if ((int)VisSetting > Enum.GetNames(typeof(Visualizations)).Length - 1)
@@ -911,18 +893,7 @@ namespace MusicPlayer
 
             // Show Statistics [S]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
-            {
-                if (optionsMenu == null || optionsMenu.IsDisposed)
-                    optionsMenu = new OptionsMenu(this);
-
-                if (optionsMenu.S == null || optionsMenu.S.IsDisposed)
-                {
-                    optionsMenu.S = new Statistics(optionsMenu);
-                    Task.Factory.StartNew(() => { optionsMenu.S.ShowDialog(); });
-                }
-                else
-                    optionsMenu.S.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu.S); Values.SetForegroundWindow(optionsMenu.S.Handle); });
-            }
+                ShowStatistics();
         }
         public void ShowColorDialog()
         {
@@ -1104,6 +1075,26 @@ namespace MusicPlayer
         {
             SecondRowMessageAlpha = StartingAlpha;
             SecondRowMessageText = Message;
+        }
+        public void ShowStatistics()
+        {
+            if (statistics == null || statistics.IsClosed || statistics.IsDisposed)
+            {
+                statistics = new Statistics(this);
+                Task.Factory.StartNew(() => { statistics.ShowDialog(); });
+            }
+            else
+                statistics.InvokeIfRequired(() => { Values.RestoreFromMinimzied(statistics); Values.SetForegroundWindow(statistics.Handle); });
+        }
+        public void ShowOptions()
+        {
+            if (optionsMenu == null || optionsMenu.IsClosed || optionsMenu.IsDisposed)
+            {
+                optionsMenu = new OptionsMenu(this);
+                Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
+            }
+            else
+                optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
         }
 
         protected override void Draw(GameTime gameTime)
