@@ -182,7 +182,7 @@ namespace MusicPlayer
                         if (!File.Exists(Assets.currentlyPlayingSongPath))
                             return;
                         else
-                            Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
+                            Process.Start("explorer.exe", "/select, \"" + Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()) + "\"");
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 });
@@ -197,7 +197,16 @@ namespace MusicPlayer
 
                         parent.parent.BackgroundOperationRunning = true;
 
+                        List<string> SongPaths = new List<string>();
+                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            if (dataGridView1.Rows[i].Selected)
+                                SongPaths.Add(Assets.GetSongPathFromSongName((string)dataGridView1.Rows[i].Cells[0].Value));
+                        UpdateMetadata updat = new UpdateMetadata(SongPaths.ToArray());
 
+                        if (SongPaths.Count > 0)
+                            updat.ShowDialog();
+                        else
+                            MessageBox.Show("You havent selected anything!\nMake sure to select entire Rows");
 
                         parent.parent.BackgroundOperationRunning = false;
                     }

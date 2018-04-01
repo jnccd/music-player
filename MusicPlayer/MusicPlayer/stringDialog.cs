@@ -36,5 +36,10 @@ namespace MusicPlayer
         {
 
         }
+
+        private void stringDialog_Shown(object sender, EventArgs e)
+        {
+            this.BringToFront();
+        }
     }
 }
