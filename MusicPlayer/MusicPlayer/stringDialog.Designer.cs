@@ -66,6 +66,7 @@
             this.Name = "stringDialog";
             this.Text = "Question";
             this.Load += new System.EventHandler(this.stringDialog_Load);
+            this.Shown += new System.EventHandler(this.stringDialog_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
