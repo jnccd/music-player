@@ -295,6 +295,24 @@ namespace MusicPlayer
             {
                 if (Program.args.Length > 0)
                     PlayNewSong(Program.args[0]);
+                else if (File.Exists(Values.CurrentExecutablePath + "\\History.txt"))
+                {
+                    try
+                    {
+                        string songName = File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last();
+
+                        if (!songName.EndsWith(".mp3"))
+                            songName += ".mp3";
+
+                        PlayPlaylistSong(songName);
+                    }
+                    catch
+                    {
+                        int PlaylistIndex = Values.RDM.Next(Playlist.Count);
+                        GetNextSong(true, false);
+                        PlayerHistory.Add(Playlist[PlaylistIndex]);
+                    }
+                }
                 else
                 {
                     int PlaylistIndex = Values.RDM.Next(Playlist.Count);
@@ -1024,16 +1042,7 @@ namespace MusicPlayer
         private static void SaveCurrentSongToHistoryFile()
         {
             string path = Values.CurrentExecutablePath + "\\History.txt";
-            string Title;
-            if (currentlyPlayingSongName.Contains(".mp3"))
-            {
-                Title = currentlyPlayingSongName.TrimEnd(new char[] { '3' });
-                Title = Title.TrimEnd(new char[] { 'p' });
-                Title = Title.TrimEnd(new char[] { 'm' });
-                Title = Title.TrimEnd(new char[] { '.' });
-            }
-            else
-                Title = currentlyPlayingSongName;
+            string Title = currentlyPlayingSongName;
 
             // This text is added only once to the file.
             if (!File.Exists(path))
