@@ -1081,7 +1081,7 @@ namespace MusicPlayer
             if (statistics == null || statistics.IsClosed || statistics.IsDisposed)
             {
                 statistics = new Statistics(this);
-                Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
+                Values.StartSTATask(() => { statistics.ShowDialog(); });
             }
             else
                 statistics.InvokeIfRequired(() => { Values.RestoreFromMinimzied(statistics); Values.SetForegroundWindow(statistics.Handle); });
