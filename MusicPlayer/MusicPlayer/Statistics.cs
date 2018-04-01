@@ -147,6 +147,7 @@ namespace MusicPlayer
                 m.MenuItems.Add(new MenuItem("Open in Browser"));
                 m.MenuItems.Add(new MenuItem("Open in Explorer"));
                 m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Selection"));
+                m.MenuItems.Add(new MenuItem("Show Cover Picture"));
 
                 m.MenuItems[0].Click += ((object s, EventArgs ev) => {
                     try
@@ -211,6 +212,24 @@ namespace MusicPlayer
                             MessageBox.Show("You havent selected anything!\nMake sure to select entire Rows");
 
                         parent.BackgroundOperationRunning = false;
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                });
+                m.MenuItems[5].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        TagLib.File file = TagLib.File.Create(path);
+                        TagLib.IPicture pic = file.Tag.Pictures[0];
+                        MemoryStream ms = new MemoryStream(pic.Data.Data);
+                        if (ms != null && ms.Length > 4096)
+                        {
+                            Image currentImage = Image.FromStream(ms);
+                            path = Values.CurrentExecutablePath + "\\Downloads\\Thumbnail.png";
+                            currentImage.Save(path);
+                            Process.Start(path);
+                        }
+                        ms.Close();
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 });

@@ -1081,7 +1081,7 @@ namespace MusicPlayer
             if (statistics == null || statistics.IsClosed || statistics.IsDisposed)
             {
                 statistics = new Statistics(this);
-                Task.Factory.StartNew(() => { statistics.ShowDialog(); });
+                Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
             }
             else
                 statistics.InvokeIfRequired(() => { Values.RestoreFromMinimzied(statistics); Values.SetForegroundWindow(statistics.Handle); });
@@ -1091,7 +1091,7 @@ namespace MusicPlayer
             if (optionsMenu == null || optionsMenu.IsClosed || optionsMenu.IsDisposed)
             {
                 optionsMenu = new OptionsMenu(this);
-                Task.Factory.StartNew(() => { optionsMenu.ShowDialog(); });
+                Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
             }
             else
                 optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
