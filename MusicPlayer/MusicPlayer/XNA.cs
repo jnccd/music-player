@@ -90,6 +90,7 @@ namespace MusicPlayer
         int originY;
         float[] values;
         bool WasFocusedLastFrame = true;
+        public bool BackgroundOperationRunning = false;
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
         Task SongCheckThread;
@@ -100,6 +101,7 @@ namespace MusicPlayer
         string lastQuestionResult = null;
         bool ForcedTitleRedraw = false;
         bool ForcedBackgroundRedraw = false;
+
 
         // Draw
         Vector2 DrawVector = new Vector2(1, 1);
@@ -411,6 +413,13 @@ namespace MusicPlayer
         }
         public void Download(string download)
         {
+            if (BackgroundOperationRunning)
+            {
+                MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
+                return;
+            }
+
+            BackgroundOperationRunning = true;
             PauseConsoleInputThread = true;
             Values.ShowConsole();
 
@@ -559,6 +568,7 @@ namespace MusicPlayer
             Assets.SaveUserSettings();
             originY = Console.CursorTop;
 
+            BackgroundOperationRunning = false;
             PauseConsoleInputThread = false;
         }
 

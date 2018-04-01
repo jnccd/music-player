@@ -168,6 +168,12 @@
       <DependentUpon>stringDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Taskbar.cs" />
+    <Compile Include="UpdateMetadata.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateMetadata.Designer.cs">
+      <DependentUpon>UpdateMetadata.cs</DependentUpon>
+    </Compile>
     <Compile Include="XNA.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Values.cs" />
@@ -227,6 +233,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="stringDialog.resx">
       <DependentUpon>stringDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UpdateMetadata.resx">
+      <DependentUpon>UpdateMetadata.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
