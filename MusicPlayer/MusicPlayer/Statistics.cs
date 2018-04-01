@@ -134,6 +134,7 @@ namespace MusicPlayer
                 bSearch_Click(this, EventArgs.Empty);
         }
 
+        // ContextMenu
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
@@ -142,6 +143,8 @@ namespace MusicPlayer
                 m.MenuItems.Add(new MenuItem("Play"));
                 m.MenuItems.Add(new MenuItem("Queue"));
                 m.MenuItems.Add(new MenuItem("Open in Browser"));
+                m.MenuItems.Add(new MenuItem("Open in Explorer"));
+                m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Selection"));
 
                 m.MenuItems[0].Click += ((object s, EventArgs ev) => {
                     try
@@ -170,6 +173,33 @@ namespace MusicPlayer
 
                             Process.Start(U.ToString());
                         });
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                });
+                m.MenuItems[3].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        if (!File.Exists(Assets.currentlyPlayingSongPath))
+                            return;
+                        else
+                            Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                });
+                m.MenuItems[4].Click += ((object s, EventArgs ev) => {
+                    try
+                    {
+                        if (parent.parent.BackgroundOperationRunning)
+                        {
+                            MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
+                            return;
+                        }
+
+                        parent.parent.BackgroundOperationRunning = true;
+
+
+
+                        parent.parent.BackgroundOperationRunning = false;
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 });
