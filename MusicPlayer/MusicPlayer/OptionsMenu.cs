@@ -242,7 +242,33 @@ namespace MusicPlayer
             DialogResult result = choose.ShowDialog();
             if (result == DialogResult.OK)
             {
-                Console.WriteLine(base.GetHashCode());
+                try
+                {
+                    if (parent.BackgroundOperationRunning)
+                    {
+                        MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
+                        return;
+                    }
+
+                    parent.BackgroundOperationRunning = true;
+
+                    List<string> CopyFiles = new List<string>();
+                    for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
+                    {
+                        if (Assets.UpvotedSongScores[i] > 1)
+                        {
+                            string path = Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i]);
+                            if (File.Exists(path))
+                                CopyFiles.Add(path);
+                        }
+                    }
+
+                    UpdateExports updat = new UpdateExports(CopyFiles.ToArray(), choose.SelectedPath);
+                    updat.ShowDialog();
+
+                    parent.BackgroundOperationRunning = false;
+                }
+                catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
             }
         }
     }

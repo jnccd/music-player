@@ -168,6 +168,12 @@
       <DependentUpon>stringDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Taskbar.cs" />
+    <Compile Include="UpdateExports.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateExports.Designer.cs">
+      <DependentUpon>UpdateExports.cs</DependentUpon>
+    </Compile>
     <Compile Include="UpdateMetadata.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -233,6 +239,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="stringDialog.resx">
       <DependentUpon>stringDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UpdateExports.resx">
+      <DependentUpon>UpdateExports.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UpdateMetadata.resx">
       <DependentUpon>UpdateMetadata.cs</DependentUpon>
