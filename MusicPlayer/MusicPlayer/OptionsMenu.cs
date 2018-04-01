@@ -18,9 +18,9 @@ namespace MusicPlayer
     public partial class OptionsMenu : Form
     {
         public XNA parent;
-        public Statistics S = null;
         bool DownloadFinished;
         bool DoesPreloadActuallyWork = true;
+        public bool IsClosed = false;
 
         public OptionsMenu(XNA parent)
         {
@@ -113,13 +113,7 @@ namespace MusicPlayer
         }
         private void ShowStatistics_Click(object sender, EventArgs e)
         {
-            if (S == null || S.IsDisposed)
-            {
-                S = new Statistics(this);
-                Task.Factory.StartNew(() => { S.ShowDialog(); });
-            }
-            else
-                S.InvokeIfRequired(() => { Values.RestoreFromMinimzied(S); Values.SetForegroundWindow(S.Handle); });
+            parent.ShowStatistics();
         }
         private void ShowConsole_Click(object sender, EventArgs e)
         {
@@ -239,7 +233,7 @@ namespace MusicPlayer
 
         private void OptionsMenu_FormClosed(object sender, FormClosedEventArgs e)
         {
-            parent.optionsMenu = null;
+            IsClosed = true;
         }
         
         private void bExport_Click(object sender, EventArgs e)

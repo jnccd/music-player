@@ -101,7 +101,7 @@
             // 
             this.bRefresh.Location = new System.Drawing.Point(13, 12);
             this.bRefresh.Name = "bRefresh";
-            this.bRefresh.Size = new System.Drawing.Size(147, 23);
+            this.bRefresh.Size = new System.Drawing.Size(73, 23);
             this.bRefresh.TabIndex = 1;
             this.bRefresh.Text = "Refresh";
             this.bRefresh.UseVisualStyleBackColor = true;
@@ -111,9 +111,9 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(167, 14);
+            this.textBox1.Location = new System.Drawing.Point(92, 14);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(443, 20);
+            this.textBox1.Size = new System.Drawing.Size(592, 20);
             this.textBox1.TabIndex = 0;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
@@ -121,9 +121,9 @@
             // bSearch
             // 
             this.bSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bSearch.Location = new System.Drawing.Point(616, 12);
+            this.bSearch.Location = new System.Drawing.Point(690, 12);
             this.bSearch.Name = "bSearch";
-            this.bSearch.Size = new System.Drawing.Size(147, 23);
+            this.bSearch.Size = new System.Drawing.Size(73, 23);
             this.bSearch.TabIndex = 3;
             this.bSearch.Text = "Search";
             this.bSearch.UseVisualStyleBackColor = true;

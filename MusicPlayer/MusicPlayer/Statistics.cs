@@ -15,10 +15,11 @@ namespace MusicPlayer
 {
     public partial class Statistics : Form
     {
-        OptionsMenu parent;
+        XNA parent;
         int currentMouseOverRow;
+        public bool IsClosed = false;
 
-        public Statistics(OptionsMenu parent)
+        public Statistics(XNA parent)
         {
             /*
             this.EnableBlur();
@@ -98,8 +99,9 @@ namespace MusicPlayer
                         index = 0;
                     dataGridView1.FirstDisplayedScrollingRowIndex = index;
                 }
-
-            dataGridView1.Refresh();
+            
+            if (dataGridView1.SortOrder != SortOrder.None)
+                dataGridView1.Sort(dataGridView1.SortedColumn, dataGridView1.SortOrder == SortOrder.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
         }
 
         private void bSearch_Click(object sender, EventArgs e)
@@ -189,13 +191,13 @@ namespace MusicPlayer
                 m.MenuItems[4].Click += ((object s, EventArgs ev) => {
                     try
                     {
-                        if (parent.parent.BackgroundOperationRunning)
+                        if (parent.BackgroundOperationRunning)
                         {
                             MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
                             return;
                         }
 
-                        parent.parent.BackgroundOperationRunning = true;
+                        parent.BackgroundOperationRunning = true;
 
                         List<string> SongPaths = new List<string>();
                         for (int i = 0; i < dataGridView1.Rows.Count; i++)
@@ -208,7 +210,7 @@ namespace MusicPlayer
                         else
                             MessageBox.Show("You havent selected anything!\nMake sure to select entire Rows");
 
-                        parent.parent.BackgroundOperationRunning = false;
+                        parent.BackgroundOperationRunning = false;
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 });
@@ -226,7 +228,7 @@ namespace MusicPlayer
 
         private void Statistics_FormClosed(object sender, FormClosedEventArgs e)
         {
-            parent.S = null;
+            IsClosed = true;
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

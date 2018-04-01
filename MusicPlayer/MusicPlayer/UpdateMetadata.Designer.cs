@@ -64,8 +64,14 @@
             this.Controls.Add(this.progressLabel);
             this.Controls.Add(this.progressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(354, 106);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(354, 106);
             this.Name = "UpdateMetadata";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Updating Mp3-Song-Metadata";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UpdateMetadata_FormClosing);
             this.Load += new System.EventHandler(this.UpdateMetadata_Load);
             this.Shown += new System.EventHandler(this.UpdateMetadata_Shown);
             this.ResumeLayout(false);
