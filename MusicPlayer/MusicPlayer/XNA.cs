@@ -180,6 +180,10 @@ namespace MusicPlayer
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 Assets.DisposeNAudioData();
                 Assets.SaveUserSettings();
+                if (optionsMenu != null)
+                    optionsMenu.Close();
+                if (statistics != null)
+                    statistics.Close();
             };
             Console.CancelKeyPress += ((object o, ConsoleCancelEventArgs e) =>
             {

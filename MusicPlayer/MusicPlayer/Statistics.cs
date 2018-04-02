@@ -99,7 +99,7 @@ namespace MusicPlayer
                         index = 0;
                     dataGridView1.FirstDisplayedScrollingRowIndex = index;
                 }
-            
+
             if (dataGridView1.SortOrder != SortOrder.None)
                 dataGridView1.Sort(dataGridView1.SortedColumn, dataGridView1.SortOrder == SortOrder.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
         }
@@ -142,28 +142,24 @@ namespace MusicPlayer
             if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 ContextMenu m = new ContextMenu();
-                m.MenuItems.Add(new MenuItem("Play"));
-                m.MenuItems.Add(new MenuItem("Queue"));
-                m.MenuItems.Add(new MenuItem("Open in Browser"));
-                m.MenuItems.Add(new MenuItem("Open in Explorer"));
-                m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Selection"));
-                m.MenuItems.Add(new MenuItem("Show Cover Picture"));
-
-                m.MenuItems[0].Click += ((object s, EventArgs ev) => {
+                m.MenuItems.Add(new MenuItem("Play", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         Assets.PlayPlaylistSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
                     }
                     catch { }
-                });
-                m.MenuItems[1].Click += ((object s, EventArgs ev) => {
+                })));
+                m.MenuItems.Add(new MenuItem("Queue", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString(), false);
                     }
                     catch { }
-                });
-                m.MenuItems[2].Click += ((object s, EventArgs ev) => {
+                })));
+                m.MenuItems.Add(new MenuItem("Open in Browser", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         Task.Factory.StartNew(() =>
@@ -178,8 +174,33 @@ namespace MusicPlayer
                         });
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                });
-                m.MenuItems[3].Click += ((object s, EventArgs ev) => {
+                })));
+                m.MenuItems.Add(new MenuItem("Open in Browser with timestamp", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            // Use the I'm Feeling Lucky URL
+                            string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Path.GetFileNameWithoutExtension(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()));
+                            url = url.Replace(' ', '+');
+                            WebRequest req = HttpWebRequest.Create(url);
+                            Uri U = req.GetResponse().ResponseUri;
+                            if (dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString().Equals(Assets.currentlyPlayingSongName))
+                            {
+                                int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
+                                U = new Uri(U.ToString() + "&t=" + seconds + "s");
+                            }
+
+                            Process.Start(U.ToString());
+                            if (Assets.IsPlaying())
+                                Assets.PlayPause();
+                        });
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
+                m.MenuItems.Add(new MenuItem("Open in Explorer", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         if (!File.Exists(Assets.currentlyPlayingSongPath))
@@ -188,8 +209,9 @@ namespace MusicPlayer
                             Process.Start("explorer.exe", "/select, \"" + Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()) + "\"");
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                });
-                m.MenuItems[4].Click += ((object s, EventArgs ev) => {
+                })));
+                m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Selection", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         if (parent.BackgroundOperationRunning)
@@ -214,8 +236,9 @@ namespace MusicPlayer
                         parent.BackgroundOperationRunning = false;
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                });
-                m.MenuItems[5].Click += ((object s, EventArgs ev) => {
+                })));
+                m.MenuItems.Add(new MenuItem("Show Cover Picture", ((object s, EventArgs ev) =>
+                {
                     try
                     {
                         string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
@@ -232,7 +255,7 @@ namespace MusicPlayer
                         ms.Close();
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                });
+                })));
 
                 currentMouseOverRow = e.RowIndex;
 
