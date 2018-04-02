@@ -14,6 +14,9 @@ using System.Collections;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
+using System.IO;
+using System.Text;
 
 namespace MusicPlayer
 {
@@ -422,7 +425,15 @@ namespace MusicPlayer
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-        
+        [DllImport("kernel32.dll",
+            EntryPoint = "GetStdHandle",
+            SetLastError = true,
+            CharSet = CharSet.Auto,
+            CallingConvention = CallingConvention.StdCall)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+        private const int STD_OUTPUT_HANDLE = -11;
+        private const int MY_CODE_PAGE = 437;
+
         private struct WINDOWPLACEMENT
         {
             public int length;
@@ -444,6 +455,18 @@ namespace MusicPlayer
                 form.WindowState = FormWindowState.Maximized;
             else
                 form.WindowState = FormWindowState.Normal;
+        }
+
+        public static void GivConsole()
+        {
+            AllocConsole();
+            IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+            SafeFileHandle safeFileHandle = new SafeFileHandle(stdHandle, true);
+            FileStream fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+            Encoding encoding = System.Text.Encoding.GetEncoding(MY_CODE_PAGE);
+            StreamWriter standardOutput = new StreamWriter(fileStream, encoding);
+            standardOutput.AutoFlush = true;
+            Console.SetOut(standardOutput);
         }
         
         const int MF_BYCOMMAND = 0x00000000;
