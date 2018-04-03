@@ -175,7 +175,8 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                m.MenuItems.Add(new MenuItem("Open in Browser with timestamp", ((object s, EventArgs ev) =>
+                if (dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString().Equals(Assets.currentlyPlayingSongName))
+                    m.MenuItems.Add(new MenuItem("Open in Browser with timestamp", ((object s, EventArgs ev) =>
                 {
                     try
                     {
