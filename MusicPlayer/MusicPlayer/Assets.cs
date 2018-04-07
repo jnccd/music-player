@@ -90,6 +90,7 @@ namespace MusicPlayer
         public static Effect gaussianBlurVert;
         public static Effect PixelBlur;
         public static Effect TitleFadeout;
+        public static Effect Vignette;
         public static BasicEffect basicEffect;
 
         // Music Player Manager Values
@@ -182,6 +183,7 @@ namespace MusicPlayer
             Console.WriteLine("Loading Effects...");
             PixelBlur = Content.Load<Effect>("PixelBlur");
             TitleFadeout = Content.Load<Effect>("TitleFadeout");
+            Vignette = Content.Load<Effect>("Vignette");
             basicEffect = new BasicEffect(GD);
             basicEffect.World = Matrix.Identity;
             basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), Vector3.Zero, Vector3.Up);
@@ -221,9 +223,16 @@ namespace MusicPlayer
             {
                 MessageBox.Show("The background won't work if the Desktop WallpaperStyle isn't set to stretch! \nDer Hintergrund wird nicht funktionieren, wenn der Dektop WallpaperStyle nicht auf Dehnen gesetzt wurde!");
             }
-            FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
-            bg = Texture2D.FromStream(GD, Stream);
-            Stream.Dispose();
+            try
+            {
+                FileStream Stream = new FileStream(UserWallpaper.GetValue("WallPaper").ToString(), FileMode.Open);
+                bg = Texture2D.FromStream(GD, Stream);
+                Stream.Dispose();
+            }
+            catch
+            {
+                throw new Exception("CouldntFindWallpaperFile");
+            }
             Program.game.TaskbarHidden = new Taskbar().AutoHide;
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) =>
             {
