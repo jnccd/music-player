@@ -34,6 +34,7 @@ namespace MusicPlayer
     {
         None,
         Blur,
+        BlurVignette,
         BlurTeint,
         bg1,
         bg2
@@ -181,9 +182,9 @@ namespace MusicPlayer
                 Assets.DisposeNAudioData();
                 Assets.SaveUserSettings();
                 if (optionsMenu != null)
-                    optionsMenu.Close();
+                    optionsMenu.InvokeIfRequired(optionsMenu.Close);
                 if (statistics != null)
-                    statistics.Close();
+                    statistics.InvokeIfRequired(statistics.Close);
             };
             Console.CancelKeyPress += ((object o, ConsoleCancelEventArgs e) =>
             {
@@ -1162,7 +1163,7 @@ namespace MusicPlayer
             // Background
             if (ForcedBackgroundRedraw || BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed)
             {
-                if (BgModes == BackGroundModes.Blur)
+                if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurVignette)
                 {
                     BeginBlur();
                     spriteBatch.Begin();
@@ -1191,7 +1192,7 @@ namespace MusicPlayer
                 GraphicsDevice.SetRenderTarget(BackgroundTarget);
                 GraphicsDevice.Clear(Color.Transparent);
 
-                if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurTeint)
+                if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurTeint || BgModes == BackGroundModes.BlurVignette)
                     DrawBlurredTex();
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
@@ -1239,10 +1240,19 @@ namespace MusicPlayer
             {
                 lock (BackgroundTarget)
                 {
-                    spriteBatch.Begin();
-
-                    spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
-
+                    if (BgModes == BackGroundModes.BlurVignette)
+                    {
+                        spriteBatch.Begin(0, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, Assets.Vignette);
+                        spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
+                        spriteBatch.End();
+                        spriteBatch.Begin();
+                    }
+                    else
+                    {
+                        spriteBatch.Begin();
+                        spriteBatch.Draw(BackgroundTarget, Values.WindowRect, Color.White);
+                    }
+                    
                     #region Second Row HUD Shadows
                     if (UpvoteSavedAlpha > 0)
                     {

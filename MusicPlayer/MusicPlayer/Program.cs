@@ -137,6 +137,8 @@ namespace MusicPlayer
             {
                 if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".\n")
                     MessageBox.Show("I got brutally murdered by another Program. Please restart me.");
+                else if (ex.Message == "CouldntFindWallpaperFile")
+                    MessageBox.Show("You seem to have moved your Desktop Wallpaper file since you last set it as your Wallpaper.\nPlease set it as your wallpaper again and restart me so I can actually find its file.");
                 else
                     MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source);
                 

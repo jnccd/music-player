@@ -97,7 +97,7 @@ namespace MusicPlayer
                     int index = i - heightInRows / 2 + 2;
                     if (index < 0)
                         index = 0;
-                    dataGridView1.FirstDisplayedScrollingRowIndex = index;
+                    //dataGridView1.FirstDisplayedScrollingRowIndex = index;
                 }
 
             if (dataGridView1.SortOrder != SortOrder.None)
@@ -114,12 +114,14 @@ namespace MusicPlayer
             {
                 LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, ((string)(dataGridView1.Rows[i].Cells[0].Value)));
                 LDistances[i].SongIndex = i;
+                dataGridView1.Rows[i].Cells[dataGridView1.Rows[i].Cells.Count - 1].Value = LDistances[i].SongDifference;
             }
 
-            LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
+            //LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
 
             dataGridView1.ClearSelection();
-
+            dataGridView1.Sort(dataGridView1.Columns[dataGridView1.Columns.Count - 1], ListSortDirection.Ascending);
+            /*
             dataGridView1.Rows[LDistances.First().SongIndex].Selected = true;
             for (int i = 1; i < LDistances.Length; i++)
             {
@@ -128,6 +130,7 @@ namespace MusicPlayer
                 dataGridView1.Rows[LDistances[i].SongIndex].Selected = true;
             }
             dataGridView1.FirstDisplayedScrollingRowIndex = LDistances.First().SongIndex;
+            */
         }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
