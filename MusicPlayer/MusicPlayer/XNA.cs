@@ -369,6 +369,7 @@ namespace MusicPlayer
                                 catch (Exception ex)
                                 {
                                     Console.WriteLine(ex.ToString());
+                                    BackgroundOperationRunning = false;
                                 }
 
                                 originY = Console.CursorTop;

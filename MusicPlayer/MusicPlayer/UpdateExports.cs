@@ -44,7 +44,8 @@ namespace MusicPlayer
                 string name = Path.GetFileNameWithoutExtension(SongPaths[i]);
                 try
                 {
-                    File.Copy(SongPaths[i], Target + "\\" + Path.GetFileName(SongPaths[i]));
+                    if (!File.Exists(Target + "\\" + Path.GetFileName(SongPaths[i])))
+                        File.Copy(SongPaths[i], Target + "\\" + Path.GetFileName(SongPaths[i]));
                 }
                 catch (Exception ex)
                 {
