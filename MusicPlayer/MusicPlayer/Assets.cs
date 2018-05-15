@@ -83,6 +83,9 @@ namespace MusicPlayer
         public static Texture2D Upvote;
         public static Texture2D Close;
         public static Texture2D Options;
+        public static Texture2D TrumpetBoy;
+        public static Texture2D TrumpetBoyBackground;
+        public static Texture2D TrumpetBoyTrumpet;
 
         public static Color SystemDefaultColor;
 
@@ -210,6 +213,9 @@ namespace MusicPlayer
             Upvote = Content.Load<Texture2D>("Upvote");
             Close = Content.Load<Texture2D>("Close");
             Options = Content.Load<Texture2D>("Options");
+            TrumpetBoy = Content.Load<Texture2D>("trumpetboy");
+            TrumpetBoyBackground = Content.Load<Texture2D>("trumpetboybackground");
+            TrumpetBoyTrumpet = Content.Load<Texture2D>("trumpetboytrumpet");
 
 
             Console.WriteLine("Loading Fonts...");

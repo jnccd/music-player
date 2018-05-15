@@ -28,7 +28,8 @@ namespace MusicPlayer
         fft,
         rawfft,
         barchart,
-        grid
+        grid,
+        trumpetboy
     }
     public enum BackGroundModes
     {
@@ -539,11 +540,7 @@ namespace MusicPlayer
             ms.Position = 0;
             pic.Data = TagLib.ByteVector.FromStream(ms);
             file.Tag.Pictures = new TagLib.IPicture[] { pic };
-
-            if (lastQuestionResult == null)
-                lastQuestionResult = VideoTitle.Split('-').First().Trim();
-
-            stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", lastQuestionResult);
+            stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle.Split('-').First().Trim());
             Question.ShowDialog();
             lastQuestionResult = Question.result;
             file.Tag.Performers = new string[] { Question.result };
@@ -1349,6 +1346,25 @@ namespace MusicPlayer
                     // FFT Graph
                     if (VisSetting == Visualizations.fft && Assets.Channel32 != null && Assets.FFToutput != null)
                         GauD.DrawRenderTarget(spriteBatch);
+                    #endregion
+                    #region Trumpet boy
+                    // FFT Graph
+                    if (VisSetting == Visualizations.trumpetboy && Assets.Channel32 != null && Assets.FFToutput != null)
+                    {
+                        float size = (float)Approximate.Sqrt(Values.OutputVolume * 100 * Values.TargetVolume);
+                        
+                        spriteBatch.Draw(Assets.White, new Rectangle(35 + 5, 50 + 5, Values.WindowSize.X - 70, Values.WindowSize.Y - 100), Color.Black * 0.6f);
+                        spriteBatch.Draw(Assets.TrumpetBoyBackground, new Rectangle(35, 50, Values.WindowSize.X - 70, Values.WindowSize.Y - 100), Color.White);
+
+                        int x = 290;
+                        int y = 100;
+                        int width = (int)(208 * (Values.WindowSize.X - 70) / 1280 * 1.05f);
+                        int height = (int)(450 * (Values.WindowSize.Y - 100) / 720 * 1.05f);
+                        int yOrigin = (int)(60 * height / 450f);
+                        spriteBatch.Draw(Assets.TrumpetBoy, new Rectangle(x, y, width, height), Color.White);
+                        spriteBatch.Draw(Assets.TrumpetBoyTrumpet, new Rectangle((int)(x + width / 2f - width / 2f * size), 
+                            (int)(y + yOrigin - yOrigin * size), (int)(width * size), (int)(height * size)), Color.White);
+                    }
                     #endregion
                     #region Raw FFT Graph
                     if (VisSetting == Visualizations.rawfft && Assets.Channel32 != null && Assets.FFToutput != null)

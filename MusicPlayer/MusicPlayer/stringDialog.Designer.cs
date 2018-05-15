@@ -64,7 +64,9 @@
             this.Controls.Add(this.done);
             this.Controls.Add(this.textBox1);
             this.Name = "stringDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Question";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.stringDialog_Load);
             this.Shown += new System.EventHandler(this.stringDialog_Shown);
             this.ResumeLayout(false);
