@@ -74,6 +74,19 @@ namespace MusicPlayer
                 }
             }
         }
+        public void ApplyForceGlobally(Vector2 Force)
+        {
+            lock (Points)
+            {
+                for (int ix = 0; ix < Points.GetLength(0); ix++)
+                {
+                    for (int iy = 0; iy < Points.GetLength(1); iy++)
+                    {
+                        Points[ix, iy].ApplyForce(Force / 10);
+                    }
+                }
+            }
+        }
         public void Twist(Vector2 Pos, float Strength, float DeviationAngle)
         {
             lock (Points)
