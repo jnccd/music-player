@@ -102,6 +102,8 @@ namespace MusicPlayer
         string lastQuestionResult = null;
         bool ForcedTitleRedraw = false;
         bool ForcedBackgroundRedraw = false;
+        System.Drawing.Point newPos;
+        System.Drawing.Point oldPos;
 
         public OptionsMenu optionsMenu;
         public Statistics statistics;
@@ -616,6 +618,8 @@ namespace MusicPlayer
                 if (Values.OutputVolume < 0.0001f)
                     Values.OutputVolume = 0.0001f;
 
+                Values.OutputVolumeIncrease = Values.LastOutputVolume - Values.OutputVolume;
+
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length - Assets.bufferLength / 2)
                     Assets.GetNextSong(false, false);
 
@@ -634,15 +638,16 @@ namespace MusicPlayer
                 }
                 if (VisSetting == Visualizations.grid)
                 {
-                    DG.ApplyForce(new Vector2(DG.Field.X, DG.Field.Y + DG.Field.Height), -Values.OutputVolumeIncrease * Values.TargetVolume * 5);
-                    DG.ApplyForce(new Vector2(DG.Field.X + DG.Field.Width, DG.Field.Y + DG.Field.Height), -Values.OutputVolumeIncrease * Values.TargetVolume * 5);
+                    //DG.ApplyForce(new Vector2(DG.Field.X, DG.Field.Y + DG.Field.Height), -Values.OutputVolumeIncrease * Values.TargetVolume * 50);
+                    //DG.ApplyForce(new Vector2(DG.Field.X + DG.Field.Width, DG.Field.Y + DG.Field.Height), -Values.OutputVolumeIncrease * Values.TargetVolume * 50);
+                    DG.ApplyForce(new Vector2(DG.Field.X + DG.Field.Width / 2, DG.Field.Y + DG.Field.Height / 2), -Values.OutputVolumeIncrease * Values.TargetVolume * 50);
 
                     for (int i = 1; i < DG.Points.GetLength(0) - 1; i++)
                     {
-                        float Whatever = -(DG.Points[i, 0].Pos.Y - DG.Field.Y - DG.Field.Height);
+                        float InversedMagnitude = -(DG.Points[i, 0].Pos.Y - DG.Field.Y - DG.Field.Height);
 
-                        float Target = -GauD.GetMaximum(i * DG.PointSpacing, (i + 1) * DG.PointSpacing) / Whatever * 200;
-                        DG.Points[i, 0].Vel.Y += ((Target + DG.Field.Y + DG.Field.Height - 30) - DG.Points[i, 0].Pos.Y) / 3f;
+                        float Target = -GauD.GetMaximum(i * DG.PointSpacing, (i + 1) * DG.PointSpacing) / InversedMagnitude * 400;
+                        DG.Points[i, 0].Vel.Y += ((Target + DG.Field.Y + DG.Field.Height - 10) - DG.Points[i, 0].Pos.Y) / 3f;
                     }
                 }
             }
@@ -794,10 +799,18 @@ namespace MusicPlayer
                     break;
 
                 case SelectedControl.DragWindow:
-                    config.Default.WindowPos = new System.Drawing.Point(gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X,
-                                                                        gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y);
+                    oldPos.X = config.Default.WindowPos.X;
+                    oldPos.Y = config.Default.WindowPos.Y;
+
+                    newPos.X = gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X;
+                    newPos.Y = gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y;
+                    
+                    config.Default.WindowPos = newPos;
                     KeepWindowInScreen();
                     ForceBackgroundRedraw();
+
+                    if (VisSetting == Visualizations.grid)
+                        DG.ApplyForceGlobally(new Vector2(oldPos.X, oldPos.Y) - new Vector2(config.Default.WindowPos.X, config.Default.WindowPos.Y));
                     break;
             }
             gameWindowForm.Location = config.Default.WindowPos;

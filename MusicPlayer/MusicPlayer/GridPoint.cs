@@ -28,7 +28,7 @@ namespace MusicPlayer
         public void ApplyForce(Vector2 Force) { if (Moveable) { Vel += Force; } }
         public void GetPulledBy(Vector2 Puller, float Force)
         {
-            float PullLength = Vector2.Distance(Puller, Pos);
+            float PullLength = Vector2.Distance(Puller, Pos) / 10;
             Vector2 PullVektor = Puller - Pos;
             float ForceMagnitude = 1000 / (PullLength * PullLength);
             float Angle = (float)Math.Atan2(PullVektor.X, PullVektor.Y);
