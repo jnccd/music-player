@@ -23,23 +23,22 @@ namespace MusicPlayer
 {
     public enum Visualizations
     {
-        none,
         line,
         dynamicline,
         fft,
         rawfft,
         barchart,
         grid,
-        trumpetboy
+        trumpetboy,
+        none
     }
     public enum BackGroundModes
     {
         None,
         Blur,
+        coverPic,
         BlurVignette,
-        BlurTeint,
-        bg1,
-        bg2
+        BlurTeint
     }
     public enum SelectedControl
     {
@@ -103,6 +102,7 @@ namespace MusicPlayer
         string lastQuestionResult = null;
         bool ForcedTitleRedraw = false;
         bool ForcedBackgroundRedraw = false;
+        public bool ForcedCoverBackgroundRedraw = false;
         System.Drawing.Point newPos;
         System.Drawing.Point oldPos;
 
@@ -639,7 +639,7 @@ namespace MusicPlayer
                 else
                     Assets.UpdateWaveBuffer();
 
-                if (VisSetting != Visualizations.line && Assets.Channel32 != null)
+                if (VisSetting != Visualizations.line && VisSetting != Visualizations.none && Assets.Channel32 != null)
                 {
                     Assets.UpdateFFTbuffer();
                     UpdateGD();
@@ -1163,6 +1163,7 @@ namespace MusicPlayer
                 try { spriteBatch.DrawString(Assets.Title, Title, Vector2.Zero, Color.White); } catch { }
 
                 spriteBatch.End();
+                ForcedTitleRedraw = false;
             }
 
             // FFT Diagram
@@ -1237,10 +1238,28 @@ namespace MusicPlayer
                         TempRect.Height = S.Bounds.Height;
                         spriteBatch.Draw(Assets.bg, TempRect, Color.White);
                     }
-                else if (BgModes == BackGroundModes.bg1)
-                    spriteBatch.Draw(Assets.bg1, Vector2.Zero, Color.White);
-                else if (BgModes == BackGroundModes.bg2)
-                    spriteBatch.Draw(Assets.bg2, Vector2.Zero, Color.White);
+                else if (BgModes == BackGroundModes.coverPic)
+                {
+                    if (Assets.CoverPicture == null || ForcedCoverBackgroundRedraw)
+                    {
+                        string path = Assets.currentlyPlayingSongPath;
+                        TagLib.File file = TagLib.File.Create(path);
+                        TagLib.IPicture pic = file.Tag.Pictures[0];
+                        MemoryStream ms = new MemoryStream(pic.Data.Data);
+                        if (ms != null && ms.Length > 4096)
+                        {
+                            System.Drawing.Image currentImage = System.Drawing.Image.FromStream(ms);
+                            path = Values.CurrentExecutablePath + "\\Downloads\\Thumbnail.png";
+                            currentImage.Save(path);
+                            Assets.CoverPicture = Texture2D.FromStream(Program.game.GraphicsDevice, new FileStream(path, FileMode.Open));
+                        }
+                        ms.Close();
+                        ForcedCoverBackgroundRedraw = false;
+                    }
+
+                    if (Assets.CoverPicture != null)
+                        spriteBatch.Draw(Assets.CoverPicture, Values.WindowRect, Color.White);
+                }
 
                 // Borders
                 if (BgModes != BackGroundModes.None)
@@ -1260,6 +1279,7 @@ namespace MusicPlayer
                 }
 
                 spriteBatch.End();
+                ForcedBackgroundRedraw = false;
             }
             #endregion
 

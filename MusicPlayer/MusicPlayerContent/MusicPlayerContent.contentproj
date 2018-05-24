@@ -67,18 +67,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bg1.jpg">
-      <Name>bg1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="bg2.jpg">
-      <Name>bg2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="PixelBlur.fx">
       <Name>PixelBlur</Name>
       <Importer>EffectImporter</Importer>
