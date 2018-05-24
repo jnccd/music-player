@@ -348,13 +348,21 @@ namespace MusicPlayer
                                 Console.WriteLine();
                                 Console.WriteLine("/cls - clears the console");
                                 Console.WriteLine();
-                                Console.WriteLine("/download | /d - Searches for the current song on youtube, converts it to mp3   and puts it into the standard folder");
+                                Console.WriteLine("/download | /d | /D - Searches for the current song on youtube, converts it to mp3   and puts it into the standard folder");
                                 Console.WriteLine();
                                 Console.WriteLine("/showinweb | /showinnet | /net | /web - will search google for the current      songs name and display the first result in the standard browser");
                                 Console.WriteLine();
-                                originY += 12;
+                                Console.WriteLine("/queue | /q - adds a song to the queue");
+                                Console.WriteLine();
+                                Console.WriteLine("/time | /t - shows the current song play time");
+                                Console.WriteLine();
+                                Console.WriteLine("/settime - sets the current play time");
+                                Console.WriteLine();
+                                Console.WriteLine("/s - shows volumes");
+                                Console.WriteLine();
+                                originY = Console.CursorTop;
                             }
-                            else if (Path.StartsWith("/d"))
+                            else if (Path.StartsWith("/d") || Path.StartsWith("/D"))
                             {
                                 try
                                 {
