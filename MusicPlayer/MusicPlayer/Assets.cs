@@ -71,8 +71,6 @@ namespace MusicPlayer
 
         public static Texture2D White;
         public static Texture2D bg;
-        public static Texture2D bg1;
-        public static Texture2D bg2;
         public static Texture2D Volume;
         public static Texture2D Volume2;
         public static Texture2D Volume3;
@@ -86,6 +84,7 @@ namespace MusicPlayer
         public static Texture2D TrumpetBoy;
         public static Texture2D TrumpetBoyBackground;
         public static Texture2D TrumpetBoyTrumpet;
+        public static Texture2D CoverPicture;
 
         public static Color SystemDefaultColor;
 
@@ -206,8 +205,6 @@ namespace MusicPlayer
             Volume2 = Content.Load<Texture2D>("volume2");
             Volume3 = Content.Load<Texture2D>("volume3");
             Volume4 = Content.Load<Texture2D>("volume4");
-            bg1 = Content.Load<Texture2D>("bg1");
-            bg2 = Content.Load<Texture2D>("bg2");
             Play = Content.Load<Texture2D>("play");
             Pause = Content.Load<Texture2D>("pause");
             Upvote = Content.Load<Texture2D>("Upvote");
@@ -216,7 +213,6 @@ namespace MusicPlayer
             TrumpetBoy = Content.Load<Texture2D>("trumpetboy");
             TrumpetBoyBackground = Content.Load<Texture2D>("trumpetboybackground");
             TrumpetBoyTrumpet = Content.Load<Texture2D>("trumpetboytrumpet");
-
 
             Console.WriteLine("Loading Fonts...");
             Font = Content.Load<SpriteFont>("Font");
@@ -737,9 +733,10 @@ namespace MusicPlayer
                 AbortAbort = true;
                 T.Wait();
             }
-
+            
             SaveCurrentSongToHistoryFile();
             Program.game.SongTimeSkipped = 0;
+            Program.game.ForcedCoverBackgroundRedraw = true;
 
             DisposeNAudioData();
             Program.game.ForceTitleRedraw();
