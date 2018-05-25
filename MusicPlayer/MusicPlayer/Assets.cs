@@ -491,12 +491,15 @@ namespace MusicPlayer
                 lock (Channel32Reader)
                 {
                     byte[] buffer = new byte[16384];
-                    Channel32Reader.Position = 0;
-                    EntireSongWaveBuffer = new GigaFloatList();
+
+                    EntireSongWaveBuffer = null;
 
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
 
+                    Channel32Reader.Position = 0;
+                    EntireSongWaveBuffer = new GigaFloatList();
+                    
                     while (Channel32Reader.Position < Channel32Reader.Length)
                     {
                         if (AbortAbort)

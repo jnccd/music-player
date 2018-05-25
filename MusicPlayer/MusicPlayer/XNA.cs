@@ -110,8 +110,8 @@ namespace MusicPlayer
         public Statistics statistics;
 
         // Draw
-        Vector2 TempVector = new Vector2(1, 1);
-        Rectangle TempRect = new Rectangle(1, 1, 1, 1);
+        Vector2 TempVector = new Vector2(0, 0);
+        Rectangle TempRect = new Rectangle(0, 0, 0, 0);
         Rectangle DurationBar = new Rectangle(51, Values.WindowSize.Y - 28, Values.WindowSize.X - 157, 3);
         Rectangle VolumeIcon = new Rectangle(Values.WindowSize.X - 132, 16, 24, 24);
         Rectangle VolumeBar = new Rectangle(Values.WindowSize.X - 100, 24, 75, 8);
@@ -1179,7 +1179,7 @@ namespace MusicPlayer
             }
 
             // Background
-            if (ForcedBackgroundRedraw || BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed)
+            if (ForcedBackgroundRedraw || BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed || ForcedCoverBackgroundRedraw)
             {
                 if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurVignette)
                 {
