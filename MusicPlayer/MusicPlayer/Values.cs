@@ -318,21 +318,31 @@ namespace MusicPlayer
         public static string AsTime(double seconds)
         {
             int s = (int)(seconds % 60);
-            int m = (int)(seconds / 60);
-            int h = m / 60;
-            int d = h / 24;
-            int y = d / 365;
+            int m = (int)(seconds / 60) % 60;
+            int h = (int)(seconds / 60 / 60) % 24;
+            int d = (int)(seconds / 60 / 60 / 24) % 365;
+            int y = (int)(seconds / 60 / 60 / 24 / 365);
 
-            if (m == 0)
-                return s.ToString();
-            else if (h == 0)
-                return m + ":" + s;
+            string sS = s.ToString();
+            if (sS.Length == 0)
+                sS.Insert(0, "00");
+            else if (sS.Length == 1)
+                sS.Insert(0, "0");
+
+            string mS = m.ToString();
+            if (mS.Length == 0)
+                mS.Insert(0, "00");
+            else if (mS.Length == 1)
+                mS.Insert(0, "0");
+
+            if (h == 0)
+                return mS + ":" + sS;
             else if (d == 0)
-                return h + ":" + m + ":" + s;
+                return h + ":" + mS + ":" + sS;
             else if (y == 0)
-                return d + ":" + h + ":" + m + ":" + s;
+                return d + ":" + h + ":" + mS + ":" + sS;
             else
-                return y + ":" + d + ":" + h + ":" + m + ":" + s;
+                return y + ":" + d + ":" + h + ":" + mS + ":" + sS;
         }
 
         public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
