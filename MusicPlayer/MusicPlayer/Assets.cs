@@ -519,7 +519,11 @@ namespace MusicPlayer
                         }
 
                         while (Channel32 != null && Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f)
+                        {
+                            if (AbortAbort)
+                                break;
                             Thread.Sleep(20);
+                        }
                     }
 
                     Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
