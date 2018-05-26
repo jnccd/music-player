@@ -376,7 +376,7 @@ namespace MusicPlayer
 
             int LowestDindex = 0;
             for (int i = 0; i < d.Length; i++)
-                if (d[i] > d[LowestDindex])
+                if (Math.Abs(d[i]) < Math.Abs(d[LowestDindex]))
                     LowestDindex = i;
 
             return Screen.AllScreens[LowestDindex];
