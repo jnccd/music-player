@@ -18,6 +18,7 @@ namespace MusicPlayer
     {
         public static string[] args;
         public static XNA game;
+        public static bool Closing = false;
 
         [STAThread]
         static void Main(string[] args)

@@ -189,19 +189,23 @@ namespace MusicPlayer
                     optionsMenu.InvokeIfRequired(optionsMenu.Close);
                 if (statistics != null)
                     statistics.InvokeIfRequired(statistics.Close);
+                Program.Closing = true;
             };
             Console.CancelKeyPress += ((object o, ConsoleCancelEventArgs e) =>
             {
-                e.Cancel = true;
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (Console.CursorLeft != 0)
+                if (!Program.Closing)
                 {
-                    Console.WriteLine();
+                    e.Cancel = true;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (Console.CursorLeft != 0)
+                    {
+                        Console.WriteLine();
+                        originY++;
+                    }
+                    Console.WriteLine("Canceled by user!");
+                    Program.game.PauseConsoleInputThread = false;
                     originY++;
                 }
-                Console.WriteLine("Canceled by user!");
-                Program.game.PauseConsoleInputThread = false;
-                originY++;
             });
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -776,7 +780,10 @@ namespace MusicPlayer
 
                 case SelectedControl.CloseButton:
                     if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
+                    {
+                        Program.Closing = true;
                         gameWindowForm.Close();
+                    }
                     break;
 
                 case SelectedControl.OptionsButton:
