@@ -320,8 +320,9 @@
             this.Controls.Add(this.ColorChange);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "OptionsMenu";
-            this.Text = "OptionsMenu (looks like garbage, ill fix this later)";
+            this.Text = "OptionsMenu";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OptionsMenu_FormClosed);
             this.Load += new System.EventHandler(this.OptionsMenu_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();

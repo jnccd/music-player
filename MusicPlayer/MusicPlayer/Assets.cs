@@ -541,15 +541,19 @@ namespace MusicPlayer
         }
         public static void UpdateWaveBufferWithEntireSongWB()
         {
-            lock (EntireSongWaveBuffer)
+            try
             {
-                WaveBuffer = new float[bufferLength / 4];
-                if (Channel32 != null && Channel32.CanRead && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
-                    WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength / 2) / 4), bufferLength / 4).ToArray();
-                else
-                    for (int i = 0; i < bufferLength / 4; i++)
-                        WaveBuffer[i] = 0;
+                lock (EntireSongWaveBuffer)
+                {
+                    WaveBuffer = new float[bufferLength / 4];
+                    if (Channel32 != null && Channel32.CanRead && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
+                        WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength / 2) / 4), bufferLength / 4).ToArray();
+                    else
+                        for (int i = 0; i < bufferLength / 4; i++)
+                            WaveBuffer[i] = 0;
+                }
             }
+            catch { }
         }
         public static float GetAverageHeight(float[] array, int from, int to)
         {
