@@ -44,7 +44,6 @@
             this.Download = new System.Windows.Forms.Button();
             this.PreloadToggle = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.ShowProgramFolder = new System.Windows.Forms.Button();
             this.cAutoVolume = new System.Windows.Forms.CheckBox();
@@ -54,7 +53,6 @@
             this.cOldSmooth = new System.Windows.Forms.CheckBox();
             this.bExport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
             // 
@@ -70,18 +68,20 @@
             // 
             // trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(5, 44);
+            this.trackBar1.Location = new System.Drawing.Point(12, 230);
             this.trackBar1.Maximum = 100;
+            this.trackBar1.Minimum = 1;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(416, 45);
             this.trackBar1.TabIndex = 1;
+            this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Value = 50;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 29);
+            this.label1.Location = new System.Drawing.Point(13, 214);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(271, 13);
             this.label1.TabIndex = 2;
@@ -169,14 +169,14 @@
             // 
             // DownloadBox
             // 
-            this.DownloadBox.Location = new System.Drawing.Point(12, 320);
+            this.DownloadBox.Location = new System.Drawing.Point(12, 294);
             this.DownloadBox.Name = "DownloadBox";
             this.DownloadBox.Size = new System.Drawing.Size(328, 20);
             this.DownloadBox.TabIndex = 11;
             // 
             // Download
             // 
-            this.Download.Location = new System.Drawing.Point(344, 318);
+            this.Download.Location = new System.Drawing.Point(346, 292);
             this.Download.Name = "Download";
             this.Download.Size = new System.Drawing.Size(82, 23);
             this.Download.TabIndex = 12;
@@ -187,7 +187,7 @@
             // PreloadToggle
             // 
             this.PreloadToggle.BackColor = System.Drawing.SystemColors.Control;
-            this.PreloadToggle.Location = new System.Drawing.Point(5, 3);
+            this.PreloadToggle.Location = new System.Drawing.Point(12, 188);
             this.PreloadToggle.Name = "PreloadToggle";
             this.PreloadToggle.Size = new System.Drawing.Size(416, 23);
             this.PreloadToggle.TabIndex = 13;
@@ -198,22 +198,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 304);
+            this.label2.Location = new System.Drawing.Point(9, 278);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(89, 13);
             this.label2.TabIndex = 14;
             this.label2.Text = "Song Download: ";
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.Controls.Add(this.PreloadToggle);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.trackBar1);
-            this.panel1.Location = new System.Drawing.Point(7, 186);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(425, 92);
-            this.panel1.TabIndex = 15;
             // 
             // timer1
             // 
@@ -234,7 +223,7 @@
             // cAutoVolume
             // 
             this.cAutoVolume.AutoSize = true;
-            this.cAutoVolume.Location = new System.Drawing.Point(12, 284);
+            this.cAutoVolume.Location = new System.Drawing.Point(12, 258);
             this.cAutoVolume.Name = "cAutoVolume";
             this.cAutoVolume.Size = new System.Drawing.Size(167, 17);
             this.cAutoVolume.TabIndex = 17;
@@ -246,7 +235,7 @@
             // 
             this.bConsoleThreadRestart.Location = new System.Drawing.Point(12, 159);
             this.bConsoleThreadRestart.Name = "bConsoleThreadRestart";
-            this.bConsoleThreadRestart.Size = new System.Drawing.Size(414, 23);
+            this.bConsoleThreadRestart.Size = new System.Drawing.Size(416, 23);
             this.bConsoleThreadRestart.TabIndex = 18;
             this.bConsoleThreadRestart.Text = "Restart Console Input Thread";
             this.bConsoleThreadRestart.UseVisualStyleBackColor = true;
@@ -255,18 +244,19 @@
             // tSmoothness
             // 
             this.tSmoothness.LargeChange = 1;
-            this.tSmoothness.Location = new System.Drawing.Point(12, 363);
+            this.tSmoothness.Location = new System.Drawing.Point(12, 337);
             this.tSmoothness.Maximum = 500;
             this.tSmoothness.Name = "tSmoothness";
             this.tSmoothness.Size = new System.Drawing.Size(413, 45);
             this.tSmoothness.TabIndex = 19;
+            this.tSmoothness.TickStyle = System.Windows.Forms.TickStyle.None;
             this.tSmoothness.Value = 50;
             this.tSmoothness.Scroll += new System.EventHandler(this.tSmoothness_Scroll);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 347);
+            this.label3.Location = new System.Drawing.Point(9, 321);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(110, 13);
             this.label3.TabIndex = 20;
@@ -275,7 +265,7 @@
             // cOldSmooth
             // 
             this.cOldSmooth.AutoSize = true;
-            this.cOldSmooth.Location = new System.Drawing.Point(330, 347);
+            this.cOldSmooth.Location = new System.Drawing.Point(333, 317);
             this.cOldSmooth.Name = "cOldSmooth";
             this.cOldSmooth.Size = new System.Drawing.Size(95, 17);
             this.cOldSmooth.TabIndex = 21;
@@ -285,7 +275,7 @@
             // 
             // bExport
             // 
-            this.bExport.Location = new System.Drawing.Point(227, 284);
+            this.bExport.Location = new System.Drawing.Point(223, 254);
             this.bExport.Name = "bExport";
             this.bExport.Size = new System.Drawing.Size(205, 23);
             this.bExport.TabIndex = 22;
@@ -297,15 +287,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 418);
+            this.ClientSize = new System.Drawing.Size(441, 365);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.PreloadToggle);
             this.Controls.Add(this.bExport);
             this.Controls.Add(this.cOldSmooth);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.tSmoothness);
             this.Controls.Add(this.bConsoleThreadRestart);
             this.Controls.Add(this.cAutoVolume);
             this.Controls.Add(this.ShowProgramFolder);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.Download);
             this.Controls.Add(this.DownloadBox);
@@ -318,6 +308,8 @@
             this.Controls.Add(this.AAtoggle);
             this.Controls.Add(this.Showinexploerer);
             this.Controls.Add(this.ColorChange);
+            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.tSmoothness);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -326,8 +318,6 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OptionsMenu_FormClosed);
             this.Load += new System.EventHandler(this.OptionsMenu_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -351,7 +341,6 @@
         private System.Windows.Forms.Button Download;
         private System.Windows.Forms.Button PreloadToggle;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button ShowProgramFolder;
         private System.Windows.Forms.CheckBox cAutoVolume;

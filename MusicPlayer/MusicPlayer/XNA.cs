@@ -558,7 +558,7 @@ namespace MusicPlayer
             file.Tag.Comment = "Downloaded using MusicPlayer";
             file.Tag.Album = "MusicPlayer Songs";
             file.Tag.AlbumArtists = new string[] { VideoTitle.Split('-').First().Trim() };
-            file.Tag.Artists = new string[] { VideoTitle.Split('-').First().Trim() };
+            file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
             file.Tag.AmazonId = "AmazonIsShit";
             file.Tag.Composers = new string[] { VideoTitle.Split('-').First().Trim() };
             file.Tag.Copyright = "None";
@@ -1460,11 +1460,15 @@ namespace MusicPlayer
                             if (Assets.EntireSongWaveBuffer != null && config.Default.Preload)
                             {
                                 double LoadPercetage = (double)Assets.EntireSongWaveBuffer.Count / Assets.Channel32.Length * 4.0;
-                                if (LoadPercetage < 1)
+                                TempRect.X = DurationBar.X + (int)(DurationBar.Width * PlayPercetage);
+                                TempRect.Width = (int)(DurationBar.Width * LoadPercetage) - (int)(DurationBar.Width * PlayPercetage);
+                                spriteBatch.Draw(Assets.White, TempRect, secondaryColor);
+                                if (config.Default.AntiAliasing)
                                 {
                                     TempRect.X = DurationBar.X + (int)(DurationBar.Width * LoadPercetage);
-                                    TempRect.Width = DurationBar.Width - (int)(DurationBar.Width * LoadPercetage);
-                                    spriteBatch.Draw(Assets.White, TempRect, secondaryColor);
+                                    TempRect.Width = 1;
+                                    float AAPercentage = (float)(LoadPercetage * DurationBar.Width) % 1;
+                                    spriteBatch.Draw(Assets.White, TempRect, secondaryColor * AAPercentage);
                                 }
                             }
                             if (config.Default.AntiAliasing)
