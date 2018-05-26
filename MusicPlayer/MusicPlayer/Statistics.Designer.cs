@@ -103,27 +103,27 @@
             // 
             // SongName
             // 
-            this.SongName.HeaderText = "SongName";
+            this.SongName.HeaderText = "Name";
             this.SongName.Name = "SongName";
             // 
             // SongScore
             // 
-            this.SongScore.HeaderText = "SongScore";
+            this.SongScore.HeaderText = "Score";
             this.SongScore.Name = "SongScore";
             // 
             // SongTrend
             // 
-            this.SongTrend.HeaderText = "SongTrend";
+            this.SongTrend.HeaderText = "Trend";
             this.SongTrend.Name = "SongTrend";
             // 
             // SongTotalUpvotes
             // 
-            this.SongTotalUpvotes.HeaderText = "SongTotalUpvotes";
+            this.SongTotalUpvotes.HeaderText = "TotalUpvotes";
             this.SongTotalUpvotes.Name = "SongTotalUpvotes";
             // 
             // SongAge
             // 
-            this.SongAge.HeaderText = "SongAge (in Days)";
+            this.SongAge.HeaderText = "Age (in Days)";
             this.SongAge.Name = "SongAge";
             // 
             // Chance
