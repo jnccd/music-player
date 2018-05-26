@@ -40,6 +40,7 @@ namespace MusicPlayer
         private void OptionsMenu_Load(object sender, EventArgs e)
         {
             trackBar1.Value = config.Default.WavePreload;
+            label1.Text = "Percentage of the songs samples that can be preloaded " + trackBar1.Value + "%";
             if (Program.game.Preload)
             {
                 PreloadToggle.Text = "Disable Preload";
@@ -91,6 +92,8 @@ namespace MusicPlayer
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             config.Default.WavePreload = trackBar1.Value;
+
+            label1.Text = "Percentage of the songs samples that can be preloaded " + trackBar1.Value + "%";
         }
         private void ColorChange_Click(object sender, EventArgs e)
         {
@@ -270,6 +273,11 @@ namespace MusicPlayer
                 }
                 catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
             }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

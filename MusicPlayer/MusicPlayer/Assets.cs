@@ -518,7 +518,7 @@ namespace MusicPlayer
                                 break;
                         }
 
-                        if (Channel32 != null && Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f)
+                        while (Channel32 != null && Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f)
                             Thread.Sleep(20);
                     }
 
