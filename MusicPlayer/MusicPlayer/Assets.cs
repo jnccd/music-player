@@ -1025,7 +1025,7 @@ namespace MusicPlayer
         {
             List<string> SongChoosingList = new List<string>();
             List<SongActionStruct> PlayerUpvoteHistoryList = PlayerUpvoteHistory.ToList();
-            float ChanceIncreasePerUpvote = Playlist.Count / 140;
+            float ChanceIncreasePerUpvote = Playlist.Count / 100;
             for (int i = 0; i < Playlist.Count; i++)
             {
                 if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
@@ -1046,10 +1046,10 @@ namespace MusicPlayer
                         if (age < 7)
                             amount += (int)((7 - age) * ChanceIncreasePerUpvote * 60f / 7f);
 
-                        if (UpvotedSongScores[index] < 50)
+                        if (UpvotedSongScores[index] < 80)
                         {
                             int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
-                            if (hisindex > 3 && hisindex < 8)
+                            if (hisindex > 2 && hisindex < 8)
                                 amount += (int)((50 - UpvotedSongScores[index]) * 4);
                         }
                     }
