@@ -1046,12 +1046,15 @@ namespace MusicPlayer
                         if (age < 7)
                             amount += (int)((7 - age) * ChanceIncreasePerUpvote * 60f / 7f);
 
-                        if (UpvotedSongScores[index] < 80)
+                        if (UpvotedSongScores[index] < 50)
                         {
                             int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
                             if (hisindex > 2 && hisindex < 8)
-                                amount += (int)((50 - UpvotedSongScores[index]) * 4);
+                                amount += (int)((100 - UpvotedSongScores[index]) * 4);
                         }
+
+                        if (UpvotedSongTotalLikes[index] == 0 && UpvotedSongStreaks[index] == 0)
+                            amount += (int)(100 * ChanceIncreasePerUpvote);
                     }
 
                     for (int k = 0; k < amount; k++)
