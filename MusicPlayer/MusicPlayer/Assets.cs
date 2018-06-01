@@ -132,6 +132,7 @@ namespace MusicPlayer
         public static int SongStartTime;
         public static bool IsCurrentSongUpvoted;
         public static int LastUpvotedSongStreak;
+        static List<string> SongChoosingList = new List<string>();
 
         // Song Data
         public static List<string> UpvotedSongNames;
@@ -302,6 +303,7 @@ namespace MusicPlayer
             }
 
             Console.WriteLine("Starting first Song...");
+            UpdateSongChoosingList();
             if (Playlist.Count > 0)
             {
                 if (Program.args.Length > 0)
@@ -727,9 +729,13 @@ namespace MusicPlayer
         private static void GetNewPlaylistSong()
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
-            List<string> SongChoosingList = GetSongChoosingList(true);
 
-            int SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
+            int SongChoosingListIndex = 0;
+
+            do
+                SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
+            while (SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && PlayerHistory.Count != 0 && Playlist.Count > 1);
+
             PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
             PlayerHistoryIndex = PlayerHistory.Count - 1;
             PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
@@ -748,7 +754,7 @@ namespace MusicPlayer
             SaveCurrentSongToHistoryFile();
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
-
+            
             DisposeNAudioData();
             Program.game.ForceTitleRedraw();
             if (Program.game.DG != null)
@@ -756,7 +762,7 @@ namespace MusicPlayer
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' ' });
-
+            
             mp3 = new Mp3FileReader(PathString);
             mp3Reader = new Mp3FileReader(PathString);
             Channel32 = new WaveChannel32(mp3);
@@ -859,6 +865,8 @@ namespace MusicPlayer
 
                     PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, false));
                     Program.game.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
+
+                    UpdateSongChoosingList();
                 }
             }
         }
@@ -893,6 +901,8 @@ namespace MusicPlayer
                 UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
                 LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 UpvotedSongTotalLikes[index]++;
+
+                UpdateSongChoosingList();
             }
             IsCurrentSongUpvoted = false;
         }
@@ -980,22 +990,10 @@ namespace MusicPlayer
             else
                 return 0;
         }
-        public static float PlayChance(string SongPath)
-        {
-            List<string> SongChoosingList = GetSongChoosingList(false);
-
-            int TargetTickets = 0;
-            foreach (string s in SongChoosingList)
-                if (s == SongPath)
-                    TargetTickets++;
-            return TargetTickets / (float)SongChoosingList.Count;
-        }
         public static object[,] GetSongInformationList()
         {
             object[,] SongInformationArray = new object[UpvotedSongNames.Count, 6];
-
-            List<string> SongChoosingList = GetSongChoosingList(false);
-
+            
             for (int i = 0; i < UpvotedSongNames.Count; i++)
             {
                 SongInformationArray[i, 0] = UpvotedSongNames[i];
@@ -1003,13 +1001,27 @@ namespace MusicPlayer
                 SongInformationArray[i, 2] = UpvotedSongStreaks[i];
                 SongInformationArray[i, 3] = UpvotedSongTotalLikes[i];
                 SongInformationArray[i, 4] = SongAge(GetSongPathFromSongName(UpvotedSongNames[i]));
+            }
+            string lastSong = "";
+            int lastIndex = 0;
+            float singleTicketWorth = 1f / SongChoosingList.Count * 100;
+            for (int i = 0; i < SongChoosingList.Count; i++)
+            {
+                if (lastSong == SongChoosingList[i])
+                {
+                    SongInformationArray[lastIndex, 5] = (float)(SongInformationArray[lastIndex, 5]) + singleTicketWorth;
+                }
+                else
+                {
+                    int index = UpvotedSongNames.IndexOf(Path.GetFileName(SongChoosingList[i]));
+                    if (SongInformationArray[index, 5] == null)
+                        SongInformationArray[index, 5] = singleTicketWorth;
+                    else
+                        SongInformationArray[index, 5] = (float)(SongInformationArray[index, 5]) + singleTicketWorth;
 
-                int TargetTickets = 0;
-                string SongName = GetSongPathFromSongName(UpvotedSongNames[i]);
-                foreach (string s in SongChoosingList)
-                    if (s == SongName)
-                        TargetTickets++;
-                SongInformationArray[i, 5] = TargetTickets / (float)SongChoosingList.Count * 100;
+                    lastIndex = index;
+                    lastSong = SongChoosingList[i];
+                }
             }
 
             return SongInformationArray;
@@ -1021,17 +1033,14 @@ namespace MusicPlayer
                     return s;
             return "COULDNT FIND SONG NAME!";
         }
-        private static List<string> GetSongChoosingList(bool ForNextSongChoosing) // This determines the song chances
+        private static void UpdateSongChoosingList() // This determines the song chances
         {
-            List<string> SongChoosingList = new List<string>();
+            SongChoosingList.Clear();
             List<SongActionStruct> PlayerUpvoteHistoryList = PlayerUpvoteHistory.ToList();
             float ChanceIncreasePerUpvote = Playlist.Count / 100;
             for (int i = 0; i < Playlist.Count; i++)
             {
-                if (ForNextSongChoosing && (PlayerHistory.Count == 0 ||
-                    Playlist[i] != PlayerHistory[PlayerHistoryIndex - 1] && File.Exists(Playlist[i]) ||
-                    Playlist.Count < 2) ||
-                    !ForNextSongChoosing && (File.Exists(Playlist[i])))
+                if (File.Exists(Playlist[i]))
                 {
                     SongChoosingList.Add(Playlist[i]);
 
@@ -1053,7 +1062,7 @@ namespace MusicPlayer
                                 amount += (int)((100 - UpvotedSongScores[index]) * 4);
                         }
 
-                        if (UpvotedSongTotalLikes[index] == 0 && UpvotedSongStreaks[index] == 0)
+                        if (UpvotedSongStreaks[index] == 0)
                             amount += (int)(100 * ChanceIncreasePerUpvote);
                     }
 
@@ -1061,7 +1070,6 @@ namespace MusicPlayer
                         SongChoosingList.Add(Playlist[i]);
                 }
             }
-            return SongChoosingList;
         }
         private static void SaveCurrentSongToHistoryFile()
         {
