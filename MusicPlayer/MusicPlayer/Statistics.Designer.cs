@@ -39,6 +39,7 @@
             this.bRefresh = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.bSearch = new System.Windows.Forms.Button();
+            this.toPlaying = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,9 +128,9 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(92, 14);
+            this.textBox1.Location = new System.Drawing.Point(171, 14);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(592, 20);
+            this.textBox1.Size = new System.Drawing.Size(513, 20);
             this.textBox1.TabIndex = 0;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
@@ -145,11 +146,22 @@
             this.bSearch.UseVisualStyleBackColor = true;
             this.bSearch.Click += new System.EventHandler(this.bSearch_Click);
             // 
+            // toPlaying
+            // 
+            this.toPlaying.Location = new System.Drawing.Point(92, 12);
+            this.toPlaying.Name = "toPlaying";
+            this.toPlaying.Size = new System.Drawing.Size(73, 23);
+            this.toPlaying.TabIndex = 4;
+            this.toPlaying.Text = "To Playing";
+            this.toPlaying.UseVisualStyleBackColor = true;
+            this.toPlaying.Click += new System.EventHandler(this.toPlaying_Click);
+            // 
             // Statistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 454);
+            this.Controls.Add(this.toPlaying);
             this.Controls.Add(this.bSearch);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.bRefresh);
@@ -178,5 +190,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SongAge;
         private System.Windows.Forms.DataGridViewTextBoxColumn Chance;
         private System.Windows.Forms.DataGridViewTextBoxColumn Surreal;
+        private System.Windows.Forms.Button toPlaying;
     }
 }

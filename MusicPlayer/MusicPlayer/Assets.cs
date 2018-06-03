@@ -1035,6 +1035,8 @@ namespace MusicPlayer
         }
         private static void UpdateSongChoosingList() // This determines the song chances
         {
+            CurrentDebugTime = Stopwatch.GetTimestamp();
+
             SongChoosingList.Clear();
             List<SongActionStruct> PlayerUpvoteHistoryList = PlayerUpvoteHistory.ToList();
             float ChanceIncreasePerUpvote = Playlist.Count / 100;
@@ -1070,6 +1072,8 @@ namespace MusicPlayer
                         SongChoosingList.Add(Playlist[i]);
                 }
             }
+
+            Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
         private static void SaveCurrentSongToHistoryFile()
         {

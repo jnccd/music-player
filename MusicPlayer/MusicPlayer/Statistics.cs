@@ -75,9 +75,7 @@ namespace MusicPlayer
                 o[3] = SongInfo[i, 3];
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
-
-                if (File.Exists(Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i])))
-                    dataGridView1.Rows.Add(o);
+                dataGridView1.Rows.Add(o);
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
@@ -269,6 +267,19 @@ namespace MusicPlayer
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void toPlaying_Click(object sender, EventArgs e)
+        {
+            int index = 0;
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                if (Assets.currentlyPlayingSongName.Equals(dataGridView1.Rows[i].Cells[0].Value))
+                {
+                    index = i;
+                    break;
+                }
+
+            dataGridView1.FirstDisplayedScrollingRowIndex = index;
         }
     }
 }
