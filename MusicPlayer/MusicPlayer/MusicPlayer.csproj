@@ -219,6 +219,7 @@
     <None Include="config.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>config.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <None Include="MusicPlayer_TemporaryKey.pfx" />
     <None Include="packages.config">
