@@ -273,7 +273,7 @@ namespace MusicPlayer
         {
             int index = 0;
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
-                if (Assets.currentlyPlayingSongName.Equals(dataGridView1.Rows[i].Cells[0].Value))
+                if (Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName).Equals(dataGridView1.Rows[i].Cells[0].Value))
                 {
                     index = i;
                     break;

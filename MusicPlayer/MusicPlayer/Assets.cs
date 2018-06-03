@@ -988,7 +988,7 @@ namespace MusicPlayer
             if (File.Exists(SongPath))
                 return SongAge(UpvotedSongNames.IndexOf(SongPath.Split('\\').Last()));
             else
-                return 0;
+                return float.NaN;
         }
         public static object[,] GetSongInformationList()
         {
@@ -996,11 +996,11 @@ namespace MusicPlayer
             
             for (int i = 0; i < UpvotedSongNames.Count; i++)
             {
-                SongInformationArray[i, 0] = UpvotedSongNames[i];
+                SongInformationArray[i, 0] = Path.GetFileNameWithoutExtension(UpvotedSongNames[i]);
                 SongInformationArray[i, 1] = UpvotedSongScores[i];
                 SongInformationArray[i, 2] = UpvotedSongStreaks[i];
                 SongInformationArray[i, 3] = UpvotedSongTotalLikes[i];
-                SongInformationArray[i, 4] = SongAge(GetSongPathFromSongName(UpvotedSongNames[i]));
+                SongInformationArray[i, 4] = SongAge(i);
             }
             string lastSong = "";
             int lastIndex = 0;
@@ -1042,35 +1042,32 @@ namespace MusicPlayer
             float ChanceIncreasePerUpvote = Playlist.Count / 100;
             for (int i = 0; i < Playlist.Count; i++)
             {
-                if (File.Exists(Playlist[i]))
+                SongChoosingList.Add(Playlist[i]);
+
+                int amount = 0;
+
+                int index = UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last());
+                if (index >= 0)
                 {
-                    SongChoosingList.Add(Playlist[i]);
+                    amount += (int)(Math.Ceiling(UpvotedSongScores[index] * ChanceIncreasePerUpvote));
 
-                    int amount = 0;
+                    float age = SongAge(index);
+                    if (age < 7)
+                        amount += (int)((7 - age) * ChanceIncreasePerUpvote * 60f / 7f);
 
-                    int index = UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last());
-                    if (index >= 0)
+                    if (UpvotedSongScores[index] < 50)
                     {
-                        amount += (int)(Math.Ceiling(UpvotedSongScores[index] * ChanceIncreasePerUpvote));
-
-                        float age = SongAge(index);
-                        if (age < 7)
-                            amount += (int)((7 - age) * ChanceIncreasePerUpvote * 60f / 7f);
-
-                        if (UpvotedSongScores[index] < 50)
-                        {
-                            int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
-                            if (hisindex > 2 && hisindex < 8)
-                                amount += (int)((100 - UpvotedSongScores[index]) * 4);
-                        }
-
-                        if (UpvotedSongStreaks[index] == 0)
-                            amount += (int)(100 * ChanceIncreasePerUpvote);
+                        int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
+                        if (hisindex > 2 && hisindex < 8)
+                            amount += (int)((100 - UpvotedSongScores[index]) * 4);
                     }
 
-                    for (int k = 0; k < amount; k++)
-                        SongChoosingList.Add(Playlist[i]);
+                    if (UpvotedSongStreaks[index] == 0)
+                        amount += (int)(100 * ChanceIncreasePerUpvote);
                 }
+
+                for (int k = 0; k < amount; k++)
+                    SongChoosingList.Add(Playlist[i]);
             }
 
             Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
