@@ -52,11 +52,8 @@ namespace MusicPlayer
         {
             if (e.Button == MouseButtons.Left)
             {
-                try
-                {
-                    Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
-                }
-                catch { }
+                if (!Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
+                    MessageBox.Show("Can't play this!");
             }
         }
 
@@ -136,7 +133,8 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        Assets.PlayPlaylistSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        if (!Assets.PlayPlaylistSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3"))
+                            MessageBox.Show("Can't play this!");
                     }
                     catch { }
                 })));

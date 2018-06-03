@@ -677,12 +677,11 @@ namespace MusicPlayer
         }
         public static bool PlayPlaylistSong(string SongNameWithFileEnd)
         {
-            SaveUserSettings();
-
             for (int i = 0; i < Playlist.Count; i++)
             {
                 if (Playlist[i].Split('\\').Last() == SongNameWithFileEnd)
                 {
+                    SaveUserSettings();
                     PlayerHistory.Add(Playlist[i]);
                     PlayerHistoryIndex = PlayerHistory.Count - 1;
                     PlaySongByPath(Playlist[i]);
