@@ -52,7 +52,7 @@ namespace MusicPlayer
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (!Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
+                if (e.RowIndex > 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
                     MessageBox.Show("This entry isnt linked to a mp3 file!");
             }
         }
@@ -146,18 +146,37 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
+                m.MenuItems.Add(new MenuItem("Copy Title to Clipboard", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        Clipboard.SetText(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
                 m.MenuItems.Add(new MenuItem("Open in Browser", ((object s, EventArgs ev) =>
                 {
                     try
                     {
                         Task.Factory.StartNew(() =>
                         {
-                            // Use the I'm Feeling Lucky URL
-                            string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Path.GetFileNameWithoutExtension(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()));
-                            url = url.Replace(' ', '+');
-                            WebRequest req = HttpWebRequest.Create(url);
-                            Uri U = req.GetResponse().ResponseUri;
-
+                            // Get fitting youtube video
+                            string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                            req.KeepAlive = false;
+                            WebResponse W = req.GetResponse();
+                            string ResultURL;
+                            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                            {
+                                string html = sr.ReadToEnd();
+                                int index = html.IndexOf("href=\"/watch?");
+                                string startcuthtml = html.Remove(0, index + 6);
+                                index = startcuthtml.IndexOf('"');
+                                string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                                ResultURL = "https://www.youtube.com" + cuthtml;
+                            }
+                            
+                            Uri U = new Uri(ResultURL);
                             Process.Start(U.ToString());
                         });
                     }
