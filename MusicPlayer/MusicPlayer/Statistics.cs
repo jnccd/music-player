@@ -53,7 +53,7 @@ namespace MusicPlayer
             if (e.Button == MouseButtons.Left)
             {
                 if (!Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
-                    MessageBox.Show("Can't play this!");
+                    MessageBox.Show("This entry isnt linked to a mp3 file!");
             }
         }
 
@@ -134,7 +134,7 @@ namespace MusicPlayer
                     try
                     {
                         if (!Assets.PlayPlaylistSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3"))
-                            MessageBox.Show("Can't play this!");
+                            MessageBox.Show("This entry isnt linked to a mp3 file!");
                     }
                     catch { }
                 })));
@@ -144,7 +144,7 @@ namespace MusicPlayer
                     {
                         Assets.QueueNewSong(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString(), false);
                     }
-                    catch { }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
                 m.MenuItems.Add(new MenuItem("Open in Browser", ((object s, EventArgs ev) =>
                 {

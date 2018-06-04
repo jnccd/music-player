@@ -1027,6 +1027,9 @@ namespace MusicPlayer
         }
         public static string GetSongPathFromSongName(string SongName)
         {
+            if (!SongName.Contains(".mp3"))
+                SongName += ".mp3";
+
             foreach (string s in Playlist)
                 if (s.Split('\\').Last() == SongName)
                     return s;
@@ -1061,7 +1064,7 @@ namespace MusicPlayer
                             amount += (int)((100 - UpvotedSongScores[index]) * 4);
                     }
 
-                    if (UpvotedSongStreaks[index] == 0)
+                    if (UpvotedSongScores[index] % 1 == 0)
                         amount += (int)(100 * ChanceIncreasePerUpvote);
                 }
 
