@@ -308,7 +308,7 @@ namespace MusicPlayer
             {
                 if (Program.args.Length > 0)
                     PlayNewSong(Program.args[0]);
-                else if (File.Exists(Values.CurrentExecutablePath + "\\History.txt"))
+                else if (false && File.Exists(Values.CurrentExecutablePath + "\\History.txt"))
                 {
                     try
                     {
@@ -733,7 +733,7 @@ namespace MusicPlayer
 
             do
                 SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
-            while (SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && PlayerHistory.Count != 0 && Playlist.Count > 1);
+            while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
 
             PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
             PlayerHistoryIndex = PlayerHistory.Count - 1;

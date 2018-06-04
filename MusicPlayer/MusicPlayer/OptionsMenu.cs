@@ -279,5 +279,13 @@ namespace MusicPlayer
         {
 
         }
+
+        private void history_Click(object sender, EventArgs e)
+        {
+            if (parent.history == null)
+                parent.history = new History();
+
+            parent.history.Show();
+        }
     }
 }
