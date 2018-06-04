@@ -128,8 +128,6 @@ namespace MusicPlayer
         {
             if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
-
-
                 ContextMenu m = new ContextMenu();
                 m.MenuItems.Add(new MenuItem("Play", ((object s, EventArgs ev) =>
                 {

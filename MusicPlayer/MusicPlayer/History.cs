@@ -30,16 +30,25 @@ namespace MusicPlayer
                     string Time = "";
                     if (Split.Length > 1)
                     {
-                        Title = Split[0];
+                        Title = Path.GetFileNameWithoutExtension(Split[0]);
                         Time = DateTime.FromBinary(Convert.ToInt64(Split[1])).ToString();
                     }
                     else
                     {
-                        Title = Songs[Songs.Length - i - 1];
+                        Title = Path.GetFileNameWithoutExtension(Songs[Songs.Length - i - 1]);
                     }
 
                     dataGridView1.Rows.Add(new object[] { Title, Time });
                 }
+            }
+        }
+
+        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                if (e.RowIndex > 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
+                    MessageBox.Show("This entry isnt linked to a mp3 file!");
             }
         }
     }
