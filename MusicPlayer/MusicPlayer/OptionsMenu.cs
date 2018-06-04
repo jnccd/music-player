@@ -282,7 +282,7 @@ namespace MusicPlayer
 
         private void history_Click(object sender, EventArgs e)
         {
-            if (parent.history == null)
+            if (parent.history == null || parent.history.IsDisposed)
                 parent.history = new History();
 
             parent.history.Show();
