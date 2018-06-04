@@ -104,7 +104,7 @@ namespace MusicPlayer
                     file.Tag.DiscCount = 0;
                     file.Tag.Genres = new string[] { "good music" };
                     file.Tag.Grouping = "None";
-                    file.Tag.Lyrics = "You expected lyrics, but it was me, dio";
+                    file.Tag.Lyrics = "You expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\n";
                     file.Tag.MusicIpId = "wubbel";
                     file.Tag.Title = name;
                     file.Tag.Track = 0;
