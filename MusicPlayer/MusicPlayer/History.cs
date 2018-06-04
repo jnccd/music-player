@@ -25,7 +25,20 @@ namespace MusicPlayer
 
                 for (int i = 0; i < Songs.Length; i++)
                 {
-                    dataGridView1.Rows.Add(new object[] { Songs[Songs.Length - i - 1] });
+                    string[] Split = Songs[Songs.Length - i - 1].Split(':');
+                    string Title = "";
+                    string Time = "";
+                    if (Split.Length > 1)
+                    {
+                        Title = Split[0];
+                        Time = DateTime.FromBinary(Convert.ToInt64(Split[1])).ToString();
+                    }
+                    else
+                    {
+                        Title = Songs[Songs.Length - i - 1];
+                    }
+
+                    dataGridView1.Rows.Add(new object[] { Title, Time });
                 }
             }
         }

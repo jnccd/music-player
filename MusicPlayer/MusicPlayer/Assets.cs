@@ -1077,18 +1077,21 @@ namespace MusicPlayer
         private static void SaveCurrentSongToHistoryFile()
         {
             string path = Values.CurrentExecutablePath + "\\History.txt";
-            string Title = currentlyPlayingSongName;
+            string write = currentlyPlayingSongName + ":" + DateTime.Now.ToBinary();
+
+            if (write == File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last())
+                return;
 
             // This text is added only once to the file.
             if (!File.Exists(path))
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(path))
-                    sw.WriteLine(Title);
+                    sw.WriteLine(write);
 
             // This text is always added, making the file longer over time
             // if it is not deleted.
             using (StreamWriter sw = File.AppendText(path))
-                sw.WriteLine(Title);
+                sw.WriteLine(write);
         }
 
         // Draw Methods
