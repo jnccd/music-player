@@ -108,6 +108,7 @@ namespace MusicPlayer
 
         public OptionsMenu optionsMenu;
         public Statistics statistics;
+        public History history;
 
         // Draw
         Vector2 TempVector = new Vector2(0, 0);

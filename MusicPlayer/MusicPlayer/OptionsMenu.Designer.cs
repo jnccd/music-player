@@ -52,6 +52,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cOldSmooth = new System.Windows.Forms.CheckBox();
             this.bExport = new System.Windows.Forms.Button();
+            this.history = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
@@ -233,9 +234,9 @@
             // 
             // bConsoleThreadRestart
             // 
-            this.bConsoleThreadRestart.Location = new System.Drawing.Point(12, 159);
+            this.bConsoleThreadRestart.Location = new System.Drawing.Point(223, 159);
             this.bConsoleThreadRestart.Name = "bConsoleThreadRestart";
-            this.bConsoleThreadRestart.Size = new System.Drawing.Size(416, 23);
+            this.bConsoleThreadRestart.Size = new System.Drawing.Size(205, 23);
             this.bConsoleThreadRestart.TabIndex = 18;
             this.bConsoleThreadRestart.Text = "Restart Console Input Thread";
             this.bConsoleThreadRestart.UseVisualStyleBackColor = true;
@@ -283,11 +284,22 @@
             this.bExport.UseVisualStyleBackColor = true;
             this.bExport.Click += new System.EventHandler(this.bExport_Click);
             // 
+            // history
+            // 
+            this.history.Location = new System.Drawing.Point(12, 159);
+            this.history.Name = "history";
+            this.history.Size = new System.Drawing.Size(205, 23);
+            this.history.TabIndex = 23;
+            this.history.Text = "Show Song History";
+            this.history.UseVisualStyleBackColor = true;
+            this.history.Click += new System.EventHandler(this.history_Click);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(441, 365);
+            this.Controls.Add(this.history);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.PreloadToggle);
             this.Controls.Add(this.bExport);
@@ -349,5 +361,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox cOldSmooth;
         private System.Windows.Forms.Button bExport;
+        private System.Windows.Forms.Button history;
     }
 }
