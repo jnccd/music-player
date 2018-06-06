@@ -782,8 +782,11 @@ namespace MusicPlayer
                 case SelectedControl.CloseButton:
                     if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
                     {
-                        Program.Closing = true;
-                        gameWindowForm.Close();
+                        if (MessageBox.Show("You really want to close me?", "Quit?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            Program.Closing = true;
+                            gameWindowForm.Close();
+                        }
                     }
                     break;
 
