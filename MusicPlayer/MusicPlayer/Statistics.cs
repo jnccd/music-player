@@ -182,25 +182,33 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                if (dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString().Equals(Assets.currentlyPlayingSongName))
+                if (dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString().Equals(Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName)))
                     m.MenuItems.Add(new MenuItem("Open in Browser with timestamp", ((object s, EventArgs ev) =>
                 {
                     try
                     {
                         Task.Factory.StartNew(() =>
                         {
-                            // Use the I'm Feeling Lucky URL
-                            string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Path.GetFileNameWithoutExtension(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()));
-                            url = url.Replace(' ', '+');
-                            WebRequest req = HttpWebRequest.Create(url);
-                            Uri U = req.GetResponse().ResponseUri;
-                            if (dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString().Equals(Assets.currentlyPlayingSongName))
+                            // Get fitting youtube video
+                            string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                            req.KeepAlive = false;
+                            WebResponse W = req.GetResponse();
+                            string ResultURL;
+                            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
                             {
-                                int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
-                                U = new Uri(U.ToString() + "&t=" + seconds + "s");
+                                string html = sr.ReadToEnd();
+                                int index = html.IndexOf("href=\"/watch?");
+                                string startcuthtml = html.Remove(0, index + 6);
+                                index = startcuthtml.IndexOf('"');
+                                string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                                ResultURL = "https://www.youtube.com" + cuthtml;
                             }
 
+                            int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
+                            Uri U = new Uri(ResultURL + "&t=" + seconds + "s");
                             Process.Start(U.ToString());
+
                             if (Assets.IsPlaying())
                                 Assets.PlayPause();
                         });
