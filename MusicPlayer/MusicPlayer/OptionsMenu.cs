@@ -258,7 +258,7 @@ namespace MusicPlayer
                     List<string> CopyFiles = new List<string>();
                     for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
                     {
-                        if (Assets.UpvotedSongScores[i] > 1)
+                        if (Assets.UpvotedSongScores[i] > 0 && Assets.UpvotedSongStreaks[i] > 0)
                         {
                             string path = Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i]);
                             if (File.Exists(path))
@@ -271,7 +271,7 @@ namespace MusicPlayer
 
                     parent.BackgroundOperationRunning = false;
                 }
-                catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); parent.BackgroundOperationRunning = false; }
             }
         }
 
