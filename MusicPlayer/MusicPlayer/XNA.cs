@@ -1116,7 +1116,7 @@ namespace MusicPlayer
         }
         public void ShowStatistics()
         {
-            if (statistics == null || statistics.IsClosed || statistics.IsDisposed)
+            if (statistics == null || statistics.IsClosed || statistics.IsDisposed || !statistics.Created)
             {
                 statistics = new Statistics(this);
                 Values.StartSTATask(() => { statistics.ShowDialog(); });
