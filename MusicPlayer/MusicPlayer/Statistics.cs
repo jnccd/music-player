@@ -126,7 +126,7 @@ namespace MusicPlayer
         // ContextMenu
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            if (e != null && e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 ContextMenu m = new ContextMenu();
                 m.MenuItems.Add(new MenuItem("Play", ((object s, EventArgs ev) =>
@@ -272,6 +272,17 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
+                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value.Equals(null))
+                {
+                    m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
+                    {
+                        try
+                        {
+                            throw new NotImplementedException();
+                        }
+                        catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                    })));
+                }
 
                 currentMouseOverRow = e.RowIndex;
 

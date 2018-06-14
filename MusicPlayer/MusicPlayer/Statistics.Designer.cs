@@ -29,6 +29,10 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.bRefresh = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.bSearch = new System.Windows.Forms.Button();
+            this.toPlaying = new System.Windows.Forms.Button();
             this.SongName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongScore = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SongTrend = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -36,10 +40,6 @@
             this.SongAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Chance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Surreal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.bRefresh = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.bSearch = new System.Windows.Forms.Button();
-            this.toPlaying = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -71,48 +71,6 @@
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
             this.dataGridView1.Resize += new System.EventHandler(this.dataGridView1_Resize);
-            // 
-            // SongName
-            // 
-            this.SongName.HeaderText = "Name";
-            this.SongName.Name = "SongName";
-            this.SongName.ReadOnly = true;
-            // 
-            // SongScore
-            // 
-            this.SongScore.HeaderText = "Score";
-            this.SongScore.Name = "SongScore";
-            this.SongScore.ReadOnly = true;
-            // 
-            // SongTrend
-            // 
-            this.SongTrend.HeaderText = "Trend";
-            this.SongTrend.Name = "SongTrend";
-            this.SongTrend.ReadOnly = true;
-            // 
-            // SongTotalUpvotes
-            // 
-            this.SongTotalUpvotes.HeaderText = "TotalUpvotes";
-            this.SongTotalUpvotes.Name = "SongTotalUpvotes";
-            this.SongTotalUpvotes.ReadOnly = true;
-            // 
-            // SongAge
-            // 
-            this.SongAge.HeaderText = "Age (in Days)";
-            this.SongAge.Name = "SongAge";
-            this.SongAge.ReadOnly = true;
-            // 
-            // Chance
-            // 
-            this.Chance.HeaderText = "PlayChance (in %)";
-            this.Chance.Name = "Chance";
-            this.Chance.ReadOnly = true;
-            // 
-            // Surreal
-            // 
-            this.Surreal.HeaderText = "SURREAL";
-            this.Surreal.Name = "Surreal";
-            this.Surreal.ReadOnly = true;
             // 
             // bRefresh
             // 
@@ -156,6 +114,48 @@
             this.toPlaying.UseVisualStyleBackColor = true;
             this.toPlaying.Click += new System.EventHandler(this.toPlaying_Click);
             // 
+            // SongName
+            // 
+            this.SongName.HeaderText = "Name";
+            this.SongName.Name = "SongName";
+            this.SongName.ReadOnly = true;
+            // 
+            // SongScore
+            // 
+            this.SongScore.HeaderText = "Score";
+            this.SongScore.Name = "SongScore";
+            this.SongScore.ReadOnly = true;
+            // 
+            // SongTrend
+            // 
+            this.SongTrend.HeaderText = "Trend";
+            this.SongTrend.Name = "SongTrend";
+            this.SongTrend.ReadOnly = true;
+            // 
+            // SongTotalUpvotes
+            // 
+            this.SongTotalUpvotes.HeaderText = "TotalUpvotes";
+            this.SongTotalUpvotes.Name = "SongTotalUpvotes";
+            this.SongTotalUpvotes.ReadOnly = true;
+            // 
+            // SongAge
+            // 
+            this.SongAge.HeaderText = "Age (in Days)";
+            this.SongAge.Name = "SongAge";
+            this.SongAge.ReadOnly = true;
+            // 
+            // Chance
+            // 
+            this.Chance.HeaderText = "PlayChance (in %)";
+            this.Chance.Name = "Chance";
+            this.Chance.ReadOnly = true;
+            // 
+            // Surreal
+            // 
+            this.Surreal.HeaderText = "NONEXISTANT";
+            this.Surreal.Name = "Surreal";
+            this.Surreal.ReadOnly = true;
+            // 
             // Statistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -183,6 +183,7 @@
         private System.Windows.Forms.Button bRefresh;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button bSearch;
+        private System.Windows.Forms.Button toPlaying;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongName;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongScore;
         private System.Windows.Forms.DataGridViewTextBoxColumn SongTrend;
@@ -190,6 +191,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SongAge;
         private System.Windows.Forms.DataGridViewTextBoxColumn Chance;
         private System.Windows.Forms.DataGridViewTextBoxColumn Surreal;
-        private System.Windows.Forms.Button toPlaying;
     }
 }
