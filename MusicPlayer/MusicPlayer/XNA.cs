@@ -415,8 +415,9 @@ namespace MusicPlayer
                             }
                             else
                                 break;
-
                             #endregion
+
+                            LastConsoleInputIndex = -1;
                         }
 
                         if (e.Key == ConsoleKey.Backspace)
