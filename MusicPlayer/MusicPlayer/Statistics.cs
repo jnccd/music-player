@@ -272,13 +272,20 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value.Equals(null))
+                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
                 {
                     m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
                     {
                         try
                         {
-                            throw new NotImplementedException();
+                            int index = Assets.UpvotedSongNames.IndexOf(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3");
+                            Assets.UpvotedSongNames.RemoveAt(index);
+                            Assets.UpvotedSongScores.RemoveAt(index);
+                            Assets.UpvotedSongStreaks.RemoveAt(index);
+                            Assets.UpvotedSongTotalLikes.RemoveAt(index);
+                            Assets.UpvotedSongAddingDates.RemoveAt(index);
+
+                            bRefresh_Click(null, EventArgs.Empty);
                         }
                         catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                     })));

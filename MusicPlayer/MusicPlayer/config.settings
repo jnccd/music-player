@@ -27,7 +27,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="WavePreload" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="Col" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Transparent</Value>
