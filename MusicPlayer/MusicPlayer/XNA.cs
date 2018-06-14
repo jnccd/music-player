@@ -273,6 +273,8 @@ namespace MusicPlayer
                             LastConsoleInputIndex--;
                             if (LastConsoleInputIndex < -1)
                                 LastConsoleInputIndex = -1;
+                            if (LastConsoleInputIndex == -1)
+                                Path = "";
                             if (LastConsoleInputIndex > -1)
                                 Path = LastConsoleInput[LastConsoleInput.Count - 1 - LastConsoleInputIndex];
                         }
@@ -591,6 +593,8 @@ namespace MusicPlayer
 
             BackgroundOperationRunning = false;
             PauseConsoleInputThread = false;
+
+            ReHookGlobalKeyHooks();
         }
 
         protected override void Update(GameTime gameTime)
