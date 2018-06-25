@@ -402,6 +402,10 @@ namespace MusicPlayer
             return tcs.Task;
         }
 
+        // Own C Code: 
+        [DllImport("Clib.dll")]
+        public static extern void DisplayHelloFromDLL();
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
         [DllImport("kernel32.dll")]
