@@ -1069,6 +1069,8 @@ namespace MusicPlayer
                         amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
 
+                amount /= 4;
+
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
             }
