@@ -621,20 +621,21 @@ namespace MusicPlayer
 
                 if (!File.Exists(Path))
                 {
-                    DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
+                    List<string> Choosing = Playlist.OrderBy(x => Values.RDM.NextDouble()).ToList();
+                    DistancePerSong[] LDistances = new DistancePerSong[Choosing.Count];
                     for (int i = 0; i < LDistances.Length; i++)
                     {
-                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, Playlist[i].Split('\\').Last().Split('.').First());
+                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, Choosing[i].Split('\\').Last().Split('.').First());
                         LDistances[i].SongIndex = i;
                     }
 
                     LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
                     int NonWorkingIndexes = 0;
-                    Path = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                    Path = Choosing[LDistances[NonWorkingIndexes].SongIndex];
                     while (!File.Exists(Path))
                     {
                         NonWorkingIndexes++;
-                        Path = Playlist[LDistances[NonWorkingIndexes].SongIndex];
+                        Path = Choosing[LDistances[NonWorkingIndexes].SongIndex];
                     }
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -647,7 +648,7 @@ namespace MusicPlayer
                             break;
                         if (i == 1)
                             Console.WriteLine("Other well fitting songs were:");
-                        Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                        Console.WriteLine(i + ". \"" + Choosing[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
                 }
@@ -1041,7 +1042,7 @@ namespace MusicPlayer
 
             SongChoosingList.Clear();
             List<SongActionStruct> PlayerUpvoteHistoryList = PlayerUpvoteHistory.ToList();
-            float ChanceIncreasePerUpvote = Playlist.Count / 100;
+            float ChanceIncreasePerUpvote = Playlist.Count / 1000;
             for (int i = 0; i < Playlist.Count; i++)
             {
                 SongChoosingList.Add(Playlist[i]);
@@ -1051,7 +1052,7 @@ namespace MusicPlayer
                 int index = UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last());
                 if (index >= 0)
                 {
-                    amount += (int)(Math.Ceiling(UpvotedSongScores[index] * ChanceIncreasePerUpvote));
+                    amount += (int)(Math.Ceiling(UpvotedSongScores[index] * UpvotedSongScores[index] * ChanceIncreasePerUpvote));
 
                     float age = SongAge(index);
                     if (age < 7)
@@ -1061,11 +1062,11 @@ namespace MusicPlayer
                     {
                         int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
                         if (hisindex > 2 && hisindex < 8)
-                            amount += (int)((100 - UpvotedSongScores[index]) * 4);
+                            amount += (int)((100 - UpvotedSongScores[index]) * (100 - UpvotedSongScores[index]) * 4);
                     }
 
                     if (UpvotedSongScores[index] % 1 == 0)
-                        amount += (int)(100 * ChanceIncreasePerUpvote);
+                        amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
 
                 for (int k = 0; k < amount; k++)
