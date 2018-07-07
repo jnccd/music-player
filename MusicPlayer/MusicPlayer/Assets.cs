@@ -1074,8 +1074,7 @@ namespace MusicPlayer
                         amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
 
-                while (amount > 5000)
-                    amount /= 2;
+                amount /= 4;
 
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
