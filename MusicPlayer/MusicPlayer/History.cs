@@ -28,17 +28,24 @@ namespace MusicPlayer
                     string[] Split = Songs[Songs.Length - i - 1].Split(':');
                     string Title = "";
                     string Time = "";
-                    if (Split.Length > 1)
+                    string ScoreChange = "";
+                    if (Split.Length == 1)
+                    {
+                        Title = Path.GetFileNameWithoutExtension(Songs[Songs.Length - i - 1]);
+                    }
+                    else if (Split.Length == 2)
                     {
                         Title = Path.GetFileNameWithoutExtension(Split[0]);
                         Time = DateTime.FromBinary(Convert.ToInt64(Split[1])).ToString();
                     }
-                    else
+                    else if (Split.Length == 3)
                     {
-                        Title = Path.GetFileNameWithoutExtension(Songs[Songs.Length - i - 1]);
+                        Title = Path.GetFileNameWithoutExtension(Split[0]);
+                        Time = DateTime.FromBinary(Convert.ToInt64(Split[1])).ToString();
+                        ScoreChange = Split[2];
                     }
 
-                    dataGridView1.Rows.Add(new object[] { Title, Time });
+                    dataGridView1.Rows.Add(new object[] { Title, Time, ScoreChange });
                 }
             }
         }
