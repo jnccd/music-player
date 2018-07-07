@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>Font.spritefont</Source>
+      <Name>Font</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Font.xnb</Output>
+      <Time>2017-06-18T01:16:06.7044129+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Title.spritefont</Source>
+      <Name>Title</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Title.xnb</Output>
+      <Time>2017-09-07T23:49:24.0299896+02:00</Time>
+    </Item>
+    <Item>
+      <Source>GaussianBlurHorz.fx</Source>
+      <Name>GaussianBlurHorz</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\GaussianBlurHorz.xnb</Output>
+      <Time>2017-07-08T22:01:06.3508245+02:00</Time>
+    </Item>
+    <Item>
+      <Source>GaussianBlurVert.fx</Source>
+      <Name>GaussianBlurVert</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\GaussianBlurVert.xnb</Output>
+      <Time>2017-07-08T22:02:41.2191079+02:00</Time>
+    </Item>
+    <Item>
+      <Source>PixelBlur.fx</Source>
+      <Name>PixelBlur</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\PixelBlur.xnb</Output>
+      <Time>2017-06-12T23:56:48.5931286+02:00</Time>
+    </Item>
+    <Item>
+      <Source>TitleFadeout.fx</Source>
+      <Name>TitleFadeout</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\TitleFadeout.xnb</Output>
+      <Time>2017-06-13T00:51:30.6032021+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Vignette.fx</Source>
+      <Name>Vignette</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Vignette.xnb</Output>
+      <Time>2018-04-07T12:23:30.6033702+02:00</Time>
+    </Item>
+    <Item>
+      <Source>volume.png</Source>
+      <Name>volume</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\volume.xnb</Output>
+      <Time>2017-03-11T02:11:25.428711+01:00</Time>
+    </Item>
+    <Item>
+      <Source>pause.png</Source>
+      <Name>pause</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\pause.xnb</Output>
+      <Time>2017-06-14T17:33:15.9539496+02:00</Time>
+    </Item>
+    <Item>
+      <Source>play.png</Source>
+      <Name>play</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\play.xnb</Output>
+      <Time>2017-06-14T23:42:01.8557393+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Upvote.png</Source>
+      <Name>Upvote</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Upvote.xnb</Output>
+      <Time>2017-06-18T00:49:46.6553473+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Close.png</Source>
+      <Name>Close</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Close.xnb</Output>
+      <Time>2017-07-07T14:36:41.1175349+02:00</Time>
+    </Item>
+    <Item>
+      <Source>volume2.png</Source>
+      <Name>volume2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\volume2.xnb</Output>
+      <Time>2017-07-07T14:56:01.8739575+02:00</Time>
+    </Item>
+    <Item>
+      <Source>volume3.png</Source>
+      <Name>volume3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\volume3.xnb</Output>
+      <Time>2017-07-07T14:56:40.9008159+02:00</Time>
+    </Item>
+    <Item>
+      <Source>volume4.png</Source>
+      <Name>volume4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\volume4.xnb</Output>
+      <Time>2017-07-07T14:57:19.1069836+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Options.png</Source>
+      <Name>Options</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Options.xnb</Output>
+      <Time>2017-12-06T02:05:05.9233468+01:00</Time>
+    </Item>
+    <Item>
+      <Source>trumpetboybackground.jpg</Source>
+      <Name>trumpetboybackground</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\trumpetboybackground.xnb</Output>
+      <Time>2018-05-14T19:28:54.9238064+02:00</Time>
+    </Item>
+    <Item>
+      <Source>trumpetboy.png</Source>
+      <Name>trumpetboy</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\trumpetboy.xnb</Output>
+      <Time>2018-05-13T20:14:56.3565874+02:00</Time>
+    </Item>
+    <Item>
+      <Source>trumpetboytrumpet.png</Source>
+      <Name>trumpetboytrumpet</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\trumpetboytrumpet.xnb</Output>
+      <Time>2018-05-14T19:29:37.5820282+02:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <ContentProjectGUID>{E920CD5D-7E6B-4688-AAA2-98939BC68008}</ContentProjectGUID>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>HiDef</TargetProfile>
+      <BuildConfiguration>Release</BuildConfiguration>
+      <CompressContent>true</CompressContent>
+      <RootDirectory>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayerContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2011-09-01T16:22:30+02:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\WINDOWS\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2018-05-12T13:20:50.3219675+02:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>
