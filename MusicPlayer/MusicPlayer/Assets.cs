@@ -133,6 +133,7 @@ namespace MusicPlayer
         public static bool IsCurrentSongUpvoted;
         public static int LastUpvotedSongStreak;
         static List<string> SongChoosingList = new List<string>();
+        public static float LastScoreChange = 0;
 
         // Song Data
         public static List<string> UpvotedSongNames;
@@ -751,7 +752,8 @@ namespace MusicPlayer
                 T.Wait();
             }
             
-            SaveCurrentSongToHistoryFile();
+            SaveCurrentSongToHistoryFile(LastScoreChange);
+            LastScoreChange = 0;
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
             
@@ -859,9 +861,10 @@ namespace MusicPlayer
                     if (UpvotedSongStreaks[index] > -1)
                         UpvotedSongStreaks[index] = -1;
                     else
-                        UpvotedSongStreaks[index] -= 2;
+                        UpvotedSongStreaks[index] -= 1;
 
-                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 16 * (1 - percentage);
+                    LastScoreChange = UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 32 * (1 - percentage);
+                    UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetDownvoteWeight(UpvotedSongScores[index]) * 32 * (1 - percentage);
 
                     PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, false));
                     Program.game.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
@@ -898,6 +901,7 @@ namespace MusicPlayer
                 if (UpvotedSongScores[index] < 0)
                     UpvotedSongScores[index] = 0;
 
+                LastScoreChange = UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
                 UpvotedSongScores[index] += UpvotedSongStreaks[index] * GetUpvoteWeight(UpvotedSongScores[index]) * (float)percentage * 8;
                 LastUpvotedSongStreak = UpvotedSongStreaks[index];
                 UpvotedSongTotalLikes[index]++;
@@ -1052,7 +1056,8 @@ namespace MusicPlayer
                 int index = UpvotedSongNames.IndexOf(Playlist[i].Split('\\').Last());
                 if (index >= 0)
                 {
-                    amount += (int)(Math.Ceiling(UpvotedSongScores[index] * UpvotedSongScores[index] * ChanceIncreasePerUpvote));
+                    if (UpvotedSongScores[index] > 0)
+                        amount += (int)(Math.Ceiling(UpvotedSongScores[index] * UpvotedSongScores[index] * ChanceIncreasePerUpvote));
 
                     float age = SongAge(index);
                     if (age < 7)
@@ -1069,7 +1074,8 @@ namespace MusicPlayer
                         amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
 
-                amount /= 4;
+                while (amount > 5000)
+                    amount /= 2;
 
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
@@ -1077,10 +1083,10 @@ namespace MusicPlayer
 
             Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
-        private static void SaveCurrentSongToHistoryFile()
+        private static void SaveCurrentSongToHistoryFile(float ScoreChange)
         {
             string path = Values.CurrentExecutablePath + "\\History.txt";
-            string write = currentlyPlayingSongName + ":" + DateTime.Now.ToBinary();
+            string write = currentlyPlayingSongName + ":" + DateTime.Now.ToBinary() + ":" + ScoreChange;
 
             if (write == File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last())
                 return;

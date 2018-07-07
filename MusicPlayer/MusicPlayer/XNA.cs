@@ -446,6 +446,15 @@ namespace MusicPlayer
                 return;
             }
 
+            for (int i = 0; i < Assets.Playlist.Count; i++)
+            {
+                if (Path.GetFileNameWithoutExtension(Assets.Playlist[i]) == download)
+                {
+                    MessageBox.Show("You already downloaded that song!");
+                    return;
+                }
+            }
+
             BackgroundOperationRunning = true;
             PauseConsoleInputThread = true;
             Values.ShowConsole();
@@ -542,7 +551,10 @@ namespace MusicPlayer
             }
 
             if (!File.Exists(output))
-                throw new Exception("Couldn't convert to mp3!");
+            {
+                MessageBox.Show("Couldn't convert to mp3!");
+                return;
+            }
 
             // edit mp3 metadata using taglib
             HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
