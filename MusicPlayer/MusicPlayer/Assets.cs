@@ -752,8 +752,6 @@ namespace MusicPlayer
                 T.Wait();
             }
             
-            SaveCurrentSongToHistoryFile(LastScoreChange);
-            LastScoreChange = 0;
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
             
@@ -789,6 +787,8 @@ namespace MusicPlayer
         public static void SaveUserSettings()
         {
             UpvoteCurrentSongIfNeccesary();
+            SaveCurrentSongToHistoryFile(LastScoreChange);
+            LastScoreChange = 0;
 
             // Sorting
             float Swapi;
@@ -888,7 +888,7 @@ namespace MusicPlayer
                     percentage = 1;
                 else
                     percentage = (Channel32.Position - Program.game.SongTimeSkipped) / (double)Channel32.Length;
-
+                
                 if (UpvotedSongScores[index] > 120)
                     UpvotedSongScores[index] = 120;
                 if (UpvotedSongScores[index] < -1)
@@ -1061,7 +1061,7 @@ namespace MusicPlayer
 
                     float age = SongAge(index);
                     if (age < 7)
-                        amount += (int)((7 - age) * ChanceIncreasePerUpvote * 60f / 7f);
+                        amount += (int)((30 - age) * ChanceIncreasePerUpvote * 60f / 30f);
 
                     if (UpvotedSongScores[index] < 50)
                     {
@@ -1084,17 +1084,19 @@ namespace MusicPlayer
         }
         private static void SaveCurrentSongToHistoryFile(float ScoreChange)
         {
+            try { string s = currentlyPlayingSongName; } catch { return; }
+
             string path = Values.CurrentExecutablePath + "\\History.txt";
             string write = currentlyPlayingSongName + ":" + DateTime.Now.ToBinary() + ":" + ScoreChange;
-
-            if (write == File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last())
-                return;
-
+            
             // This text is added only once to the file.
             if (!File.Exists(path))
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(path))
                     sw.WriteLine(write);
+
+            if (write == File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last())
+                return;
 
             // This text is always added, making the file longer over time
             // if it is not deleted.

@@ -63,15 +63,16 @@
             // 
             // PlayTime
             // 
-            this.PlayTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.PlayTime.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.PlayTime.FillWeight = 50F;
             this.PlayTime.HeaderText = "Play Time";
             this.PlayTime.Name = "PlayTime";
             this.PlayTime.ReadOnly = true;
-            this.PlayTime.Width = 307;
+            this.PlayTime.Width = 78;
             // 
             // ScoreChange
             // 
+            this.ScoreChange.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.ScoreChange.HeaderText = "Score Change";
             this.ScoreChange.Name = "ScoreChange";
             this.ScoreChange.ReadOnly = true;

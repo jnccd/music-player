@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>fRjNCBoGKSgayjTKktVzAf/KbuQ=</dsig:DigestValue>
+        <dsig:DigestValue>UXtYud7+K9Xcuswnlq8k8+akHvQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -180,22 +180,22 @@
       <dsig:DigestValue>IMoAqXBph+e+PyfWC3YkrXZWti0=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Content\GaussianBlurHorz.xnb" size="1332">
+  <file name="Content\GaussianBlurHorz.xnb" size="1334">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>8/wbENjIUMZcdCuSQbvI8G6VD38=</dsig:DigestValue>
+      <dsig:DigestValue>Ss1Q10QkkMGOZZDE4/xPVBwUhvQ=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Content\GaussianBlurVert.xnb" size="1356">
+  <file name="Content\GaussianBlurVert.xnb" size="1352">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>xg0I9D4cHrnqEjOBVA5dEA372Xo=</dsig:DigestValue>
+      <dsig:DigestValue>6/h2iEkgdCVTJ9X+TA7rQWUbrQQ=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Options.xnb" size="516">
@@ -243,13 +243,13 @@
       <dsig:DigestValue>ASw2Dq+GBS4B7VgFbpYr4L2tQ3w=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Content\TitleFadeout.xnb" size="828">
+  <file name="Content\TitleFadeout.xnb" size="824">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>BSWIvv/rsNYI8XqmCLi+77a8yjE=</dsig:DigestValue>
+      <dsig:DigestValue>QyK0M5mxIzFDj75PxDYjTIRza8w=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\trumpetboy.xnb" size="105172">
@@ -294,7 +294,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>+JEqlU9/j06/MHKUcbVu1gtpR5M=</dsig:DigestValue>
+      <dsig:DigestValue>MTsnnWB+pdhf9EhWU1Z4Z4cg2iU=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\volume.xnb" size="584">

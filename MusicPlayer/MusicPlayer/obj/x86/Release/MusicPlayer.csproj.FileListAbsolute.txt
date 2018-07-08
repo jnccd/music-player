@@ -1,33 +1,3 @@
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Font.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.pdb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.dll
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Game.dll
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.GamerServices.dll
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Graphics.dll
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Input.Touch.dll
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.xml
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Game.xml
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Graphics.xml
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.GamerServices.xml
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Input.Touch.xml
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.csprojResolveAssemblyReference.cache
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\obj\x86\Release\Microsoft.Xna.Framework.RuntimeProfile.txt
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.exe
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.pdb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Title.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\GaussianBlurHorz.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\GaussianBlurVert.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\volume.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\bg4.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\bg5.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\bg1.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\bg3.xnb
-C:\Users\One\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayer\bin\x86\Release\Content\bg2.xnb
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\NAudio.dll
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MediaToolkit.dll
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\taglib-sharp.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Font.xnb
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\Title.xnb
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Content\GaussianBlurHorz.xnb
@@ -50,14 +20,18 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe.config
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe.manifest
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.application
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.pdb
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe.CodeAnalysisLog.xml
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MusicPlayer.exe.lastcodeanalysissucceeded
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\MediaToolkit.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Game.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.GamerServices.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Graphics.dll
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\NAudio.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\policy.2.0.taglib-sharp.dll
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\taglib-sharp.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Input.Touch.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.xml
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Game.xml
@@ -65,8 +39,8 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.GamerServices.xml
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Input.Touch.xml
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\policy.2.0.taglib-sharp.config
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.csprojResolveAssemblyReference.cache
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.History.resources
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.OptionsMenu.resources
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.Statistics.resources
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.stringDialog.resources
@@ -78,4 +52,3 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.application
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.exe
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.pdb
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.History.resources
