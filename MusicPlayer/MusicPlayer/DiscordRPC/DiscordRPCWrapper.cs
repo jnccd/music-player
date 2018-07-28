@@ -71,8 +71,16 @@ namespace MusicPlayer
             presence.details = details;
             presence.state = state;
 
-            presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
-            presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+            if (startTimestamp.ToBinary() != 0 && endTimestamp.ToBinary() != 0)
+            {
+                presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
+                presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+            }
+            else
+            {
+                presence.startTimestamp = 0;
+                presence.endTimestamp = 0;
+            }
 
             presence.largeImageKey = "";
             presence.largeImageText = "";
@@ -86,8 +94,16 @@ namespace MusicPlayer
             presence.details = details;
             presence.state = state;
 
-            presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
-            presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+            if (startTimestamp.ToBinary() != 0 && endTimestamp.ToBinary() != 0)
+            {
+                presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
+                presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+            }
+            else
+            {
+                presence.startTimestamp = 0;
+                presence.endTimestamp = 0;
+            }
 
             presence.largeImageKey = largeImageKey;
             presence.largeImageText = largeImageText;

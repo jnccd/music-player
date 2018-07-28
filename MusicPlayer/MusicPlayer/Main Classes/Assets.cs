@@ -601,8 +601,16 @@ namespace MusicPlayer
         {
             if (output != null)
             {
-                if (output.PlaybackState == PlaybackState.Playing) output.Pause();
-                else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped) output.Play();
+                if (output.PlaybackState == PlaybackState.Playing)
+                {
+                    output.Pause();
+                    Program.game.UpdateDiscordRPC(false);
+                }
+                else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
+                {
+                    output.Play();
+                    Program.game.UpdateDiscordRPC(true);
+                }
             }
         }
         public static bool IsPlaying()
@@ -784,8 +792,7 @@ namespace MusicPlayer
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
 
-            DiscordRPCWrapper.UpdatePresence("Playing:", Path.GetFileNameWithoutExtension(PathString),
-                DateTime.Now, DateTime.Now.AddSeconds(Channel32.TotalTime.TotalSeconds), "shell32", "MusicPlayer", "", "");
+            Program.game.UpdateDiscordRPC(true);
         }
         public static void SaveUserSettings()
         {

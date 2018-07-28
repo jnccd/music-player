@@ -219,10 +219,29 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        if (!File.Exists(Assets.currentlyPlayingSongPath))
+                        string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        if (!File.Exists(path))
                             return;
                         else
-                            Process.Start("explorer.exe", "/select, \"" + Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString()) + "\"");
+                            Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
+                m.MenuItems.Add(new MenuItem("Rename", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+
+                        if (!File.Exists(Assets.currentlyPlayingSongPath))
+                            return;
+
+                        stringDialog Dia = new stringDialog("What name should it get?", dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        Dia.ShowDialog();
+                        if (Dia.result != "")
+                        {
+                            
+                        }
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
