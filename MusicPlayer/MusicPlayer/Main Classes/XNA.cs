@@ -532,8 +532,8 @@ namespace MusicPlayer
             P.Start();
 
             foreach (char c in Path.GetInvalidFileNameChars())
-                VideoTitle = VideoTitle.Replace(c, '-');
-            VideoTitle = VideoTitle.Replace('.', '-');
+                VideoTitle = VideoTitle.Replace(c, '_');
+            VideoTitle = VideoTitle.Replace('.', '_');
 
             P.WaitForExit();
 

@@ -1028,13 +1028,18 @@ namespace MusicPlayer
                 else
                 {
                     int index = UpvotedSongNames.IndexOf(Path.GetFileName(SongChoosingList[i]));
-                    if (SongInformationArray[index, 5] == null)
-                        SongInformationArray[index, 5] = singleTicketWorth;
-                    else
-                        SongInformationArray[index, 5] = (float)(SongInformationArray[index, 5]) + singleTicketWorth;
+                    string song = SongChoosingList[i];
+                    string path = Path.GetFileName(SongChoosingList[i]);
+                    if (index != -1)
+                    {
+                        if (SongInformationArray[index, 5] == null)
+                            SongInformationArray[index, 5] = singleTicketWorth;
+                        else
+                            SongInformationArray[index, 5] = (float)(SongInformationArray[index, 5]) + singleTicketWorth;
 
-                    lastIndex = index;
-                    lastSong = SongChoosingList[i];
+                        lastIndex = index;
+                        lastSong = SongChoosingList[i];
+                    }
                 }
             }
 
@@ -1048,9 +1053,9 @@ namespace MusicPlayer
             foreach (string s in Playlist)
                 if (s.Split('\\').Last() == SongName)
                     return s;
-            return "COULDNT FIND SONG NAME!";
+            return "";
         }
-        private static void UpdateSongChoosingList() // This determines the song chances
+        public static void UpdateSongChoosingList() // This determines the song chances
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
 

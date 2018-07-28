@@ -232,15 +232,33 @@ namespace MusicPlayer
                     try
                     {
                         string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        int UpvotedSongNamesIndex = Assets.UpvotedSongNames.IndexOf(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3");
+                        int PlaylistIndex = Assets.Playlist.IndexOf(path);
 
-                        if (!File.Exists(Assets.currentlyPlayingSongPath))
+                        if (!File.Exists(path))
                             return;
 
                         stringDialog Dia = new stringDialog("What name should it get?", dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
                         Dia.ShowDialog();
-                        if (Dia.result != "")
+                        if (Dia.result == dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString())
                         {
-                            
+                            MessageBox.Show("You didn't chagne the name...");
+                        }
+                        else if (Dia.result != "")
+                        {
+                            try
+                            {
+                                string dest = path.Split('\\').Reverse().Skip(1).Reverse().Aggregate((i, j) => i + "\\" + j) + "\\" + Dia.result + ".mp3";
+                                File.Move(path, dest);
+                                Assets.UpvotedSongNames[UpvotedSongNamesIndex] = Dia.result + ".mp3";
+                                config.Default.SongPaths = Assets.UpvotedSongNames.ToArray();
+                                config.Default.Save();
+
+                                Assets.Playlist[PlaylistIndex] = dest;
+
+                                Assets.UpdateSongChoosingList();
+                                bRefresh_Click(null, EventArgs.Empty);
+                            } catch (Exception ex) { MessageBox.Show(ex.ToString()); }
                         }
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
@@ -291,8 +309,7 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
-                {
+                //if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
                     m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
                     {
                         try
@@ -308,7 +325,6 @@ namespace MusicPlayer
                         }
                         catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                     })));
-                }
 
                 currentMouseOverRow = e.RowIndex;
 
