@@ -183,3 +183,76 @@ Stack Trace:    bei Microsoft.Xna.Framework.Helpers.CheckDisposed(Object obj, In
    bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
    bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
 =============End=============
+
+==========================Error Logging========================
+============Start=============20.07.2018 13:01:24
+Error Message: CouldntFindWallpaperFile
+Stack Trace:    bei MusicPlayer.Assets.Load(ContentManager Content, GraphicsDevice GD) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Assets.cs:Zeile 238.
+   bei MusicPlayer.XNA.LoadContent() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 212.
+   bei Microsoft.Xna.Framework.Game.Initialize()
+   bei MusicPlayer.XNA.Initialize() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 176.
+   bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
+=============End=============
+
+==========================Error Logging========================
+============Start=============20.07.2018 13:10:28
+Error Message: CouldntFindWallpaperFile
+Stack Trace:    bei MusicPlayer.Assets.Load(ContentManager Content, GraphicsDevice GD) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Assets.cs:Zeile 238.
+   bei MusicPlayer.XNA.LoadContent() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 212.
+   bei Microsoft.Xna.Framework.Game.Initialize()
+   bei MusicPlayer.XNA.Initialize() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 176.
+   bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
+=============End=============
+
+==========================Error Logging========================
+============Start=============20.07.2018 13:20:52
+Error Message: CouldntFindWallpaperFile
+Stack Trace:    bei MusicPlayer.Assets.Load(ContentManager Content, GraphicsDevice GD) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Assets.cs:Zeile 238.
+   bei MusicPlayer.XNA.LoadContent() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 212.
+   bei Microsoft.Xna.Framework.Game.Initialize()
+   bei MusicPlayer.XNA.Initialize() in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 176.
+   bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
+=============End=============
+
+==========================Error Logging========================
+============Start=============21.07.2018 15:07:20
+Error Message: Der Objektverweis wurde nicht auf eine Objektinstanz festgelegt.
+Stack Trace:    bei MusicPlayer.XNA.Draw(GameTime gameTime) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 1490.
+   bei Microsoft.Xna.Framework.Game.DrawFrame()
+   bei Microsoft.Xna.Framework.Game.Tick()
+   bei Microsoft.Xna.Framework.Game.HostIdle(Object sender, EventArgs e)
+   bei Microsoft.Xna.Framework.GameHost.OnIdle()
+   bei Microsoft.Xna.Framework.WindowsGameHost.RunOneFrame()
+   bei Microsoft.Xna.Framework.WindowsGameHost.ApplicationIdle(Object sender, EventArgs e)
+   bei System.Windows.Forms.Application.ThreadContext.System.Windows.Forms.UnsafeNativeMethods.IMsoComponent.FDoIdle(Int32 grfidlef)
+   bei System.Windows.Forms.Application.ComponentManager.System.Windows.Forms.UnsafeNativeMethods.IMsoComponentManager.FPushMessageLoop(IntPtr dwComponentID, Int32 reason, Int32 pvLoopData)
+   bei System.Windows.Forms.Application.ThreadContext.RunMessageLoopInner(Int32 reason, ApplicationContext context)
+   bei System.Windows.Forms.Application.ThreadContext.RunMessageLoop(Int32 reason, ApplicationContext context)
+   bei System.Windows.Forms.Application.Run(Form mainForm)
+   bei Microsoft.Xna.Framework.WindowsGameHost.Run()
+   bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
+=============End=============
+
+==========================Error Logging========================
+============Start=============23.07.2018 02:42:50
+Error Message: Der Objektverweis wurde nicht auf eine Objektinstanz festgelegt.
+Stack Trace:    bei MusicPlayer.XNA.Draw(GameTime gameTime) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\XNA.cs:Zeile 1490.
+   bei Microsoft.Xna.Framework.Game.DrawFrame()
+   bei Microsoft.Xna.Framework.Game.Tick()
+   bei Microsoft.Xna.Framework.Game.HostIdle(Object sender, EventArgs e)
+   bei Microsoft.Xna.Framework.GameHost.OnIdle()
+   bei Microsoft.Xna.Framework.WindowsGameHost.RunOneFrame()
+   bei Microsoft.Xna.Framework.WindowsGameHost.ApplicationIdle(Object sender, EventArgs e)
+   bei System.Windows.Forms.Application.ThreadContext.System.Windows.Forms.UnsafeNativeMethods.IMsoComponent.FDoIdle(Int32 grfidlef)
+   bei System.Windows.Forms.Application.ComponentManager.System.Windows.Forms.UnsafeNativeMethods.IMsoComponentManager.FPushMessageLoop(IntPtr dwComponentID, Int32 reason, Int32 pvLoopData)
+   bei System.Windows.Forms.Application.ThreadContext.RunMessageLoopInner(Int32 reason, ApplicationContext context)
+   bei System.Windows.Forms.Application.ThreadContext.RunMessageLoop(Int32 reason, ApplicationContext context)
+   bei System.Windows.Forms.Application.Run(Form mainForm)
+   bei Microsoft.Xna.Framework.WindowsGameHost.Run()
+   bei Microsoft.Xna.Framework.Game.RunGame(Boolean useBlockingRun)
+   bei MusicPlayer.Program.Main(String[] args) in C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\Program.cs:Zeile 135.
+=============End=============

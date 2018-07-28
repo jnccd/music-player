@@ -370,7 +370,7 @@ namespace MusicPlayer
                                 Console.WriteLine();
                                 originY = Console.CursorTop;
                             }
-                            else if (Path.StartsWith("/d") || Path.StartsWith("/D"))
+                            else if (Path.StartsWith("/d") || Path.StartsWith("/D") || Path.StartsWith("https://"))
                             {
                                 try
                                 {
@@ -379,8 +379,10 @@ namespace MusicPlayer
                                     string download;
                                     if (Path.StartsWith("/download"))
                                         download = Path.Remove(0, "/download".Length + 1);
-                                    else
+                                    else if (!Path.StartsWith("https://"))
                                         download = Path.Remove(0, "/d".Length + 1);
+                                    else
+                                        download = Path;
                                     Path = "";
 
                                     Download(download);
@@ -803,6 +805,7 @@ namespace MusicPlayer
                         {
                             Program.Closing = true;
                             gameWindowForm.Close();
+                            DiscordRPCWrapper.Shutdown();
                         }
                     }
                     break;

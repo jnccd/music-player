@@ -23,6 +23,7 @@ namespace MusicPlayer
         [STAThread]
         static void Main(string[] args)
         {
+            #region Check for other program instances
             Console.WriteLine("Checking for other MusicPlayer instances...");
             try
             {
@@ -38,19 +39,19 @@ namespace MusicPlayer
                         Console.WriteLine("Data sent! Closing...");
                         return;
                     }
-            } catch
-            {
+            } catch {
                 Console.WriteLine("Please just start one instance of me at a time!");
                 Thread.Sleep(1000);
                 return;
             }
+            #endregion
 
             // Smol settings
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Values.DisableConsoleRezise();
-
-            // Song Data List initialization
+            
+            #region Song Data List initialization
             if (config.Default.SongPaths != null && config.Default.SongScores != null)
             {
                 Assets.UpvotedSongNames = config.Default.SongPaths.ToList();
@@ -88,7 +89,8 @@ namespace MusicPlayer
             }
             else
                 Assets.UpvotedSongAddingDates = config.Default.SongDate.ToList();
-            
+            #endregion
+
             Console.Clear();
 
             // Actual start
@@ -98,9 +100,10 @@ namespace MusicPlayer
             Program.args = args;
 
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
+            DiscordRPCWrapper.Initialize("460490126607384576");
 
+            #region Filewatcher
             FileSystemWatcher weightwatchers = new FileSystemWatcher();
-
             try
             {
                 string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
@@ -124,6 +127,7 @@ namespace MusicPlayer
                 }
             }
             catch { Console.WriteLine("Couldn't set filewatcher! (UNKNOWN ERROR)"); }
+            #endregion
 
 #if DEBUG
             game = new XNA();

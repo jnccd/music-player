@@ -783,6 +783,9 @@ namespace MusicPlayer
             Channel32.Volume = 0;
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
+
+            DiscordRPCWrapper.UpdatePresence("Playing:", Path.GetFileNameWithoutExtension(PathString),
+                DateTime.Now, DateTime.Now.AddSeconds(Channel32.TotalTime.TotalSeconds), "shell32", "MusicPlayer", "", "");
         }
         public static void SaveUserSettings()
         {
@@ -1066,11 +1069,11 @@ namespace MusicPlayer
                     if (UpvotedSongScores[index] < 50)
                     {
                         int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongNames[index]);
-                        if (hisindex > 2 && hisindex < 8)
+                        if (hisindex != -1 && PlayerUpvoteHistoryList[hisindex].hasUpvoted && hisindex > 2 && hisindex < 8)
                             amount += (int)((100 - UpvotedSongScores[index]) * (100 - UpvotedSongScores[index]) * 4);
                     }
 
-                    if (UpvotedSongScores[index] % 1 == 0)
+                    if (UpvotedSongStreaks[index] == 0)
                         amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
 

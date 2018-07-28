@@ -29,7 +29,6 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Game.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.GamerServices.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Graphics.dll
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\NAudio.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\policy.2.0.taglib-sharp.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\taglib-sharp.dll
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\bin\x86\Release\Microsoft.Xna.Framework.Input.Touch.dll
@@ -52,3 +51,4 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.application
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.exe
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.pdb
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Release\MusicPlayer.csprojResolveAssemblyReference.cache
