@@ -778,6 +778,7 @@ namespace MusicPlayer
                 {
                     SongTimeSkipped = Assets.Channel32.Position - SkipStartPosition;
                     Assets.output.Play();
+                    UpdateDiscordRPC(true);
                 }
                 selectedControl = SelectedControl.None;
             }
@@ -1148,6 +1149,47 @@ namespace MusicPlayer
             }
             else
                 optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
+        }
+        public void UpdateDiscordRPC(bool WithTime)
+        {
+            string SongName = Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongPath);
+            string[] SongNameSplit = SongName.Split('-');
+
+            DateTime startTime, endTime;
+            if (WithTime)
+            {
+                startTime = DateTime.Now;
+                endTime = DateTime.Now.AddSeconds((1 - Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
+            }
+            else
+            {
+                startTime = DateTime.FromBinary(0);
+                endTime = DateTime.FromBinary(0);
+            }
+
+            string details, state;
+            if (SongName.Length < 20)
+            {
+                details = SongName;
+                state = "";
+            }
+            else if (SongNameSplit.Length == 2)
+            {
+                details = SongNameSplit[0].Trim(' ');
+                state = SongNameSplit[1].Trim(' ');
+            }
+            else if (SongNameSplit.Length > 2)
+            {
+                details = SongNameSplit[0].Trim(' ');
+                state = SongNameSplit.Skip(1).ToList().Aggregate((i, j) => i + "-" + j);
+            }
+            else
+            {
+                details = SongName;
+                state = "";
+            }
+
+            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "shell32", "MusicPlayer", "", "");
         }
 
         protected override void Draw(GameTime gameTime)

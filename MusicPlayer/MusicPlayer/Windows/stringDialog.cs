@@ -11,7 +11,7 @@ namespace MusicPlayer
 {
     public partial class stringDialog : Form
     {
-        public string result;
+        public string result = "";
 
         public stringDialog(string Question, string preText)
         {
