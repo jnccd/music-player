@@ -12,6 +12,7 @@
 
 # Build
 [Dd]ebug/
+[Rr]elease/
 Downloads/
 
 # Visual Studio 2015 cache/options directory
