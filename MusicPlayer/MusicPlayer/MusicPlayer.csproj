@@ -125,70 +125,72 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets.cs" />
-    <Compile Include="Control.cs" />
-    <Compile Include="DropShadow.cs">
+    <Compile Include="Main Classes\Assets.cs" />
+    <Compile Include="Main Classes\Control.cs" />
+    <Compile Include="DiscordRPC\DiscordRpc.cs" />
+    <Compile Include="DiscordRPC\DiscordRPCWrapper.cs" />
+    <Compile Include="HelperClasses\DropShadow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DynamicGrid.cs" />
-    <Compile Include="FPSCounter.cs" />
-    <Compile Include="GaussianDiagram.cs" />
-    <Compile Include="GigaList.cs" />
-    <Compile Include="GridPoint.cs" />
-    <Compile Include="GridSpring.cs" />
-    <Compile Include="History.cs">
+    <Compile Include="DynamicGrid\DynamicGrid.cs" />
+    <Compile Include="HelperClasses\FPSCounter.cs" />
+    <Compile Include="HelperClasses\GaussianDiagram.cs" />
+    <Compile Include="HelperClasses\GigaList.cs" />
+    <Compile Include="DynamicGrid\GridPoint.cs" />
+    <Compile Include="DynamicGrid\GridSpring.cs" />
+    <Compile Include="Windows\History.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="History.Designer.cs">
+    <Compile Include="Windows\History.Designer.cs">
       <DependentUpon>History.cs</DependentUpon>
     </Compile>
-    <Compile Include="InterceptKeys.cs" />
+    <Compile Include="HelperClasses\InterceptKeys.cs" />
     <Compile Include="config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>config.settings</DependentUpon>
     </Compile>
-    <Compile Include="OptionsMenu.cs">
+    <Compile Include="Windows\OptionsMenu.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsMenu.Designer.cs">
+    <Compile Include="Windows\OptionsMenu.Designer.cs">
       <DependentUpon>OptionsMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Main Classes\Program.cs" />
     <Compile Include="RequestedSong.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>RequestedSong.settings</DependentUpon>
     </Compile>
-    <Compile Include="Statistics.cs">
+    <Compile Include="Windows\Statistics.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Statistics.Designer.cs">
+    <Compile Include="Windows\Statistics.Designer.cs">
       <DependentUpon>Statistics.cs</DependentUpon>
     </Compile>
-    <Compile Include="stringDialog.cs">
+    <Compile Include="Windows\stringDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="stringDialog.Designer.cs">
+    <Compile Include="Windows\stringDialog.Designer.cs">
       <DependentUpon>stringDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Taskbar.cs" />
-    <Compile Include="UpdateExports.cs">
+    <Compile Include="HelperClasses\Taskbar.cs" />
+    <Compile Include="Windows\UpdateExports.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UpdateExports.Designer.cs">
+    <Compile Include="Windows\UpdateExports.Designer.cs">
       <DependentUpon>UpdateExports.cs</DependentUpon>
     </Compile>
-    <Compile Include="UpdateMetadata.cs">
+    <Compile Include="Windows\UpdateMetadata.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UpdateMetadata.Designer.cs">
+    <Compile Include="Windows\UpdateMetadata.Designer.cs">
       <DependentUpon>UpdateMetadata.cs</DependentUpon>
     </Compile>
-    <Compile Include="XNA.cs" />
-    <Compile Include="Timer.cs" />
-    <Compile Include="Values.cs" />
+    <Compile Include="Main Classes\XNA.cs" />
+    <Compile Include="HelperClasses\Timer.cs" />
+    <Compile Include="Main Classes\Values.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
@@ -238,22 +240,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="History.resx">
+    <EmbeddedResource Include="Windows\History.resx">
       <DependentUpon>History.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsMenu.resx">
+    <EmbeddedResource Include="Windows\OptionsMenu.resx">
       <DependentUpon>OptionsMenu.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Statistics.resx">
+    <EmbeddedResource Include="Windows\Statistics.resx">
       <DependentUpon>Statistics.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="stringDialog.resx">
+    <EmbeddedResource Include="Windows\stringDialog.resx">
       <DependentUpon>stringDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UpdateExports.resx">
+    <EmbeddedResource Include="Windows\UpdateExports.resx">
       <DependentUpon>UpdateExports.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UpdateMetadata.resx">
+    <EmbeddedResource Include="Windows\UpdateMetadata.resx">
       <DependentUpon>UpdateMetadata.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
