@@ -750,12 +750,12 @@ namespace MusicPlayer
         {
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
-            if (T != null && T.Status == TaskStatus.Running && AbortAbort == false)
+            if (T != null && T.Status == TaskStatus.Running)
             {
-                AbortAbort = true;
+                if (AbortAbort == false)
+                    AbortAbort = true;
                 T.Wait();
             }
-            T.Wait();
 
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
