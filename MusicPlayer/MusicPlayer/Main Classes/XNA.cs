@@ -1156,6 +1156,7 @@ namespace MusicPlayer
             string[] SongNameSplit = SongName.Split('-');
 
             DateTime startTime, endTime;
+            string smolimagekey = "", smolimagetext = "";
             if (WithTime)
             {
                 startTime = DateTime.Now;
@@ -1165,6 +1166,9 @@ namespace MusicPlayer
             {
                 startTime = DateTime.FromBinary(0);
                 endTime = DateTime.FromBinary(0);
+
+                smolimagekey = "pausev3";
+                smolimagetext = "Paused";
             }
 
             string details, state;
@@ -1189,7 +1193,7 @@ namespace MusicPlayer
                 state = "";
             }
 
-            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "shell32", "MusicPlayer", "", "");
+            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "iconv2", "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext);
         }
 
         protected override void Draw(GameTime gameTime)
