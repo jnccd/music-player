@@ -238,6 +238,12 @@ namespace MusicPlayer
                         if (!File.Exists(path))
                             return;
 
+                        if (dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString().Equals(Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName)))
+                        {
+                            MessageBox.Show("Sorry Dave but im afraight I cant do that\n(You cant play a file and rename it at the same time!)");
+                            return;
+                        }
+
                         stringDialog Dia = new stringDialog("What name should it get?", dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
                         Dia.ShowDialog();
                         if (Dia.result == dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString())

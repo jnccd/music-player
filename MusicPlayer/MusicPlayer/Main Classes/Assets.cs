@@ -540,10 +540,6 @@ namespace MusicPlayer
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                 Debug.WriteLine("Exception: " + e);
-                //DisposeNAudioData();
-                //PlayerHistory.RemoveAt(PlayerHistory.Count - 1);
-                //PlayerHistoryIndex = PlayerHistory.Count - 1;
-                //GetNextSong(true);
             }
         }
         public static void UpdateWaveBufferWithEntireSongWB()
@@ -754,12 +750,13 @@ namespace MusicPlayer
         {
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
-            if (T != null && T.Status == TaskStatus.Running)
+            if (T != null && T.Status == TaskStatus.Running && AbortAbort == false)
             {
                 AbortAbort = true;
                 T.Wait();
             }
-            
+            T.Wait();
+
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
             
