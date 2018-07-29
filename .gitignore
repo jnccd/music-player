@@ -13,6 +13,9 @@
 # Build
 [Dd]ebug/
 [Rr]elease/
+bin/
+obj/
+x86/
 Downloads/
 
 # Visual Studio 2015 cache/options directory
@@ -37,6 +40,8 @@ dlldata.c
 project.lock.json
 artifacts/
 
+History.txt
+Log.txt
 *_i.c
 *_p.c
 *_i.h
@@ -61,6 +66,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.lnk
 
 # Chutzpah Test files
 _Chutzpah*
