@@ -1180,8 +1180,8 @@ namespace MusicPlayer
             }
             else if (SongNameSplit.Length > 2)
             {
-                details = SongNameSplit[0].Trim(' ');
-                state = SongNameSplit.Skip(1).ToList().Aggregate((i, j) => i + "-" + j);
+                details = SongNameSplit.Reverse().Skip(1).Reverse().Aggregate((i, j) => i + "-" + j);
+                state = SongNameSplit.Last();
             }
             else
             {
