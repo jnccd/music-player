@@ -294,7 +294,7 @@ namespace MusicPlayer
             //    parent.history.Show();
             //}
             try { parent.history.Close(); } catch { }
-            parent.history = new History();
+            parent.history = new History(parent);
             parent.history.Show();
         }
     }

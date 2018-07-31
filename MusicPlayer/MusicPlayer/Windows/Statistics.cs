@@ -52,7 +52,7 @@ namespace MusicPlayer
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (e.RowIndex > 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
+                if (e.RowIndex >= 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
                     MessageBox.Show("This entry isnt linked to a mp3 file!");
             }
         }
@@ -155,6 +155,30 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
+                m.MenuItems.Add(new MenuItem("Copy URL to Clipboard", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        // Get fitting youtube video
+                        string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                        HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                        req.KeepAlive = false;
+                        WebResponse W = req.GetResponse();
+                        string ResultURL;
+                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                        {
+                            string html = sr.ReadToEnd();
+                            int index = html.IndexOf("href=\"/watch?");
+                            string startcuthtml = html.Remove(0, index + 6);
+                            index = startcuthtml.IndexOf('"');
+                            string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                            ResultURL = "https://www.youtube.com" + cuthtml;
+                        }
+
+                        Clipboard.SetText(ResultURL);
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
                 m.MenuItems.Add(new MenuItem("Open in Browser", ((object s, EventArgs ev) =>
                 {
                     try
@@ -249,7 +273,7 @@ namespace MusicPlayer
                         Dia.ShowDialog();
                         if (Dia.result == dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString())
                         {
-                            MessageBox.Show("You didn't chagne the name...");
+                            MessageBox.Show("You didn't change the name...");
                         }
                         else if (Dia.result != "")
                         {
@@ -259,18 +283,21 @@ namespace MusicPlayer
                                 File.Move(path, dest);
 
                                 string historyPath = Values.CurrentExecutablePath + "\\History.txt";
-                                string[] historyContent = File.ReadAllLines(historyPath);
-                                for (int i = 0; i < historyContent.Length; i++)
+                                if (File.Exists(historyPath))
                                 {
-                                    string[] split = historyContent[i].Split(':');
-                                    if (split[0] == Assets.UpvotedSongNames[UpvotedSongNamesIndex])
+                                    string[] historyContent = File.ReadAllLines(historyPath);
+                                    for (int i = 0; i < historyContent.Length; i++)
                                     {
-                                        split[0] = Dia.result + ".mp3";
-                                        historyContent[i] = split.Aggregate((y, j) => y + ":" + j);
+                                        string[] split = historyContent[i].Split(':');
+                                        if (split[0] == Assets.UpvotedSongNames[UpvotedSongNamesIndex])
+                                        {
+                                            split[0] = Dia.result + ".mp3";
+                                            historyContent[i] = split.Aggregate((y, j) => y + ":" + j);
+                                        }
                                     }
+                                    File.Delete(historyPath);
+                                    File.WriteAllLines(historyPath, historyContent);
                                 }
-                                File.Delete(historyPath);
-                                File.WriteAllLines(historyPath, historyContent);
 
                                 Assets.UpvotedSongNames[UpvotedSongNamesIndex] = Dia.result + ".mp3";
                                 config.Default.SongPaths = Assets.UpvotedSongNames.ToArray();
@@ -331,7 +358,7 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                //if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
+                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
                     m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
                     {
                         try
@@ -374,6 +401,19 @@ namespace MusicPlayer
             int index = 0;
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 if (Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName).Equals(dataGridView1.Rows[i].Cells[0].Value))
+                {
+                    index = i;
+                    break;
+                }
+
+            dataGridView1.FirstDisplayedScrollingRowIndex = index;
+        }
+
+        public void toSong(string Song)
+        {
+            int index = 0;
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                if ((string)dataGridView1.Rows[i].Cells[0].Value == Song)
                 {
                     index = i;
                     break;

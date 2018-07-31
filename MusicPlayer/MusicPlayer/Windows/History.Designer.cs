@@ -32,6 +32,7 @@
             this.Song = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PlayTime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ScoreChange = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bRefresh = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,11 +48,12 @@
             this.Song,
             this.PlayTime,
             this.ScoreChange});
-            this.dataGridView1.Location = new System.Drawing.Point(12, 12);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 41);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(755, 462);
+            this.dataGridView1.Size = new System.Drawing.Size(755, 433);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
             // 
             // Song
@@ -77,11 +79,22 @@
             this.ScoreChange.Name = "ScoreChange";
             this.ScoreChange.ReadOnly = true;
             // 
+            // bRefresh
+            // 
+            this.bRefresh.Location = new System.Drawing.Point(12, 12);
+            this.bRefresh.Name = "bRefresh";
+            this.bRefresh.Size = new System.Drawing.Size(755, 23);
+            this.bRefresh.TabIndex = 1;
+            this.bRefresh.Text = "Refresh";
+            this.bRefresh.UseVisualStyleBackColor = true;
+            this.bRefresh.Click += new System.EventHandler(this.bRefresh_Click);
+            // 
             // History
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(780, 487);
+            this.Controls.Add(this.bRefresh);
             this.Controls.Add(this.dataGridView1);
             this.Name = "History";
             this.Text = "History";
@@ -97,5 +110,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Song;
         private System.Windows.Forms.DataGridViewTextBoxColumn PlayTime;
         private System.Windows.Forms.DataGridViewTextBoxColumn ScoreChange;
+        private System.Windows.Forms.Button bRefresh;
     }
 }
