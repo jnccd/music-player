@@ -370,7 +370,7 @@ namespace MusicPlayer
                                 Console.WriteLine();
                                 originY = Console.CursorTop;
                             }
-                            else if (Path.StartsWith("/d") || Path.StartsWith("/D") || Path.StartsWith("https://"))
+                            else if (Path.StartsWith("/d") || Path.StartsWith("/D") || Path.StartsWith("https://www.youtube.com/watch?v="))
                             {
                                 try
                                 {
@@ -379,7 +379,7 @@ namespace MusicPlayer
                                     string download;
                                     if (Path.StartsWith("/download"))
                                         download = Path.Remove(0, "/download".Length + 1);
-                                    else if (!Path.StartsWith("https://"))
+                                    else if (!Path.StartsWith("https://www.youtube.com/watch?v="))
                                         download = Path.Remove(0, "/d".Length + 1);
                                     else
                                         download = Path;
@@ -448,18 +448,12 @@ namespace MusicPlayer
                 return;
             }
 
-            for (int i = 0; i < Assets.Playlist.Count; i++)
-            {
-                if (Path.GetFileNameWithoutExtension(Assets.Playlist[i]) == download)
-                {
-                    MessageBox.Show("You already downloaded that song!");
-                    return;
-                }
-            }
-
             BackgroundOperationRunning = true;
             PauseConsoleInputThread = true;
             Values.ShowConsole();
+
+            if (download.StartsWith("https://www.youtube.com/watch?v="))
+                download = download.Remove(0, "https://www.youtube.com/watch?v=".Length);
 
             // Get fitting youtube video
             string url = string.Format("https://www.youtube.com/results?search_query=" + download);
@@ -485,7 +479,7 @@ namespace MusicPlayer
             string VideoThumbnailURL;
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
             {
-                // Extract info from HTMP string
+                // Extract info from HTML string
                 string html = sr.ReadToEnd();
                 int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
                 string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
@@ -537,73 +531,90 @@ namespace MusicPlayer
 
             P.WaitForExit();
 
-            // Convert Video File to mp3 and put it into the default folder
-            Console.WriteLine("Converting to mp3...");
-
-            string input = videofile;
-            string output = config.Default.MusicPath + "\\" + VideoTitle + ".mp3";
-
-            MediaFile inM = new MediaFile { Filename = input };
-            MediaFile outM = new MediaFile { Filename = output };
-
-            using (var engine = new Engine())
+            if (File.Exists(videofile))
             {
-                engine.GetMetadata(inM);
-                engine.Convert(inM, outM);
+                // Convert Video File to mp3 and put it into the default folder
+                Console.WriteLine("Converting to mp3...");
+
+                string input = videofile;
+                string output = config.Default.MusicPath + "\\" + VideoTitle + ".mp3";
+
+                if (File.Exists(output))
+                {
+                    if (MessageBox.Show("File already exists! Override?", "Override?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        if (output == Assets.currentlyPlayingSongPath)
+                        {
+                            MessageBox.Show("I can't override it while you are playing it!");
+                            return;
+                        }
+
+                        File.Delete(output);
+                    }
+                }
+
+                MediaFile inM = new MediaFile { Filename = input };
+                MediaFile outM = new MediaFile { Filename = output };
+
+                using (var engine = new Engine())
+                {
+                    engine.GetMetadata(inM);
+                    engine.Convert(inM, outM);
+                }
+
+                if (!File.Exists(output))
+                {
+                    MessageBox.Show("Couldn't convert to mp3!");
+                    return;
+                }
+
+                // edit mp3 metadata using taglib
+                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
+                HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                Stream stream = httpWebReponse.GetResponseStream();
+                System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
+                TagLib.File file = TagLib.File.Create(output);
+                TagLib.Picture pic = new TagLib.Picture();
+                pic.Type = TagLib.PictureType.FrontCover;
+                pic.Description = "Cover";
+                pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+                MemoryStream ms = new MemoryStream();
+                im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                ms.Position = 0;
+                pic.Data = TagLib.ByteVector.FromStream(ms);
+                file.Tag.Pictures = new TagLib.IPicture[] { pic };
+                //stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle.Split('-').First().Trim());
+                //Question.ShowDialog();
+                //lastQuestionResult = Question.result;
+                file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
+                file.Tag.Comment = "Downloaded using MusicPlayer";
+                file.Tag.Album = "MusicPlayer Songs";
+                file.Tag.AlbumArtists = new string[] { VideoTitle.Split('-').First().Trim() };
+                file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
+                file.Tag.AmazonId = "AmazonIsShit";
+                file.Tag.Composers = new string[] { VideoTitle.Split('-').First().Trim() };
+                file.Tag.Copyright = "None";
+                file.Tag.Disc = 0;
+                file.Tag.DiscCount = 0;
+                file.Tag.Genres = new string[] { "good music" };
+                file.Tag.Grouping = "None";
+                file.Tag.Lyrics = "You expected lyrics, but it was me dio";
+                file.Tag.MusicIpId = "wubbel";
+                file.Tag.Title = VideoTitle;
+                file.Tag.Track = 0;
+                file.Tag.TrackCount = 0;
+                file.Tag.Year = 1982;
+
+                file.Save();
+                ms.Close();
+
+                // finishing touches
+                File.Delete(videofile);
+                Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
+                Assets.PlayNewSong(outM.Filename);
+                Assets.SaveUserSettings();
+                originY = Console.CursorTop;
             }
-
-            if (!File.Exists(output))
-            {
-                MessageBox.Show("Couldn't convert to mp3!");
-                return;
-            }
-
-            // edit mp3 metadata using taglib
-            HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
-            HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            Stream stream = httpWebReponse.GetResponseStream();
-            System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
-            TagLib.File file = TagLib.File.Create(output);
-            TagLib.Picture pic = new TagLib.Picture();
-            pic.Type = TagLib.PictureType.FrontCover;
-            pic.Description = "Cover";
-            pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
-            MemoryStream ms = new MemoryStream();
-            im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-            ms.Position = 0;
-            pic.Data = TagLib.ByteVector.FromStream(ms);
-            file.Tag.Pictures = new TagLib.IPicture[] { pic };
-            //stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle.Split('-').First().Trim());
-            //Question.ShowDialog();
-            //lastQuestionResult = Question.result;
-            file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
-            file.Tag.Comment = "Downloaded using MusicPlayer";
-            file.Tag.Album = "MusicPlayer Songs";
-            file.Tag.AlbumArtists = new string[] { VideoTitle.Split('-').First().Trim() };
-            file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
-            file.Tag.AmazonId = "AmazonIsShit";
-            file.Tag.Composers = new string[] { VideoTitle.Split('-').First().Trim() };
-            file.Tag.Copyright = "None";
-            file.Tag.Disc = 0;
-            file.Tag.DiscCount = 0;
-            file.Tag.Genres = new string[] { "good music" };
-            file.Tag.Grouping = "None";
-            file.Tag.Lyrics = "You expected lyrics, but it was me dio";
-            file.Tag.MusicIpId = "wubbel";
-            file.Tag.Title = VideoTitle;
-            file.Tag.Track = 0;
-            file.Tag.TrackCount = 0;
-            file.Tag.Year = 1982;
-
-            file.Save();
-            ms.Close();
-
-            // finishing touches
-            File.Delete(videofile);
-            Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
-            Assets.PlayNewSong(outM.Filename);
-            Assets.SaveUserSettings();
-            originY = Console.CursorTop;
 
             BackgroundOperationRunning = false;
             PauseConsoleInputThread = false;

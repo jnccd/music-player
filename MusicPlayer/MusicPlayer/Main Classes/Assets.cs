@@ -783,7 +783,7 @@ namespace MusicPlayer
                 else
                     UpdateEntireSongBuffers();
             }
-
+            
             output.Play();
             Channel32.Volume = 0;
             SongStartTime = Values.Timer;
