@@ -81,6 +81,7 @@ namespace MusicPlayer
             dataGridView1.Columns[3].Width = 80;
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
+            dataGridView1.Columns[6].Width = 0;
             if (RowIndex != -1)
                 dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
 
@@ -256,6 +257,21 @@ namespace MusicPlayer
                             {
                                 string dest = path.Split('\\').Reverse().Skip(1).Reverse().Aggregate((i, j) => i + "\\" + j) + "\\" + Dia.result + ".mp3";
                                 File.Move(path, dest);
+
+                                string historyPath = Values.CurrentExecutablePath + "\\History.txt";
+                                string[] historyContent = File.ReadAllLines(historyPath);
+                                for (int i = 0; i < historyContent.Length; i++)
+                                {
+                                    string[] split = historyContent[i].Split(':');
+                                    if (split[0] == Assets.UpvotedSongNames[UpvotedSongNamesIndex])
+                                    {
+                                        split[0] = Dia.result + ".mp3";
+                                        historyContent[i] = split.Aggregate((y, j) => y + ":" + j);
+                                    }
+                                }
+                                File.Delete(historyPath);
+                                File.WriteAllLines(historyPath, historyContent);
+
                                 Assets.UpvotedSongNames[UpvotedSongNamesIndex] = Dia.result + ".mp3";
                                 config.Default.SongPaths = Assets.UpvotedSongNames.ToArray();
                                 config.Default.Save();
