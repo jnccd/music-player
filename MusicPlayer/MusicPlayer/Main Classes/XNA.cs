@@ -325,6 +325,15 @@ namespace MusicPlayer
                                 Path = "";
                                 originY = Console.CursorTop + 1;
                             }
+                            else if (Path.StartsWith("/songbufferstate"))
+                            {
+                                Console.WriteLine("\nWas aborted: " + Assets.SongBufferThreadWasAborted);
+                                Console.WriteLine("\nLast exception: " + Assets.LastSongBufferThreadException.ToString());
+                                Console.WriteLine("\nLast exception stack trace: " + Assets.LastSongBufferThreadException.StackTrace + "\n");
+
+                                Path = "";
+                                originY = Console.CursorTop + 1;
+                            }
                             else if (Path == "/showinweb" || Path == "/showinnet" || Path == "/net" || Path == "/web")
                             {
                                 LastConsoleInput.Add(Path);
@@ -789,7 +798,7 @@ namespace MusicPlayer
                 {
                     SongTimeSkipped = Assets.Channel32.Position - SkipStartPosition;
                     Assets.output.Play();
-                    UpdateDiscordRPC(true);
+                    UpdateDiscordRPC(true, true);
                 }
                 selectedControl = SelectedControl.None;
             }
@@ -1161,7 +1170,7 @@ namespace MusicPlayer
             else
                 optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
         }
-        public void UpdateDiscordRPC(bool WithTime)
+        public void UpdateDiscordRPC(bool WithTime, bool ElapsedTime)
         {
             string SongName = Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongPath);
             string[] SongNameSplit = SongName.Split('-');
@@ -1170,7 +1179,7 @@ namespace MusicPlayer
             string smolimagekey = "", smolimagetext = "";
             if (WithTime)
             {
-                startTime = DateTime.Now;
+                startTime = DateTime.Now.AddSeconds(-(Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
                 endTime = DateTime.Now.AddSeconds((1 - Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
             }
             else
@@ -1204,7 +1213,7 @@ namespace MusicPlayer
                 state = "";
             }
 
-            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "iconv2", "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext);
+            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "iconv2", "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
 
         protected override void Draw(GameTime gameTime)
