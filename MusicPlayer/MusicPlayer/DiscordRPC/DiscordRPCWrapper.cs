@@ -89,15 +89,23 @@ namespace MusicPlayer
 
             DiscordRpc.UpdatePresence(ref presence);
         }
-        public static void UpdatePresence(string details, string state, DateTime startTimestamp, DateTime endTimestamp, string largeImageKey, string largeImageText, string smallImageKey, string smallImageText)
+        public static void UpdatePresence(string details, string state, DateTime startTimestamp, DateTime endTimestamp, string largeImageKey, string largeImageText, string smallImageKey, string smallImageText, bool ElapsedTime)
         {
             presence.details = details;
             presence.state = state;
 
             if (startTimestamp.ToBinary() != 0 && endTimestamp.ToBinary() != 0)
             {
-                presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
-                presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+                if (ElapsedTime)
+                {
+                    presence.startTimestamp = DateTimeToTimestamp(startTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+                    presence.endTimestamp = 0;
+                }
+                else
+                {
+                    presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
+                    presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+                }
             }
             else
             {

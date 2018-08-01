@@ -167,6 +167,8 @@ namespace MusicPlayer
         public static float[] RawFFToutput;
         public static Complex[] tempbuffer = null;
         static int TempBufferLengthLog2;
+        public static bool SongBufferThreadWasAborted = false;
+        public static Exception LastSongBufferThreadException = new Exception();
 
         // Debug
         public static long CurrentDebugTime = 0;
@@ -529,6 +531,8 @@ namespace MusicPlayer
                         }
                     }
 
+                    SongBufferThreadWasAborted = AbortAbort;
+
                     Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                     Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                     AbortAbort = false;
@@ -536,6 +540,8 @@ namespace MusicPlayer
             }
             catch (Exception e)
             {
+                LastSongBufferThreadException = e;
+
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
@@ -600,12 +606,12 @@ namespace MusicPlayer
                 if (output.PlaybackState == PlaybackState.Playing)
                 {
                     output.Pause();
-                    Program.game.UpdateDiscordRPC(false);
+                    Program.game.UpdateDiscordRPC(false, true);
                 }
                 else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
                 {
                     output.Play();
-                    Program.game.UpdateDiscordRPC(true);
+                    Program.game.UpdateDiscordRPC(true, true);
                 }
             }
         }
@@ -789,7 +795,7 @@ namespace MusicPlayer
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
 
-            Program.game.UpdateDiscordRPC(true);
+            Program.game.UpdateDiscordRPC(true, true);
         }
         public static void SaveUserSettings()
         {
