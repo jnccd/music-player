@@ -196,7 +196,7 @@ namespace MusicPlayer
                 return Scores.Min();
             else
                 return 1000;
-        }
+        } //useless
         public static float OwnDistanceWrapper(string Input, string SongName)
         {
             if (Input == null || Input == "" || SongName == "" || SongName == null)
@@ -210,37 +210,28 @@ namespace MusicPlayer
 
             List<float> Distances = new List<float>();
 
-            if (false)
-            {
-                // old
-                for (int i = 0; i < SongName.Length - Input.Length; i++)
-                {
-                    string Work = SongName;
-                    Work = Work.Remove(0, i);
-                    Work = Work.Remove(Input.Length, Work.Length - Input.Length);
+            string[] InSplit = Input.Split(' ');
 
-                    Distances.Add(LevenshteinDistance(Work, Input));
-                }
+            if (InSplit.Length == 1)
+            {
+                string[] split = SongName.Split(' ');
+                for (int i = 0; i < split.Length; i++)
+                    if (split[i] != "-")
+                        Distances.Add(LevenshteinDistance(split[i], Input));
             }
             else
             {
-                string[] InSplit = Input.Split(' ');
-
-                if (InSplit.Length == 1)
+                float count = 0;
+                for (int i = 0; i < InSplit.Length; i++)
                 {
+                    List<float> Distances2 = new List<float>();
                     string[] split = SongName.Split(' ');
-                    for (int i = 0; i < split.Length; i++)
-                        Distances.Add(LevenshteinDistance(split[i], Input));
+                    for (int j = 0; j < split.Length; j++)
+                        if (split[j] != "-")
+                            Distances2.Add(LevenshteinDistance(split[j], InSplit[i]));
+                    count += Distances2.Min();
                 }
-                else
-                {
-                    float count = 0;
-                    for (int i = 0; i < InSplit.Length; i++)
-                    {
-                        count += OwnDistanceWrapper(InSplit[i], SongName);
-                    }
-                    Distances.Add(count);
-                }
+                Distances.Add(count);
             }
 
             return Distances.Min();

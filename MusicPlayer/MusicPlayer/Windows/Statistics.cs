@@ -18,6 +18,7 @@ namespace MusicPlayer
         XNA parent;
         int currentMouseOverRow;
         public bool IsClosed = false;
+        string LastSearched = "";
 
         public Statistics(XNA parent)
         {
@@ -82,8 +83,6 @@ namespace MusicPlayer
             dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].Width = 80;
             dataGridView1.Columns[6].Width = 0;
-            if (RowIndex != -1)
-                dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
 
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 if (Assets.currentlyPlayingSongName.Equals(dataGridView1.Rows[i].Cells[0].Value))
@@ -97,12 +96,25 @@ namespace MusicPlayer
                 }
 
             if (dataGridView1.SortOrder != SortOrder.None)
-                dataGridView1.Sort(dataGridView1.SortedColumn, dataGridView1.SortOrder == SortOrder.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
+            {
+                if (dataGridView1.SortedColumn.Index == 6)
+                {
+                    textBox1.Text = LastSearched;
+                    bSearch_Click(null, EventArgs.Empty);
+                }
+                else
+                    dataGridView1.Sort(dataGridView1.SortedColumn, dataGridView1.SortOrder == SortOrder.Ascending ? ListSortDirection.Ascending : ListSortDirection.Descending);
+            }
+            if (RowIndex != -1)
+                dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
         }
 
         private void bSearch_Click(object sender, EventArgs e)
         {
+            dataGridView1.Sort(dataGridView1.Columns[0], ListSortDirection.Ascending); //randomly sorted lists will have random search orders for hits with the same score
+
             string Path = textBox1.Text;
+            LastSearched = Path;
             textBox1.Text = "";
 
             DistancePerSong[] LDistances = new DistancePerSong[dataGridView1.Rows.Count];
