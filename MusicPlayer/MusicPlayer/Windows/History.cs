@@ -55,8 +55,12 @@ namespace MusicPlayer
                     }
 
                     dataGridView1.Rows.Add(new object[] { Title, Time, ScoreChange });
+                    if (!Assets.UpvotedSongNames.Contains(Split[0]))
+                        dataGridView1.Rows[dataGridView1.Rows.Count - 1].DefaultCellStyle.BackColor = Color.Red;
                 }
             }
+            if (RowIndex > 0)
+                dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
         }
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)

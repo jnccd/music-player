@@ -1181,6 +1181,9 @@ namespace MusicPlayer
             {
                 startTime = DateTime.Now.AddSeconds(-(Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
                 endTime = DateTime.Now.AddSeconds((1 - Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
+
+                smolimagekey = "playv2";
+                smolimagetext = "Playing";
             }
             else
             {
@@ -1211,6 +1214,15 @@ namespace MusicPlayer
             {
                 details = SongName;
                 state = "";
+            }
+            if (SongName.Length <= 15)
+            {
+                details += " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
+            }
+            else
+            {
+                state += " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
+                state.TrimStart(' ');
             }
 
             DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "iconv2", "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
