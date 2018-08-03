@@ -74,6 +74,8 @@ namespace MusicPlayer
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
                 dataGridView1.Rows.Add(o);
+                if (o[o.Length - 1] == null)
+                    dataGridView1.Rows[dataGridView1.RowCount - 1].DefaultCellStyle.BackColor = Color.Red;
             }
 
             dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
@@ -92,7 +94,6 @@ namespace MusicPlayer
                     int index = i - heightInRows / 2 + 2;
                     if (index < 0)
                         index = 0;
-                    //dataGridView1.FirstDisplayedScrollingRowIndex = index;
                 }
 
             if (dataGridView1.SortOrder != SortOrder.None)
@@ -141,6 +142,16 @@ namespace MusicPlayer
         {
             if (e != null && e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    {
+                        if (dataGridView1.SelectedRows.Contains(dataGridView1.Rows[x]))
+                            continue;
+                        dataGridView1.Rows[x].Cells[y].Selected = false;
+                    }
+
+                dataGridView1.Rows[e.RowIndex].Cells[0].Selected = true;
+
                 ContextMenu m = new ContextMenu();
                 m.MenuItems.Add(new MenuItem("Play", ((object s, EventArgs ev) =>
                 {
@@ -324,7 +335,7 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Selection", ((object s, EventArgs ev) =>
+                m.MenuItems.Add(new MenuItem("Update Mp3-Metadata of Row-Selection", ((object s, EventArgs ev) =>
                 {
                     try
                     {
@@ -370,7 +381,7 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                if (dataGridView1.Rows[e.RowIndex].Cells[5].Value == null)
+                if (dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.ColumnCount - 2].Value == null)
                     m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
                     {
                         try
