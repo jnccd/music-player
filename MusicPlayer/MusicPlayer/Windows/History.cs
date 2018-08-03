@@ -77,6 +77,7 @@ namespace MusicPlayer
         {
             if (e != null && e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
+                dataGridView1.Rows[e.RowIndex].Cells[0].Selected = true;
                 ContextMenu m = new ContextMenu();
                 m.MenuItems.Add(new MenuItem("Play", ((object s, EventArgs ev) =>
                 {

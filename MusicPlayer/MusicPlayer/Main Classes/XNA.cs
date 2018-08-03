@@ -906,13 +906,47 @@ namespace MusicPlayer
                 if (BgModes == BackGroundModes.None)
                     Shadow.Opacity = 0;
                 else
-                    Shadow.Opacity = 1;
+                {
+                    Shadow.Dispose();
+                    Shadow = new DropShadow(gameWindowForm, true);
+                    Shadow.Show();
+                }
                 ForceBackgroundRedraw();
             }
 
             // New Color [C]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.C))
                 ShowColorDialog();
+
+            // Copy URL the Clipboard [U]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.U))
+            {
+                Values.StartSTATask(() =>
+                {
+                    try
+                    {
+                        // Get fitting youtube video
+                        string url = string.Format("https://www.youtube.com/results?search_query=" + Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName));
+                        HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                        req.KeepAlive = false;
+                        WebResponse W = req.GetResponse();
+                        string ResultURL;
+                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                        {
+                            string html = sr.ReadToEnd();
+                            int index = html.IndexOf("href=\"/watch?");
+                            string startcuthtml = html.Remove(0, index + 6);
+                            index = startcuthtml.IndexOf('"');
+                            string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                            ResultURL = "https://www.youtube.com" + cuthtml;
+                        }
+
+                        Clipboard.SetText(ResultURL);
+                        ShowSecondRowMessage("Copied  URL  to  clipboard!", 1);
+                    }
+                    catch (Exception e) { MessageBox.Show("Can't find that song.\n\nException: " + e.ToString()); }
+                });
+            }
 
             // Show Console [K]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.K))
