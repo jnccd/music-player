@@ -19,6 +19,8 @@ namespace MusicPlayer
         public static string[] args;
         public static XNA game;
         public static bool Closing = false;
+        public static FileSystemWatcher weightwatchers;
+        public static FileSystemWatcher crackopenthebois;
 
         [STAThread]
         static void Main(string[] args)
@@ -47,10 +49,12 @@ namespace MusicPlayer
             #endregion
 
             // Smol settings
+            Console.Title = "MusicPlayer Console";
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Values.DisableConsoleRezise();
-            
+            Values.RegisterUriScheme();
+
             #region Song Data List initialization
             if (config.Default.SongPaths != null && config.Default.SongScores != null)
             {
@@ -103,7 +107,8 @@ namespace MusicPlayer
             DiscordRPCWrapper.Initialize("460490126607384576");
 
             #region Filewatcher
-            FileSystemWatcher weightwatchers = new FileSystemWatcher();
+            // SettingsPath
+            weightwatchers = new FileSystemWatcher();
             try
             {
                 string[] P = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MusicPlayer");
@@ -117,7 +122,10 @@ namespace MusicPlayer
                     weightwatchers.Path = SettingsPath;
                     weightwatchers.Changed += ((object source, FileSystemEventArgs e) =>
                     {
-                        game.CheckForRequestedSongs();
+                        try
+                        {
+                            game.CheckForRequestedSongs();
+                        } catch { }
                     });
                     weightwatchers.EnableRaisingEvents = true;
                 }
@@ -127,6 +135,29 @@ namespace MusicPlayer
                 }
             }
             catch { Console.WriteLine("Couldn't set filewatcher! (UNKNOWN ERROR)"); }
+
+            // DownloadPath
+            if (config.Default.BrowserDownloadFolderPath != "" && config.Default.BrowserDownloadFolderPath != null)
+            {
+                crackopenthebois = new FileSystemWatcher();
+                try
+                {
+                    if (Directory.Exists(config.Default.BrowserDownloadFolderPath))
+                    {
+                        config.Default.BrowserDownloadFolderPath = config.Default.BrowserDownloadFolderPath;
+                        config.Default.Save();
+
+                        crackopenthebois.Path = config.Default.BrowserDownloadFolderPath;
+                        crackopenthebois.Changed += CrackOpen;
+                        crackopenthebois.EnableRaisingEvents = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Couldn't set filewatcher! (wrong SelectedPath: " + config.Default.BrowserDownloadFolderPath + " )");
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show("Couldn't set filewatcher! (ERROR: " + ex + ")"); }
+            }
             #endregion
 
 #if DEBUG
@@ -163,6 +194,37 @@ namespace MusicPlayer
                 }
             }
 #endif
+        }
+
+        public static void CrackOpen(object source, FileSystemEventArgs ev)
+        {
+            string[] bois = Directory.GetFiles(config.Default.BrowserDownloadFolderPath);
+            for (int i = 0; i < bois.Length; i++)
+            {
+                string fileName = Path.GetFileName(bois[i]);
+                if (fileName == "MusicPlayer.PlayRequest")
+                {
+                    string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.PlayRequest";
+                    string crackedOpenBoi = File.ReadAllText(boi);
+                    File.Delete(boi);
+                    game.PauseConsoleInputThread = true;
+                    Task.Factory.StartNew(() => {
+                        string down = crackedOpenBoi;
+                        string[] split = down.Split('±');
+                        game.Download(split[0]);
+                        if (split.Length > 1)
+                        {
+                            long secondspassed = Convert.ToInt64(split[1].Split('.')[0]);
+                            Assets.Channel32.Position = secondspassed * Assets.Channel32.WaveFormat.AverageBytesPerSecond;
+                        }
+                    });
+                    Thread.Sleep(200);
+                    Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
+                    Values.SetForegroundWindow(Values.GetConsoleWindow());
+                    SendKeys.SendWait("odd");
+                    break;
+                }
+            }
         }
     }
 }

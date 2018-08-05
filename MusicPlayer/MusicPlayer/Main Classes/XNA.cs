@@ -109,7 +109,7 @@ namespace MusicPlayer
         public OptionsMenu optionsMenu;
         public Statistics statistics;
         public History history;
-
+        
         // Draw
         Vector2 TempVector = new Vector2(0, 0);
         Rectangle TempRect = new Rectangle(0, 0, 0, 0);
@@ -201,11 +201,10 @@ namespace MusicPlayer
                     if (Console.CursorLeft != 0)
                     {
                         Console.WriteLine();
-                        originY++;
                     }
                     Console.WriteLine("Canceled by user!");
                     Program.game.PauseConsoleInputThread = false;
-                    originY++;
+                    originY = Console.CursorTop;
                 }
             });
 
@@ -392,9 +391,9 @@ namespace MusicPlayer
                                         download = Path.Remove(0, "/d".Length + 1);
                                     else
                                         download = Path;
-                                    Path = "";
-
+                                    
                                     Download(download);
+                                    Path = "";
                                 }
                                 catch (Exception ex)
                                 {
@@ -905,11 +904,12 @@ namespace MusicPlayer
                     BgModes = 0;
                 if (BgModes == BackGroundModes.None)
                     Shadow.Opacity = 0;
-                else
+                else if (BgModes == BackGroundModes.None + 1)
                 {
                     Shadow.Dispose();
                     Shadow = new DropShadow(gameWindowForm, true);
                     Shadow.Show();
+                    Shadow.UpdateSizeLocation();
                 }
                 ForceBackgroundRedraw();
             }

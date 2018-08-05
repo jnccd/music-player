@@ -621,36 +621,36 @@ namespace MusicPlayer
             else if (output.PlaybackState == PlaybackState.Playing) return true;
             return false;
         }
-        public static bool PlayNewSong(string Path)
+        public static bool PlayNewSong(string sPath)
         {
             if (Values.Timer > SongChangedTickTime + 10 && !config.Default.MultiThreading ||
                 config.Default.MultiThreading)
             {
                 SaveUserSettings();
 
-                Path = Path.Trim('"');
+                sPath = sPath.Trim('"');
 
-                if (!File.Exists(Path))
+                if (!File.Exists(sPath))
                 {
                     List<string> Choosing = Playlist.OrderBy(x => Values.RDM.NextDouble()).ToList();
                     DistancePerSong[] LDistances = new DistancePerSong[Choosing.Count];
                     for (int i = 0; i < LDistances.Length; i++)
                     {
-                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(Path, Choosing[i].Split('\\').Last().Split('.').First());
+                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(sPath, Path.GetFileNameWithoutExtension(Choosing[i]));
                         LDistances[i].SongIndex = i;
                     }
 
                     LDistances = LDistances.OrderBy(x => x.SongDifference).ToArray();
                     int NonWorkingIndexes = 0;
-                    Path = Choosing[LDistances[NonWorkingIndexes].SongIndex];
-                    while (!File.Exists(Path))
+                    sPath = Choosing[LDistances[NonWorkingIndexes].SongIndex];
+                    while (!File.Exists(sPath))
                     {
                         NonWorkingIndexes++;
-                        Path = Choosing[LDistances[NonWorkingIndexes].SongIndex];
+                        sPath = Choosing[LDistances[NonWorkingIndexes].SongIndex];
                     }
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(">Found one matching song: \"" + Path.Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                    Console.WriteLine(">Found one matching song: \"" + sPath.Split('\\').Last().Split('.').First() + "\" with a difference of " +
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
 
                     for (int i = 1; i <= 5; i++)
@@ -664,20 +664,20 @@ namespace MusicPlayer
                     }
                 }
 
-                PlayerHistory.Add(Path);
+                PlayerHistory.Add(sPath);
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
 
-                if (!Playlist.Contains(Path))
-                    Playlist.Add(Path);
+                if (!Playlist.Contains(sPath))
+                    Playlist.Add(sPath);
 
                 try
                 {
-                    PlaySongByPath(Path);
+                    PlaySongByPath(sPath);
                 }
                 catch
                 {
                     MessageBox.Show("That song is not readable!");
-                    PlayerHistory.Remove(Path);
+                    PlayerHistory.Remove(sPath);
                     PlayerHistoryIndex = PlayerHistory.Count - 1;
                     GetNextSong(true, false);
                 }
@@ -754,6 +754,13 @@ namespace MusicPlayer
         }
         private static void PlaySongByPath(string PathString)
         {
+            if (!File.Exists(PathString))
+            {
+                Playlist.Remove(PathString);
+                GetNextSong(true, false);
+                return;
+            }
+
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
             if (T != null && T.Status == TaskStatus.Running)

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -39,6 +40,8 @@ namespace MusicPlayer
 
         private void OptionsMenu_Load(object sender, EventArgs e)
         {
+            if (config.Default.BrowserDownloadFolderPath != "" && config.Default.BrowserDownloadFolderPath != null)
+                bBDownloadF.Text = "Change Browser Extension Download Folder";
             trackBar1.Value = config.Default.WavePreload;
             label1.Text = "Percentage of the songs samples that can be preloaded " + trackBar1.Value + "%";
             if (Program.game.Preload)
@@ -296,6 +299,37 @@ namespace MusicPlayer
             try { parent.history.Close(); } catch { }
             parent.history = new History(parent);
             parent.history.Show();
+        }
+
+        private void bBDownloadF_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog FBD = new FolderBrowserDialog();
+            FBD.SelectedPath = config.Default.BrowserDownloadFolderPath;
+            DialogResult result = FBD.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                if (Program.crackopenthebois != null)
+                    Program.crackopenthebois.Dispose();
+                Program.crackopenthebois = new FileSystemWatcher();
+                try
+                {
+                    if (Directory.Exists(FBD.SelectedPath))
+                    {
+                        config.Default.BrowserDownloadFolderPath = FBD.SelectedPath;
+                        config.Default.Save();
+
+                        Program.crackopenthebois.Path = config.Default.BrowserDownloadFolderPath;
+                        Program.crackopenthebois.Changed += Program.CrackOpen;
+                        Program.crackopenthebois.EnableRaisingEvents = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Couldn't set filewatcher! (wrong SelectedPath: " + config.Default.BrowserDownloadFolderPath + " )");
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show("Couldn't set filewatcher! (ERROR: " + ex + ")"); }
+                bBDownloadF.Text = "Change Browser Extension Download Folder";
+            }
         }
     }
 }

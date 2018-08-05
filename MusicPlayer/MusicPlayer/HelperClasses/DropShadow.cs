@@ -34,6 +34,11 @@ namespace MusicPlayer
         {
             if (WindowState == FormWindowState.Minimized)
                 DropShadow_GotFocus(this, e);
+            UpdateSizeLocation();
+        }
+
+        public void UpdateSizeLocation()
+        {
             Size = new Size(parentForm.Size.Width, parentForm.Size.Height);
             Location = new Point(parentForm.Location.X, parentForm.Location.Y);
         }
@@ -64,8 +69,7 @@ namespace MusicPlayer
         {
             if (WindowState == FormWindowState.Minimized)
                 DropShadow_GotFocus(this, e);
-            Size = new Size(parentForm.Size.Width, parentForm.Size.Height);
-            Location = new Point(parentForm.Location.X, parentForm.Location.Y);
+            UpdateSizeLocation();
         }
 
         protected override CreateParams CreateParams
