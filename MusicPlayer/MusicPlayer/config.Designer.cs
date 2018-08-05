@@ -233,5 +233,17 @@ namespace MusicPlayer {
                 this["SongDate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BrowserDownloadFolderPath {
+            get {
+                return ((string)(this["BrowserDownloadFolderPath"]));
+            }
+            set {
+                this["BrowserDownloadFolderPath"] = value;
+            }
+        }
     }
 }

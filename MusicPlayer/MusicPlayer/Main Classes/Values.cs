@@ -17,6 +17,7 @@ using System.Threading;
 using Microsoft.Win32.SafeHandles;
 using System.IO;
 using System.Text;
+using Microsoft.Win32;
 
 namespace MusicPlayer
 {
@@ -393,9 +394,26 @@ namespace MusicPlayer
             return tcs.Task;
         }
 
-        // Own C Code: 
-        [DllImport("Clib.dll")]
-        public static extern void DisplayHelloFromDLL();
+        public static void RegisterUriScheme()
+        {
+            string UriScheme = "MusicPlayerScheme";
+            string FriendlyName = "MusicPlayer";
+
+            string[] subkeys = Registry.CurrentUser.OpenSubKey("SOFTWARE").OpenSubKey("Classes").GetSubKeyNames();
+            if (subkeys.Contains(UriScheme))
+                return;
+
+            RegistryKey key = Registry.CurrentUser.CreateSubKey("SOFTWARE\\Classes\\" + UriScheme);
+
+            key.SetValue("", "URL:" + FriendlyName);
+            key.SetValue("URL Protocol", "");
+
+            RegistryKey defaultIcon = key.CreateSubKey("DefaultIcon");
+            defaultIcon.SetValue("", "MusicPlayer.exe" + ",1");
+
+            RegistryKey commandKey = key.CreateSubKey(@"shell\open\command");
+            commandKey.SetValue("", "\"" + CurrentExecutablePath + "\\MusicPlayer.exe" + "\" \"%1\"");
+        }
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
@@ -573,6 +591,7 @@ namespace MusicPlayer
             return str.IndexOf(substring, comp) >= 0;
         }
     }
+
     public class Approximate
     {
         public static float Sqrt(float z)

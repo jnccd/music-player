@@ -53,6 +53,7 @@
             this.cOldSmooth = new System.Windows.Forms.CheckBox();
             this.bExport = new System.Windows.Forms.Button();
             this.history = new System.Windows.Forms.Button();
+            this.bBDownloadF = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
@@ -294,11 +295,23 @@
             this.history.UseVisualStyleBackColor = true;
             this.history.Click += new System.EventHandler(this.history_Click);
             // 
+            // bBDownloadF
+            // 
+            this.bBDownloadF.BackColor = System.Drawing.SystemColors.Control;
+            this.bBDownloadF.Location = new System.Drawing.Point(12, 359);
+            this.bBDownloadF.Name = "bBDownloadF";
+            this.bBDownloadF.Size = new System.Drawing.Size(416, 23);
+            this.bBDownloadF.TabIndex = 24;
+            this.bBDownloadF.Text = "Add Browser Extension Download Folder";
+            this.bBDownloadF.UseVisualStyleBackColor = false;
+            this.bBDownloadF.Click += new System.EventHandler(this.bBDownloadF_Click);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(441, 365);
+            this.ClientSize = new System.Drawing.Size(441, 394);
+            this.Controls.Add(this.bBDownloadF);
             this.Controls.Add(this.history);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.PreloadToggle);
@@ -362,5 +375,6 @@
         private System.Windows.Forms.CheckBox cOldSmooth;
         private System.Windows.Forms.Button bExport;
         private System.Windows.Forms.Button history;
+        private System.Windows.Forms.Button bBDownloadF;
     }
 }
