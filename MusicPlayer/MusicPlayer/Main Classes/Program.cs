@@ -211,8 +211,7 @@ namespace MusicPlayer
                     Task.Factory.StartNew(() => {
                         string down = crackedOpenBoi;
                         string[] split = down.Split('±');
-                        game.Download(split[0]);
-                        if (split.Length > 1)
+                        if (game.Download(split[0]) && split.Length > 1)
                         {
                             long secondspassed = Convert.ToInt64(split[1].Split('.')[0]);
                             Assets.Channel32.Position = secondspassed * Assets.Channel32.WaveFormat.AverageBytesPerSecond;

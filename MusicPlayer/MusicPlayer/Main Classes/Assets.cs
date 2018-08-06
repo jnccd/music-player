@@ -650,7 +650,7 @@ namespace MusicPlayer
                     }
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(">Found one matching song: \"" + sPath.Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                    Console.WriteLine(">Found one matching song: \"" + Path.GetFileNameWithoutExtension(sPath) + "\" with a difference of " +
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
 
                     for (int i = 1; i <= 5; i++)
@@ -659,7 +659,7 @@ namespace MusicPlayer
                             break;
                         if (i == 1)
                             Console.WriteLine("Other well fitting songs were:");
-                        Console.WriteLine(i + ". \"" + Choosing[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                        Console.WriteLine(i + ". \"" + Path.GetFileNameWithoutExtension(Choosing[LDistances[NonWorkingIndexes + i].SongIndex]) + "\" with a difference of " +
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
                 }
@@ -948,7 +948,7 @@ namespace MusicPlayer
                 DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
                 for (int i = 0; i < LDistances.Length; i++)
                 {
-                    LDistances[i].SongDifference = Values.OwnDistanceWrapper(Song, Playlist[i].Split('\\').Last().Split('.').First());
+                    LDistances[i].SongDifference = Values.OwnDistanceWrapper(Song, Path.GetFileNameWithoutExtension(Playlist[i]));
                     LDistances[i].SongIndex = i;
                 }
 
@@ -964,7 +964,7 @@ namespace MusicPlayer
                 if (ConsoleOutput)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(">Queued one matching song: \"" + Song.Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                    Console.WriteLine(">Queued one matching song: \"" + Path.GetFileNameWithoutExtension(Song) + "\" with a difference of " +
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
 
 
@@ -974,7 +974,7 @@ namespace MusicPlayer
                             break;
                         if (i == 1)
                             Console.WriteLine("Other well fitting songs were:");
-                        Console.WriteLine(i + ". \"" + Playlist[LDistances[NonWorkingIndexes + i].SongIndex].Split('\\').Last().Split('.').First() + "\" with a difference of " +
+                        Console.WriteLine(i + ". \"" + Path.GetFileNameWithoutExtension(Playlist[LDistances[NonWorkingIndexes + i].SongIndex]) + "\" with a difference of " +
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
                 }
