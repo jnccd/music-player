@@ -317,15 +317,15 @@ namespace MusicPlayer
 
             string sS = s.ToString();
             if (sS.Length == 0)
-                sS.Insert(0, "00");
+                sS = sS.Insert(0, "00");
             else if (sS.Length == 1)
-                sS.Insert(0, "0");
+                sS = sS.Insert(0, "0");
 
             string mS = m.ToString();
             if (mS.Length == 0)
-                mS.Insert(0, "00");
+                mS = mS.Insert(0, "00");
             else if (mS.Length == 1)
-                mS.Insert(0, "0");
+                mS = mS.Insert(0, "0");
 
             if (h == 0)
                 return mS + ":" + sS;
