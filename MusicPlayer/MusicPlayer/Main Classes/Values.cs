@@ -307,7 +307,7 @@ namespace MusicPlayer
         {
             return (float)((Math.Pow(2, -1.5 * (x - 1) * (x - 1)) / 10f + 1) * (-Math.Pow(5, -x) + 1));
         }
-        public static string AsTime(double seconds) // isnt perfect
+        public static string AsTime(double seconds)
         {
             int s = (int)(seconds % 60);
             int m = (int)(seconds / 60) % 60;

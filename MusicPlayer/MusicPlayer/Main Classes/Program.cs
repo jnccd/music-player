@@ -106,6 +106,21 @@ namespace MusicPlayer
             InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
             DiscordRPCWrapper.Initialize("460490126607384576");
 
+            #region clear old browser requests
+            if (config.Default.BrowserDownloadFolderPath != "" && config.Default.BrowserDownloadFolderPath != null)
+            {
+                string[] bois = Directory.GetFiles(config.Default.BrowserDownloadFolderPath);
+                for (int i = 0; i < bois.Length; i++)
+                {
+                    string fileExtension = Path.GetExtension(bois[i]);
+                    if (fileExtension == ".PlayRequest")
+                        File.Delete(bois[i]);
+                    if (fileExtension == ".VideoDownloadRequest")
+                        File.Delete(bois[i]);
+                }
+            }
+            #endregion
+
             #region Filewatcher
             // SettingsPath
             weightwatchers = new FileSystemWatcher();
@@ -159,7 +174,6 @@ namespace MusicPlayer
                 catch (Exception ex) { MessageBox.Show("Couldn't set filewatcher! (ERROR: " + ex + ")"); }
             }
             #endregion
-
 #if DEBUG
             game = new XNA();
             game.Run();
@@ -220,7 +234,23 @@ namespace MusicPlayer
                     Thread.Sleep(200);
                     Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
                     Values.SetForegroundWindow(Values.GetConsoleWindow());
-                    SendKeys.SendWait("odd");
+                    SendKeys.SendWait("SUCCCCC");
+                    break;
+                }
+                if (fileName == "MusicPlayer.VideoDownloadRequest")
+                {
+                    string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.VideoDownloadRequest";
+                    string crackedOpenBoi = File.ReadAllText(boi);
+                    File.Delete(boi);
+                    game.PauseConsoleInputThread = true;
+                    Task.Factory.StartNew(() => {
+                        string down = crackedOpenBoi;
+                        game.DownloadAsVideo(down);
+                    });
+                    Thread.Sleep(200);
+                    Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
+                    Values.SetForegroundWindow(Values.GetConsoleWindow());
+                    SendKeys.SendWait("SUCCCCC");
                     break;
                 }
             }
