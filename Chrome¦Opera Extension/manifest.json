@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+
+  "name": "Music Player Extension",
+  "version": "0.0.1",
+  "description": "Adds cool download button to YouTube",
+
+  "content_scripts": [{
+    "css": ["styles.css"],
+    "js": ["content.js"],
+    "matches": ["https://www.youtube.com/*"]
+  }]
+}

@@ -243,6 +243,9 @@ namespace MusicPlayer
                     originY = Console.CursorTop;
                     while (!Path.Contains(".mp3\""))
                     {
+                        if (Path == "SUCCCCC")
+                            Path = "";
+
                         Thread.Sleep(5);
                         Console.SetCursorPosition(0, originY);
                         for (int i = 0; i < Path.Length / 65 + 2; i++)
@@ -252,7 +255,7 @@ namespace MusicPlayer
                         Console.Write("Play Song: ");
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.Write(Path);
-
+                        
                         ConsoleKeyInfo e = Console.ReadKey();
 
                         if (PauseConsoleInputThread) { Console.CursorLeft = 0; }
@@ -638,6 +641,94 @@ namespace MusicPlayer
                 BackgroundOperationRunning = false;
                 PauseConsoleInputThread = false;
                 
+                MessageBox.Show(e.ToString());
+                return false;
+            }
+            return true;
+        }
+        public bool DownloadAsVideo(string youtubepath)
+        {
+            if (BackgroundOperationRunning)
+            {
+                MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
+                return false;
+            }
+
+            if (!youtubepath.StartsWith("https://www.youtube.com/watch?v="))
+            {
+                MessageBox.Show("This doesn't look like a youtube video path to me");
+                return false;
+            }
+
+            if (config.Default.BrowserDownloadFolderPath == "" || config.Default.BrowserDownloadFolderPath == null)
+            {
+                MessageBox.Show("I need to put it into the BrowserDownloadFolderPath but I dont have it");
+                return false;
+            }
+
+            try
+            {
+                BackgroundOperationRunning = true;
+                PauseConsoleInputThread = true;
+                Values.ShowConsole();
+
+                // Get video title
+                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(youtubepath);
+                req.KeepAlive = false;
+                WebResponse W = req.GetResponse();
+                string VideoTitle;
+                string VideoThumbnailURL;
+                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                {
+                    // Extract info from HTML string
+                    string html = sr.ReadToEnd();
+                    int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
+                    string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
+                    index = startcuthtml.IndexOf('"');
+                    VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
+
+                    index = html.IndexOf("<link itemprop=\"thumbnailUrl\" href=\"");
+                    startcuthtml = html.Remove(0, index + "<link itemprop=\"thumbnailUrl\" href=\"".Length);
+                    index = startcuthtml.IndexOf('"');
+                    VideoThumbnailURL = startcuthtml.Remove(index, startcuthtml.Length - index);
+
+                    // Decode the encoded string.
+                    StringWriter myWriter = new StringWriter();
+                    System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
+                    VideoTitle = myWriter.ToString();
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("Found video named: ");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(VideoTitle);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+
+                // Download Video File
+                Process P = new Process();
+                string b = Values.CurrentExecutablePath;
+                foreach (char c in Path.GetInvalidFileNameChars())
+                    VideoTitle = VideoTitle.Replace(c, '_');
+                VideoTitle = VideoTitle.Replace('.', '_');
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"" + config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4" + "\" " + youtubepath)
+                {
+                    UseShellExecute = false
+                };
+
+                P.Start();
+                P.WaitForExit();
+                originY = Console.CursorTop;
+
+                BackgroundOperationRunning = false;
+                PauseConsoleInputThread = false;
+
+                ReHookGlobalKeyHooks();
+            }
+            catch (Exception e)
+            {
+                BackgroundOperationRunning = false;
+                PauseConsoleInputThread = false;
+
                 MessageBox.Show(e.ToString());
                 return false;
             }
