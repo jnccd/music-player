@@ -55,7 +55,7 @@ namespace MusicPlayer
                     }
 
                     dataGridView1.Rows.Add(new object[] { Title, Time, ScoreChange });
-                    if (!Assets.UpvotedSongNames.Contains(Split[0]))
+                    if (!Assets.UpvotedSongData.Select(x => x.Name).Contains(Split[0]))
                         dataGridView1.Rows[dataGridView1.Rows.Count - 1].DefaultCellStyle.BackColor = Color.Red;
                 }
             }

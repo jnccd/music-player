@@ -65,7 +65,7 @@ namespace MusicPlayer
             object[] o = new object[6];
             object[,] SongInfo = Assets.GetSongInformationList();
 
-            for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
+            for (int i = 0; i < Assets.UpvotedSongData.Count; i++)
             {
                 o[0] = SongInfo[i, 0];
                 o[1] = SongInfo[i, 1];
@@ -78,13 +78,15 @@ namespace MusicPlayer
                     dataGridView1.Rows[dataGridView1.RowCount - 1].DefaultCellStyle.BackColor = Color.Red;
             }
 
-            dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
-            dataGridView1.Columns[1].Width = 80;
-            dataGridView1.Columns[2].Width = 80;
+            dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            for (int i = 1; i < dataGridView1.Columns.Count - 1; i++)
+                if (i == 2)
+                    dataGridView1.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                else
+                    dataGridView1.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            dataGridView1.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             dataGridView1.Columns[3].Width = 80;
-            dataGridView1.Columns[4].Width = 80;
-            dataGridView1.Columns[5].Width = 80;
-            dataGridView1.Columns[6].Width = 0;
+            dataGridView1.Columns[dataGridView1.Columns.Count - 1].Width = 2;
 
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 if (Assets.currentlyPlayingSongName.Equals(dataGridView1.Rows[i].Cells[0].Value))
@@ -280,7 +282,7 @@ namespace MusicPlayer
                     try
                     {
                         string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                        int UpvotedSongNamesIndex = Assets.UpvotedSongNames.IndexOf(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3");
+                        int UpvotedSongNamesIndex = Assets.UpvotedSongData.FindIndex(x => x.Name == dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3");
                         int PlaylistIndex = Assets.Playlist.IndexOf(path);
 
                         if (!File.Exists(path))
@@ -312,7 +314,7 @@ namespace MusicPlayer
                                     for (int i = 0; i < historyContent.Length; i++)
                                     {
                                         string[] split = historyContent[i].Split(':');
-                                        if (split[0] == Assets.UpvotedSongNames[UpvotedSongNamesIndex])
+                                        if (split[0] == Assets.UpvotedSongData[UpvotedSongNamesIndex].Name)
                                         {
                                             split[0] = Dia.result + ".mp3";
                                             historyContent[i] = split.Aggregate((y, j) => y + ":" + j);
@@ -322,9 +324,8 @@ namespace MusicPlayer
                                     File.WriteAllLines(historyPath, historyContent);
                                 }
 
-                                Assets.UpvotedSongNames[UpvotedSongNamesIndex] = Dia.result + ".mp3";
-                                config.Default.SongPaths = Assets.UpvotedSongNames.ToArray();
-                                config.Default.Save();
+                                Assets.UpvotedSongData[UpvotedSongNamesIndex].Name = Dia.result + ".mp3";
+                                Assets.SaveUserSettings(false);
 
                                 Assets.Playlist[PlaylistIndex] = dest;
 
@@ -386,12 +387,9 @@ namespace MusicPlayer
                     {
                         try
                         {
-                            int index = Assets.UpvotedSongNames.IndexOf(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3");
-                            Assets.UpvotedSongNames.RemoveAt(index);
-                            Assets.UpvotedSongScores.RemoveAt(index);
-                            Assets.UpvotedSongStreaks.RemoveAt(index);
-                            Assets.UpvotedSongTotalLikes.RemoveAt(index);
-                            Assets.UpvotedSongAddingDates.RemoveAt(index);
+                            int index = Assets.UpvotedSongData.FindIndex(x => x.Name == dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3");
+                            if (index >= 0)
+                                Assets.UpvotedSongData.RemoveAt(index);
 
                             bRefresh_Click(null, EventArgs.Empty);
                         }

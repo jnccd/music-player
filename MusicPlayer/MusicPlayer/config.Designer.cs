@@ -245,5 +245,28 @@ namespace MusicPlayer {
                 this["BrowserDownloadFolderPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FirstStart {
+            get {
+                return ((bool)(this["FirstStart"]));
+            }
+            set {
+                this["FirstStart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int[] SongTotalDislikes {
+            get {
+                return ((int[])(this["SongTotalDislikes"]));
+            }
+            set {
+                this["SongTotalDislikes"] = value;
+            }
+        }
     }
 }

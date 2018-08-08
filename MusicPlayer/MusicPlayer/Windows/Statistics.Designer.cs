@@ -134,7 +134,7 @@
             // 
             // SongTotalUpvotes
             // 
-            this.SongTotalUpvotes.HeaderText = "TotalUpvotes";
+            this.SongTotalUpvotes.HeaderText = "Up/Downvote Ratio";
             this.SongTotalUpvotes.Name = "SongTotalUpvotes";
             this.SongTotalUpvotes.ReadOnly = true;
             // 
@@ -152,7 +152,7 @@
             // 
             // Surreal
             // 
-            this.Surreal.HeaderText = "NONEXISTANT";
+            this.Surreal.HeaderText = "THIS DOESNT EXIST";
             this.Surreal.Name = "Surreal";
             this.Surreal.ReadOnly = true;
             // 
