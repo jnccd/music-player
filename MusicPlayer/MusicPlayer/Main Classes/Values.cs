@@ -197,7 +197,7 @@ namespace MusicPlayer
                 return Scores.Min();
             else
                 return 1000;
-        } //useless
+        } //useless but I kept it for nostalgia
         public static float OwnDistanceWrapper(string Input, string SongName)
         {
             if (Input == null || Input == "" || SongName == "" || SongName == null)
@@ -604,6 +604,11 @@ namespace MusicPlayer
             u.tmp >>= 1; /* Divide by 2. */
             u.tmp += 1 << 29; /* Add ((b + 1) / 2) * 2^m. */
             return u.f;
+        }
+        public static double Exp(double val)
+        {
+            long tmp = (long)(1512775 * val + 1072632447);
+            return BitConverter.Int64BitsToDouble(tmp << 32);
         }
 
         [StructLayout(LayoutKind.Explicit)]

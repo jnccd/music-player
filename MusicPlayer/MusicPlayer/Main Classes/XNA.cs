@@ -185,7 +185,7 @@ namespace MusicPlayer
             {
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 Assets.DisposeNAudioData();
-                Assets.SaveUserSettings();
+                Assets.SaveUserSettings(true);
                 if (optionsMenu != null)
                     optionsMenu.InvokeIfRequired(optionsMenu.Close);
                 if (statistics != null)
@@ -627,7 +627,6 @@ namespace MusicPlayer
                     File.Delete(videofile);
                     Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
                     Assets.PlayNewSong(outM.Filename);
-                    Assets.SaveUserSettings();
                     originY = Console.CursorTop;
                 }
 
@@ -1315,7 +1314,7 @@ namespace MusicPlayer
             string[] SongNameSplit = SongName.Split('-');
 
             DateTime startTime, endTime;
-            string smolimagekey = "", smolimagetext = "";
+            string smolimagekey = "", smolimagetext = "", bigimagekey = "iconv2";
             if (WithTime)
             {
                 startTime = DateTime.Now.AddSeconds(-(Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
@@ -1368,7 +1367,12 @@ namespace MusicPlayer
                 state = state.TrimStart(' ');
             }
 
-            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, "iconv2", "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
+#if DEBUG
+            details = details.Insert(0, "[DEBUG-VERSION] ");
+            bigimagekey = "debugiconv1";
+#endif
+
+            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
 
         protected override void Draw(GameTime gameTime)

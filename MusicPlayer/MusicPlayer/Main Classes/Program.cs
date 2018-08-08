@@ -55,44 +55,24 @@ namespace MusicPlayer
             Values.DisableConsoleRezise();
             Values.RegisterUriScheme();
 
+            // Support for older SongUpvote Lists
+            if (config.Default.SongTotalDislikes == null && config.Default.SongPaths != null)
+                config.Default.SongTotalDislikes = new int[config.Default.SongPaths.Length];
+
             #region Song Data List initialization
-            if (config.Default.SongPaths != null && config.Default.SongScores != null)
+            Assets.UpvotedSongData = new List<UpvotedSong>();
+            if (config.Default.SongPaths != null && config.Default.SongScores != null && config.Default.SongUpvoteStreak != null && config.Default.SongTotalLikes != null &&
+                config.Default.SongTotalDislikes != null && config.Default.SongDate != null &&
+                config.Default.SongScores.Length == config.Default.SongPaths.Length && config.Default.SongUpvoteStreak.Length == config.Default.SongPaths.Length &&
+                config.Default.SongTotalLikes.Length == config.Default.SongPaths.Length && config.Default.SongTotalDislikes.Length == config.Default.SongPaths.Length &&
+                config.Default.SongDate.Length == config.Default.SongPaths.Length)
             {
-                Assets.UpvotedSongNames = config.Default.SongPaths.ToList();
-                Assets.UpvotedSongScores = config.Default.SongScores.ToList();
+                for (int i = 0; i < config.Default.SongPaths.Length; i++)
+                    Assets.UpvotedSongData.Add(new UpvotedSong(config.Default.SongPaths[i], config.Default.SongScores[i], config.Default.SongUpvoteStreak[i],
+                            config.Default.SongTotalLikes[i], config.Default.SongTotalDislikes[i], config.Default.SongDate[i]));
             }
-            else
-            {
-                Assets.UpvotedSongNames = new List<string>();
-                Assets.UpvotedSongScores = new List<float>();
-            }
-            // Streaks
-            if (config.Default.SongUpvoteStreak == null || config.Default.SongUpvoteStreak.Length != Assets.UpvotedSongScores.Count)
-            {
-                Assets.UpvotedSongStreaks = new List<int>(Assets.UpvotedSongScores.Count);
-                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
-                    Assets.UpvotedSongStreaks.Add(0);
-            }
-            else
-                Assets.UpvotedSongStreaks = config.Default.SongUpvoteStreak.ToList();
-            // TotalLikes
-            if (config.Default.SongTotalLikes == null || config.Default.SongTotalLikes.Length != Assets.UpvotedSongScores.Count)
-            {
-                Assets.UpvotedSongTotalLikes = new List<int>(Assets.UpvotedSongScores.Count);
-                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
-                    Assets.UpvotedSongTotalLikes.Add(0);
-            }
-            else
-                Assets.UpvotedSongTotalLikes = config.Default.SongTotalLikes.ToList();
-            // SongDate
-            if (config.Default.SongDate == null || config.Default.SongDate.Length != Assets.UpvotedSongScores.Count)
-            {
-                Assets.UpvotedSongAddingDates = new List<long>(Assets.UpvotedSongScores.Count);
-                for (int i = 0; i < Assets.UpvotedSongScores.Count; i++)
-                    Assets.UpvotedSongAddingDates.Add(0);
-            }
-            else
-                Assets.UpvotedSongAddingDates = config.Default.SongDate.ToList();
+            else if (!config.Default.FirstStart)
+                MessageBox.Show("Song statistics corrupted!\nResetting...");
             #endregion
 
             Console.Clear();

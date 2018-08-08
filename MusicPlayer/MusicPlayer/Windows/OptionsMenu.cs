@@ -259,11 +259,11 @@ namespace MusicPlayer
                     parent.BackgroundOperationRunning = true;
 
                     List<string> CopyFiles = new List<string>();
-                    for (int i = 0; i < Assets.UpvotedSongNames.Count; i++)
+                    for (int i = 0; i < Assets.UpvotedSongData.Count; i++)
                     {
-                        if (Assets.UpvotedSongScores[i] > 0 && Assets.UpvotedSongStreaks[i] > 0)
+                        if (Assets.UpvotedSongData[i].Score > 0 && Assets.UpvotedSongData[i].Streak > 0)
                         {
-                            string path = Assets.GetSongPathFromSongName(Assets.UpvotedSongNames[i]);
+                            string path = Assets.GetSongPathFromSongName(Assets.UpvotedSongData[i].Name);
                             if (File.Exists(path))
                                 CopyFiles.Add(path);
                         }
