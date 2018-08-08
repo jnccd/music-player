@@ -1333,7 +1333,11 @@ namespace MusicPlayer
                 smolimagetext = "Paused";
             }
 
-            string details, state;
+            string details, state, time;
+            if (WithTime)
+                time = " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
+            else
+                time = " (" + Values.AsTime(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds) + " / " + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
             if (SongName.Length < 20)
             {
                 details = SongName;
@@ -1356,11 +1360,11 @@ namespace MusicPlayer
             }
             if (SongName.Length <= 15)
             {
-                details += " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
+                details += time;
             }
             else
             {
-                state += " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
+                state += time;
                 state = state.TrimStart(' ');
             }
 

@@ -136,6 +136,15 @@ namespace MusicPlayer
         public static float LastScoreChange = 0;
 
         // Song Data
+        public struct UpvotedSong
+        {
+            string Name;
+            float Score;
+            int Streak;
+            int TotalLikes;
+            long AddingDates;
+        }
+        public static List<UpvotedSong> UpvotedSongData = new List<UpvotedSong>();
         public static List<string> UpvotedSongNames;
         public static List<float> UpvotedSongScores;
         public static List<int> UpvotedSongStreaks;
