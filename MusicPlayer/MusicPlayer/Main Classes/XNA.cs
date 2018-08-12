@@ -901,7 +901,7 @@ namespace MusicPlayer
                 {
                     SongTimeSkipped = Assets.Channel32.Position - SkipStartPosition;
                     Assets.output.Play();
-                    UpdateDiscordRPC(true, true);
+                    UpdateDiscordRPC();
                 }
                 selectedControl = SelectedControl.None;
             }
@@ -1308,8 +1308,12 @@ namespace MusicPlayer
             else
                 optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
         }
-        public void UpdateDiscordRPC(bool WithTime, bool ElapsedTime)
+        public void UpdateDiscordRPC()
         {
+            // Old Arguments
+            bool WithTime = (Assets.output.PlaybackState == PlaybackState.Playing);
+            bool ElapsedTime = true;
+
             string SongName = Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongPath);
             string[] SongNameSplit = SongName.Split('-');
 

@@ -268,5 +268,17 @@ namespace MusicPlayer {
                 this["SongTotalDislikes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DiscordRPCActive {
+            get {
+                return ((bool)(this["DiscordRPCActive"]));
+            }
+            set {
+                this["DiscordRPCActive"] = value;
+            }
+        }
     }
 }

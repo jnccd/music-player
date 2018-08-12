@@ -54,6 +54,7 @@
             this.bExport = new System.Windows.Forms.Button();
             this.history = new System.Windows.Forms.Button();
             this.bBDownloadF = new System.Windows.Forms.Button();
+            this.bDiscordRPC = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
@@ -91,7 +92,7 @@
             // 
             // Showinexploerer
             // 
-            this.Showinexploerer.Location = new System.Drawing.Point(12, 71);
+            this.Showinexploerer.Location = new System.Drawing.Point(223, 70);
             this.Showinexploerer.Name = "Showinexploerer";
             this.Showinexploerer.Size = new System.Drawing.Size(205, 23);
             this.Showinexploerer.TabIndex = 3;
@@ -111,7 +112,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(223, 71);
+            this.button1.Location = new System.Drawing.Point(223, 157);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(205, 23);
             this.button1.TabIndex = 5;
@@ -121,7 +122,7 @@
             // 
             // ShowStatistics
             // 
-            this.ShowStatistics.Location = new System.Drawing.Point(12, 129);
+            this.ShowStatistics.Location = new System.Drawing.Point(12, 99);
             this.ShowStatistics.Name = "ShowStatistics";
             this.ShowStatistics.Size = new System.Drawing.Size(205, 23);
             this.ShowStatistics.TabIndex = 6;
@@ -131,7 +132,7 @@
             // 
             // ShowConsole
             // 
-            this.ShowConsole.Location = new System.Drawing.Point(12, 100);
+            this.ShowConsole.Location = new System.Drawing.Point(12, 70);
             this.ShowConsole.Name = "ShowConsole";
             this.ShowConsole.Size = new System.Drawing.Size(205, 23);
             this.ShowConsole.TabIndex = 7;
@@ -141,7 +142,7 @@
             // 
             // ShowBrowser
             // 
-            this.ShowBrowser.Location = new System.Drawing.Point(223, 100);
+            this.ShowBrowser.Location = new System.Drawing.Point(223, 99);
             this.ShowBrowser.Name = "ShowBrowser";
             this.ShowBrowser.Size = new System.Drawing.Size(205, 23);
             this.ShowBrowser.TabIndex = 8;
@@ -175,6 +176,7 @@
             this.DownloadBox.Name = "DownloadBox";
             this.DownloadBox.Size = new System.Drawing.Size(328, 20);
             this.DownloadBox.TabIndex = 11;
+            this.DownloadBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DownloadBox_KeyDown);
             // 
             // Download
             // 
@@ -188,13 +190,12 @@
             // 
             // PreloadToggle
             // 
-            this.PreloadToggle.BackColor = System.Drawing.SystemColors.Control;
-            this.PreloadToggle.Location = new System.Drawing.Point(12, 188);
+            this.PreloadToggle.Location = new System.Drawing.Point(12, 186);
             this.PreloadToggle.Name = "PreloadToggle";
             this.PreloadToggle.Size = new System.Drawing.Size(416, 23);
             this.PreloadToggle.TabIndex = 13;
             this.PreloadToggle.Text = "Enable Preload";
-            this.PreloadToggle.UseVisualStyleBackColor = false;
+            this.PreloadToggle.UseVisualStyleBackColor = true;
             this.PreloadToggle.Click += new System.EventHandler(this.PreloadToggle_Click);
             // 
             // label2
@@ -214,7 +215,7 @@
             // 
             // ShowProgramFolder
             // 
-            this.ShowProgramFolder.Location = new System.Drawing.Point(223, 129);
+            this.ShowProgramFolder.Location = new System.Drawing.Point(223, 128);
             this.ShowProgramFolder.Name = "ShowProgramFolder";
             this.ShowProgramFolder.Size = new System.Drawing.Size(205, 23);
             this.ShowProgramFolder.TabIndex = 16;
@@ -235,7 +236,7 @@
             // 
             // bConsoleThreadRestart
             // 
-            this.bConsoleThreadRestart.Location = new System.Drawing.Point(223, 159);
+            this.bConsoleThreadRestart.Location = new System.Drawing.Point(12, 157);
             this.bConsoleThreadRestart.Name = "bConsoleThreadRestart";
             this.bConsoleThreadRestart.Size = new System.Drawing.Size(205, 23);
             this.bConsoleThreadRestart.TabIndex = 18;
@@ -287,7 +288,7 @@
             // 
             // history
             // 
-            this.history.Location = new System.Drawing.Point(12, 159);
+            this.history.Location = new System.Drawing.Point(12, 128);
             this.history.Name = "history";
             this.history.Size = new System.Drawing.Size(205, 23);
             this.history.TabIndex = 23;
@@ -297,20 +298,30 @@
             // 
             // bBDownloadF
             // 
-            this.bBDownloadF.BackColor = System.Drawing.SystemColors.Control;
             this.bBDownloadF.Location = new System.Drawing.Point(12, 359);
             this.bBDownloadF.Name = "bBDownloadF";
             this.bBDownloadF.Size = new System.Drawing.Size(416, 23);
             this.bBDownloadF.TabIndex = 24;
-            this.bBDownloadF.Text = "Add Browser Extension Download Folder";
-            this.bBDownloadF.UseVisualStyleBackColor = false;
+            this.bBDownloadF.Text = "Add Browser Download Folder so the Browser Extension can work";
+            this.bBDownloadF.UseVisualStyleBackColor = true;
             this.bBDownloadF.Click += new System.EventHandler(this.bBDownloadF_Click);
+            // 
+            // bDiscordRPC
+            // 
+            this.bDiscordRPC.Location = new System.Drawing.Point(12, 388);
+            this.bDiscordRPC.Name = "bDiscordRPC";
+            this.bDiscordRPC.Size = new System.Drawing.Size(416, 23);
+            this.bDiscordRPC.TabIndex = 25;
+            this.bDiscordRPC.Text = "Activate DiscordRPC";
+            this.bDiscordRPC.UseVisualStyleBackColor = true;
+            this.bDiscordRPC.Click += new System.EventHandler(this.bDiscordRPC_Click);
             // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(441, 394);
+            this.ClientSize = new System.Drawing.Size(438, 421);
+            this.Controls.Add(this.bDiscordRPC);
             this.Controls.Add(this.bBDownloadF);
             this.Controls.Add(this.history);
             this.Controls.Add(this.label1);
@@ -376,5 +387,6 @@
         private System.Windows.Forms.Button bExport;
         private System.Windows.Forms.Button history;
         private System.Windows.Forms.Button bBDownloadF;
+        private System.Windows.Forms.Button bDiscordRPC;
     }
 }
