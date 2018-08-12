@@ -621,12 +621,12 @@ namespace MusicPlayer
                 if (output.PlaybackState == PlaybackState.Playing)
                 {
                     output.Pause();
-                    Program.game.UpdateDiscordRPC(false, true);
+                    Program.game.UpdateDiscordRPC();
                 }
                 else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
                 {
                     output.Play();
-                    Program.game.UpdateDiscordRPC(true, true);
+                    Program.game.UpdateDiscordRPC();
                 }
             }
         }
@@ -817,7 +817,7 @@ namespace MusicPlayer
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
 
-            Program.game.UpdateDiscordRPC(true, true);
+            Program.game.UpdateDiscordRPC();
         }
         public static void SaveUserSettings(bool SongSwap)
         {

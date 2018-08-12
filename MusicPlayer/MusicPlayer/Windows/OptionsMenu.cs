@@ -40,6 +40,10 @@ namespace MusicPlayer
 
         private void OptionsMenu_Load(object sender, EventArgs e)
         {
+            if (config.Default.DiscordRPCActive)
+                bDiscordRPC.Text = "Deactivate DiscordRPC";
+            else
+                bDiscordRPC.Text = "Activate DiscordRPC";
             if (config.Default.BrowserDownloadFolderPath != "" && config.Default.BrowserDownloadFolderPath != null)
                 bBDownloadF.Text = "Change Browser Extension Download Folder";
             trackBar1.Value = config.Default.WavePreload;
@@ -163,34 +167,25 @@ namespace MusicPlayer
             Program.game.ForceBackgroundRedraw();
         }
 
-        private void Download_Click(object sender, EventArgs e) // WIP
+        private void Download_Click(object sender, EventArgs e)
         {
-            string download = DownloadBox.Text;
-            Download.Text = "Downloading...";
-            Download.Enabled = false;
-            DownloadBox.Enabled = false;
-            Program.game.PauseConsoleInputThread = true;
-
-            Task.Factory.StartNew(() =>
-            {
-                Task T = null;
-
-                T = Task.Factory.StartNew(() => 
-                {
-                    try
-                    {
-                        Program.game.Download(download);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+            Values.StartSTATask(() => {
+                string download = DownloadBox.Text;
+                Program.game.optionsMenu.InvokeIfRequired(() => { Download.Text = "Downloading..."; });
+                Program.game.optionsMenu.InvokeIfRequired(() => { Download.Enabled = false; });
+                Program.game.optionsMenu.InvokeIfRequired(() => { DownloadBox.Enabled = false; });
+                Program.game.PauseConsoleInputThread = true;
+                Task T = Task.Factory.StartNew(() => {
+                    Program.game.Download(download);
                 });
-
-                if (T != null)
-                    T.Wait();
-
-                DownloadFinished = true;
+                Thread.Sleep(200);
+                Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
+                Values.SetForegroundWindow(Values.GetConsoleWindow());
+                SendKeys.SendWait("SUCCCCC");
+                T.Wait();
+                Program.game.optionsMenu.InvokeIfRequired(() => { Download.Text = "Start"; });
+                Program.game.optionsMenu.InvokeIfRequired(() => { Download.Enabled = true; });
+                Program.game.optionsMenu.InvokeIfRequired(() => { DownloadBox.Enabled = true; });
             });
         }
 
@@ -330,6 +325,36 @@ namespace MusicPlayer
                 catch (Exception ex) { MessageBox.Show("Couldn't set filewatcher! (ERROR: " + ex + ")"); }
                 bBDownloadF.Text = "Change Browser Extension Download Folder";
             }
+        }
+
+        private void bDiscordRPC_Click(object sender, EventArgs e)
+        {
+            bDiscordRPC.Enabled = false;
+            config.Default.DiscordRPCActive = !config.Default.DiscordRPCActive;
+
+            if (config.Default.DiscordRPCActive)
+            {
+                DiscordRPCWrapper.Initialize("460490126607384576");
+                Program.game.UpdateDiscordRPC();
+                bDiscordRPC.Text = "Deactivate DiscordRPC";
+            }
+            else
+            {
+                DiscordRPCWrapper.Shutdown();
+                bDiscordRPC.Text = "Activate DiscordRPC";
+            }
+            
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(1500);
+                Program.game.optionsMenu.InvokeIfRequired(() => { bDiscordRPC.Enabled = true; });
+            });
+        }
+
+        private void DownloadBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                Download_Click(null, EventArgs.Empty);
         }
     }
 }
