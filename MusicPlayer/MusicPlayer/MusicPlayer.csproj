@@ -126,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main Classes\Assets.cs" />
-    <Compile Include="Main Classes\Control.cs" />
+    <Compile Include="HelperClasses\Control.cs" />
     <Compile Include="DiscordRPC\DiscordRpc.cs" />
     <Compile Include="DiscordRPC\DiscordRPCWrapper.cs" />
     <Compile Include="HelperClasses\DropShadow.cs">

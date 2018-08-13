@@ -83,7 +83,7 @@
             // 
             this.bRefresh.Location = new System.Drawing.Point(12, 12);
             this.bRefresh.Name = "bRefresh";
-            this.bRefresh.Size = new System.Drawing.Size(755, 23);
+            this.bRefresh.Size = new System.Drawing.Size(756, 23);
             this.bRefresh.TabIndex = 1;
             this.bRefresh.Text = "Refresh";
             this.bRefresh.UseVisualStyleBackColor = true;
@@ -96,6 +96,7 @@
             this.ClientSize = new System.Drawing.Size(780, 487);
             this.Controls.Add(this.bRefresh);
             this.Controls.Add(this.dataGridView1);
+            this.MinimumSize = new System.Drawing.Size(684, 127);
             this.Name = "History";
             this.Text = "History";
             this.Load += new System.EventHandler(this.History_Load);
