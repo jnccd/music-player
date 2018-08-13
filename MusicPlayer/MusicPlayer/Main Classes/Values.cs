@@ -50,7 +50,8 @@ namespace MusicPlayer
                 config.Default.Volume = value;
             }
         }
-
+        public static float VolumeMultiplier = 1;
+        
         public static int Timer = 0;
 
         public static int LevenshteinDistance(string s, string t)
@@ -566,7 +567,7 @@ namespace MusicPlayer
     {
         WCA_ACCENT_POLICY = 19
     }
-
+    
     public static class FormExtensions
     {
         public static void InvokeIfRequired(this ISynchronizeInvoke obj,

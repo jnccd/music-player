@@ -65,7 +65,7 @@ namespace MusicPlayer
     }
     public class UpvotedSong
     {
-        public UpvotedSong(string Name, float Score, int Streak, int TotalLikes, int TotalDislikes, long AddingDates)
+        public UpvotedSong(string Name, float Score, int Streak, int TotalLikes, int TotalDislikes, long AddingDates, float Volume)
         {
             this.Name = Name;
             this.Score = Score;
@@ -73,6 +73,7 @@ namespace MusicPlayer
             this.TotalLikes = TotalLikes;
             this.TotalDislikes = TotalDislikes;
             this.AddingDates = AddingDates;
+            this.Volume = Volume;
         }
 
         public string Name;
@@ -81,6 +82,7 @@ namespace MusicPlayer
         public int TotalLikes;
         public int TotalDislikes;
         public long AddingDates;
+        public float Volume;
     }
 
     public static class Assets
@@ -254,7 +256,6 @@ namespace MusicPlayer
             {
                 throw new Exception("CouldntFindWallpaperFile");
             }
-            Program.game.TaskbarHidden = new Taskbar().AutoHide;
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) =>
             {
                 RefreshBGtex(GD);
@@ -262,23 +263,8 @@ namespace MusicPlayer
                 int argbColorRefresh = (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM", "ColorizationColor", null);
                 System.Drawing.Color tempRefresh = System.Drawing.Color.FromArgb(argbColorRefresh);
                 SystemDefaultColor = Color.FromNonPremultiplied(tempRefresh.R, tempRefresh.G, tempRefresh.B, tempRefresh.A);
-
-                var tb = new Taskbar();
-
-                if (Program.game.TaskbarHidden == true && tb.AutoHide == false)
-                {
-                    Program.game.TaskbarHidden = tb.AutoHide;
-                    Program.game.KeepWindowInScreen();
-                }
-                else if (Program.game.TaskbarHidden == false && tb.AutoHide == true)
-                {
-                    config.Default.WindowPos = new System.Drawing.Point(Program.game.gameWindowForm.Location.X, Program.game.gameWindowForm.Location.Y + 38);
-                    Program.game.gameWindowForm.Location = new System.Drawing.Point(Program.game.gameWindowForm.Location.X, Program.game.gameWindowForm.Location.Y + 38);
-                    Program.game.TaskbarHidden = tb.AutoHide;
-                    Program.game.KeepWindowInScreen();
-                }
-                else
-                    Program.game.TaskbarHidden = tb.AutoHide;
+                
+                Program.game.KeepWindowInScreen();
             });
             // System Default Color
             try
@@ -538,7 +524,11 @@ namespace MusicPlayer
                                 break;
                         }
 
-                        while (Channel32 != null && Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f)
+                        bool noVolumeData = DoesCurrentSongaveNoVolumeData();
+
+                        while (Channel32 != null && 
+                            Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f &&
+                            !noVolumeData)
                         {
                             if (AbortAbort)
                                 break;
@@ -547,6 +537,38 @@ namespace MusicPlayer
                     }
 
                     SongBufferThreadWasAborted = AbortAbort;
+                    
+                    if (Channel32Reader.Position >= Channel32Reader.Length && DoesCurrentSongaveNoVolumeData())
+                    {
+                        float n = 0;
+                        float m = 0;
+
+                        for (int i = 0; i < EntireSongWaveBuffer.Count; i++)
+                        {
+                            float f = EntireSongWaveBuffer.Get(i) * EntireSongWaveBuffer.Get(i);
+                            n += f;
+                            if (m < f)
+                                m = f;
+                        }
+                        n /= EntireSongWaveBuffer.Count;
+
+                        float sn = Approximate.Sqrt(n);
+                        float sm = Approximate.Sqrt(m);
+
+                        float papr = (float)Math.Log(m/n);
+
+                        float mult = 0.12f / sn;
+                        Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+
+                        int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
+                        Values.VolumeMultiplier = mult;
+                        UpvotedSongData[index].Volume = mult;
+
+                        Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
+                        Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn + ", MAX Volume = " + sm);
+                        Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult + ", PAPR = " + papr);
+                        Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
+                    }
 
                     Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                     Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
@@ -557,10 +579,12 @@ namespace MusicPlayer
             {
                 LastSongBufferThreadException = e;
 
+                Debug.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                 Debug.WriteLine("Exception: " + e);
+                Debug.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             }
         }
         public static void UpdateWaveBufferWithEntireSongWB()
@@ -776,6 +800,10 @@ namespace MusicPlayer
                 return;
             }
 
+            int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
+            if (index != -1 && UpvotedSongData[index].Volume != -1)
+                Values.VolumeMultiplier = UpvotedSongData[index].Volume;
+
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
             if (T != null && T.Status == TaskStatus.Running)
@@ -839,6 +867,7 @@ namespace MusicPlayer
             config.Default.SongTotalLikes = UpvotedSongData.Select(x => x.TotalLikes).ToArray();
             config.Default.SongTotalDislikes = UpvotedSongData.Select(x => x.TotalDislikes).ToArray();
             config.Default.SongDate = UpvotedSongData.Select(x => x.AddingDates).ToArray();
+            config.Default.SongVolume = UpvotedSongData.Select(x => x.Volume).ToArray();
 
             config.Default.Background = (int)Program.game.BgModes;
             config.Default.Vis = (int)Program.game.VisSetting;
@@ -927,7 +956,7 @@ namespace MusicPlayer
         public static void AddSongToListIfNotDoneSoFar(string Song)
         {
             if (!UpvotedSongData.Exists(x => x.Name == Song.Split('\\').Last()))
-                UpvotedSongData.Add(new UpvotedSong(Song.Split('\\').Last(), 0, 0, 0, 0, GetSongFileCreationDate(Song)));
+                UpvotedSongData.Add(new UpvotedSong(Song.Split('\\').Last(), 0, 0, 0, 0, GetSongFileCreationDate(Song), -1));
         }
         public static void QueueNewSong(string Song, bool ConsoleOutput)
         {
@@ -974,6 +1003,13 @@ namespace MusicPlayer
         {
             Program.game.ShowSecondRowMessage("Added  a  song  to  the  queue!", 1f);
             PlayerHistory.Add(Song);
+        }
+        public static bool DoesCurrentSongaveNoVolumeData()
+        {
+            int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
+            if (index != -1)
+                return UpvotedSongData[index].Volume == -1;
+            return false;
         }
         // For Statistics
         public static long GetSongFileCreationDate(string SongPath)

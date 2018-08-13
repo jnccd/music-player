@@ -46,6 +46,12 @@ namespace MusicPlayer
                 Thread.Sleep(1000);
                 return;
             }
+            // Also check for cheeky curious changes to the settings
+            if (config.Default.MultiThreading == false)
+            {
+                MessageBox.Show("Dont mess with the settings file!\nLook this is an old option and it wont do much but possibly break the program so just activate it again.");
+                return;
+            }
             #endregion
 
             // Smol settings
@@ -58,18 +64,24 @@ namespace MusicPlayer
             // Support for older SongUpvote Lists
             if (config.Default.SongTotalDislikes == null && config.Default.SongPaths != null)
                 config.Default.SongTotalDislikes = new int[config.Default.SongPaths.Length];
+            if (config.Default.SongVolume == null && config.Default.SongPaths != null)
+            {
+                config.Default.SongVolume = new float[config.Default.SongPaths.Length];
+                for (int i = 0; i < config.Default.SongPaths.Length; i++)
+                    config.Default.SongVolume[i] = -1;
+            }
 
             #region Song Data List initialization
             Assets.UpvotedSongData = new List<UpvotedSong>();
             if (config.Default.SongPaths != null && config.Default.SongScores != null && config.Default.SongUpvoteStreak != null && config.Default.SongTotalLikes != null &&
-                config.Default.SongTotalDislikes != null && config.Default.SongDate != null &&
+                config.Default.SongTotalDislikes != null && config.Default.SongDate != null && config.Default.SongVolume != null &&
                 config.Default.SongScores.Length == config.Default.SongPaths.Length && config.Default.SongUpvoteStreak.Length == config.Default.SongPaths.Length &&
                 config.Default.SongTotalLikes.Length == config.Default.SongPaths.Length && config.Default.SongTotalDislikes.Length == config.Default.SongPaths.Length &&
-                config.Default.SongDate.Length == config.Default.SongPaths.Length)
+                config.Default.SongDate.Length == config.Default.SongPaths.Length && config.Default.SongVolume.Length == config.Default.SongPaths.Length)
             {
                 for (int i = 0; i < config.Default.SongPaths.Length; i++)
                     Assets.UpvotedSongData.Add(new UpvotedSong(config.Default.SongPaths[i], config.Default.SongScores[i], config.Default.SongUpvoteStreak[i],
-                            config.Default.SongTotalLikes[i], config.Default.SongTotalDislikes[i], config.Default.SongDate[i]));
+                            config.Default.SongTotalLikes[i], config.Default.SongTotalDislikes[i], config.Default.SongDate[i], config.Default.SongVolume[i]));
             }
             else if (!config.Default.FirstStart)
                 MessageBox.Show("Song statistics corrupted!\nResetting...");

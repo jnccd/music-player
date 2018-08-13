@@ -280,5 +280,16 @@ namespace MusicPlayer {
                 this["DiscordRPCActive"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public float[] SongVolume {
+            get {
+                return ((float[])(this["SongVolume"]));
+            }
+            set {
+                this["SongVolume"] = value;
+            }
+        }
     }
 }

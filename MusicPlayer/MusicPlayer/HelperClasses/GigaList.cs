@@ -9,6 +9,14 @@ namespace MusicPlayer
     {
         List<float>[] List;
         const long LIST_LENGTH = 67108863;
+        long count;
+        public long Count
+        {
+            get
+            {
+                return count;
+            }
+        }
 
         public GigaFloatList()
         {
@@ -16,6 +24,7 @@ namespace MusicPlayer
             List[0] = new List<float>((int)LIST_LENGTH);
             for (int i = 0; i < List.Length; i++)
                 List[i] = new List<float>(1);
+            count = 0;
         }
 
         public void Add(float item)
@@ -28,7 +37,8 @@ namespace MusicPlayer
                 else
                     break;
             }
-            
+
+            count++;
             List[ListIndex].Add(item);
         }
         public float Get(long index)
@@ -54,16 +64,6 @@ namespace MusicPlayer
             }
             else
                 return null;
-        }
-        public long Count
-        {
-            get
-            {
-                long i = 0;
-                foreach (List<float> L in List)
-                    i += L.Count;
-                return i;
-            }
         }
     }
 }

@@ -87,7 +87,6 @@ namespace MusicPlayer
         List<float> DebugPercentages = new List<float>();
         public bool FocusWindow = false;
         public bool Preload;
-        public bool TaskbarHidden = false;
         int originY;
         float[] values;
         bool WasFocusedLastFrame = true;
@@ -105,6 +104,8 @@ namespace MusicPlayer
         public bool ForcedCoverBackgroundRedraw = false;
         System.Drawing.Point newPos;
         System.Drawing.Point oldPos;
+        Point Diff = new Point();
+        Point[] WindowPoints = new Point[4];
 
         public OptionsMenu optionsMenu;
         public Statistics statistics;
@@ -248,7 +249,7 @@ namespace MusicPlayer
 
                         Thread.Sleep(5);
                         Console.SetCursorPosition(0, originY);
-                        for (int i = 0; i < Path.Length / 65 + 2; i++)
+                        for (int i = 0; i < Path.Length / 65 + 4; i++)
                             Console.Write("                                                                    ");
                         Console.SetCursorPosition(0, originY);
                         Console.ForegroundColor = ConsoleColor.White;
@@ -814,7 +815,7 @@ namespace MusicPlayer
             try
             {
                 if (config.Default.AutoVolume)
-                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume; // Null pointer exception? 13.02.18 13:36 / 27.02.18 01:35
+                    Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume * Values.VolumeMultiplier; // Null pointer exception? 13.02.18 13:36 / 27.02.18 01:35
                 else
                     Assets.Channel32.Volume = Values.TargetVolume;
             }
@@ -1184,7 +1185,7 @@ namespace MusicPlayer
                 {
                     double lastindex = Math.Pow(ReadLength, (i - 1) / (double)Values.WindowSize.X);
                     double index = Math.Pow(ReadLength, i / (double)Values.WindowSize.X);
-                    values[i - 70] = Assets.GetMaxHeight(Assets.FFToutput, (int)lastindex, (int)index);
+                    values[i - 70] = Assets.GetMaxHeight(Assets.FFToutput, (int)lastindex, (int)index) * Values.VolumeMultiplier * 2;
                 }
                 //Debug.WriteLine("GD Update 1 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
@@ -1199,7 +1200,7 @@ namespace MusicPlayer
         public void UpdateRectangles()
         {
             TargetVolumeBar.X = Values.WindowSize.X - 100;
-            TargetVolumeBar.Y = 24;
+            TargetVolumeBar.Y = 24 + 0;
             TargetVolumeBar.Width = (int)(75 * Values.TargetVolume / MaxVolume);
             TargetVolumeBar.Height = 8;
 
@@ -1207,7 +1208,9 @@ namespace MusicPlayer
             {
                 ActualVolumeBar.X = Values.WindowSize.X - 25 - 75;
                 ActualVolumeBar.Y = 24;
-                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume);
+                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume / Values.VolumeMultiplier);
+                if (ActualVolumeBar.Width > 75)
+                    ActualVolumeBar.Width = 75;
                 ActualVolumeBar.Height = 8;
             }
         }
@@ -1218,26 +1221,22 @@ namespace MusicPlayer
             Rectangle[] ScreenBoxes = new Rectangle[Screen.AllScreens.Length];
 
             for (int i = 0; i < ScreenBoxes.Length; i++)
-                ScreenBoxes[i] = new Rectangle(Screen.AllScreens[i].Bounds.X, Screen.AllScreens[i].Bounds.Y,
-                    Screen.AllScreens[i].Bounds.Width, Screen.AllScreens[i].Bounds.Height - 56);
-
-            Point[] WindowPoints = new Point[4];
+                ScreenBoxes[i] = new Rectangle(Screen.AllScreens[i].WorkingArea.X, Screen.AllScreens[i].WorkingArea.Y,
+                    Screen.AllScreens[i].WorkingArea.Width, Screen.AllScreens[i].WorkingArea.Height - 56);
+            
             WindowPoints[0] = new Point(VirtualWindow.X, VirtualWindow.Y);
             WindowPoints[1] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y);
             WindowPoints[2] = new Point(VirtualWindow.X, VirtualWindow.Y + VirtualWindow.Height);
             WindowPoints[3] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y + VirtualWindow.Height);
 
+            Screen Main = Values.TheWindowsMainScreen(VirtualWindow);
+            if (Main == null)
+                Main = Screen.PrimaryScreen;
+
             for (int i = 0; i < WindowPoints.Length; i++)
                 if (!RectanglesContainPoint(WindowPoints[i], ScreenBoxes))
                 {
-                    Screen Main = Values.TheWindowsMainScreen(VirtualWindow);
-                    if (Main == null) Main = Screen.PrimaryScreen;
-                    Point Diff = new Point();
-
-                    if (TaskbarHidden)
-                        Diff = PointRectDiff(WindowPoints[i], new Rectangle(Main.Bounds.X, Main.Bounds.Y, Main.Bounds.Width, Main.Bounds.Height - 2));
-                    else
-                        Diff = PointRectDiff(WindowPoints[i], new Rectangle(Main.Bounds.X, Main.Bounds.Y, Main.Bounds.Width, Main.Bounds.Height - 40));
+                    Diff = PointRectDiff(WindowPoints[i], new Rectangle(Main.WorkingArea.X, Main.WorkingArea.Y, Main.WorkingArea.Width, Main.WorkingArea.Height));
 
                     if (Diff != new Point(0, 0))
                     {
@@ -1311,7 +1310,7 @@ namespace MusicPlayer
         public void UpdateDiscordRPC()
         {
             // Old Arguments
-            bool WithTime = (Assets.output.PlaybackState == PlaybackState.Playing);
+            bool IsPlaying = (Assets.output.PlaybackState == PlaybackState.Playing);
             bool ElapsedTime = true;
 
             string SongName = Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongPath);
@@ -1319,7 +1318,7 @@ namespace MusicPlayer
 
             DateTime startTime, endTime;
             string smolimagekey = "", smolimagetext = "", bigimagekey = "iconv2";
-            if (WithTime)
+            if (IsPlaying)
             {
                 startTime = DateTime.Now.AddSeconds(-(Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
                 endTime = DateTime.Now.AddSeconds((1 - Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds);
@@ -1337,7 +1336,7 @@ namespace MusicPlayer
             }
 
             string details, state, time;
-            if (WithTime)
+            if (IsPlaying)
                 time = " (" + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
             else
                 time = " (" + Values.AsTime(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds) + " / " + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds) + ")";
@@ -1361,7 +1360,7 @@ namespace MusicPlayer
                 details = SongName;
                 state = "";
             }
-            if (SongName.Length <= 15)
+            if (SongName.Length <= 15 && IsPlaying || SongName.Length <= 10 && !IsPlaying)
             {
                 details += time;
             }
