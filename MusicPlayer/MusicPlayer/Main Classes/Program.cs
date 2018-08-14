@@ -21,6 +21,7 @@ namespace MusicPlayer
         public static bool Closing = false;
         public static FileSystemWatcher weightwatchers;
         public static FileSystemWatcher crackopenthebois;
+        static IntPtr m_hhook;
 
         [STAThread]
         static void Main(string[] args)
@@ -167,6 +168,12 @@ namespace MusicPlayer
                 catch (Exception ex) { MessageBox.Show("Couldn't set filewatcher! (ERROR: " + ex + ")"); }
             }
             #endregion
+
+            #region Game Started Stop Discord RPC Watcher
+            m_hhook = Values.SetWinEventHook(Values.EVENT_SYSTEM_FOREGROUND,
+                    Values.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero,
+                    _WinEvent, 0, 0, Values.WINEVENT_OUTOFCONTEXT);
+            #endregion
 #if DEBUG
             game = new XNA();
             game.Run();
@@ -178,7 +185,7 @@ namespace MusicPlayer
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".\n")
+                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".")
                     MessageBox.Show("I got brutally murdered by another Program. Please restart me.");
                 else if (ex.Message == "CouldntFindWallpaperFile")
                     MessageBox.Show("You seem to have moved your Desktop Wallpaper file since you last set it as your Wallpaper.\nPlease set it as your wallpaper again and restart me so I can actually find its file.");
@@ -203,6 +210,40 @@ namespace MusicPlayer
 #endif
         }
 
+        static bool DisabledDiscordRPCcuzGame = false;
+        static IntPtr hwnd;
+        static Values.WinEventDelegate _WinEvent = new Values.WinEventDelegate(WinEventProc);
+        // Event Handlers
+        static void WinEventProc(IntPtr hWinEventHook, uint eventType,
+            IntPtr hwnd, int idObject, int idChild,
+            uint dwEventThread, uint dwmsEventTime)
+        {
+            if (eventType == Values.EVENT_SYSTEM_FOREGROUND)
+            {
+                Program.hwnd = hwnd;
+                Task T = Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(1500);
+                    StringBuilder sb = new StringBuilder(500);
+                    Values.GetWindowText(Program.hwnd, sb, sb.Capacity);
+
+                    bool gameActive = Values.IsForegroundFullScreen();
+                    Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive + " | " + (game.optionsMenu == null));
+                    if (config.Default.DiscordRPCActive && gameActive)
+                    {
+                        DisabledDiscordRPCcuzGame = true;
+                        if (game.optionsMenu != null)
+                            game.optionsMenu.InvokeIfRequired(game.optionsMenu.DiscordToggleWrapper);
+                    }
+                    if (DisabledDiscordRPCcuzGame && !gameActive)
+                    {
+                        if (game.optionsMenu != null)
+                            game.optionsMenu.InvokeIfRequired(game.optionsMenu.DiscordToggleWrapper);
+                        DisabledDiscordRPCcuzGame = false;
+                    }
+                });
+            }
+        }
         public static void CrackOpen(object source, FileSystemEventArgs ev)
         {
             string[] bois = Directory.GetFiles(config.Default.BrowserDownloadFolderPath);
