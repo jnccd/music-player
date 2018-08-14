@@ -291,5 +291,17 @@ namespace MusicPlayer {
                 this["SongVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoStopDiscordRPConGameDetection {
+            get {
+                return ((bool)(this["AutoStopDiscordRPConGameDetection"]));
+            }
+            set {
+                this["AutoStopDiscordRPConGameDetection"] = value;
+            }
+        }
     }
 }

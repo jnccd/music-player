@@ -22,6 +22,7 @@ namespace MusicPlayer
         bool DownloadFinished;
         bool DoesPreloadActuallyWork = true;
         public bool IsClosed = false;
+        public bool HasBeenShown = false;
 
         public OptionsMenu(XNA parent)
         {
@@ -327,34 +328,46 @@ namespace MusicPlayer
             }
         }
 
+        public void DiscordToggleWrapper()
+        {
+            bDiscordRPC_Click(null, EventArgs.Empty);
+        }
         private void bDiscordRPC_Click(object sender, EventArgs e)
         {
-            bDiscordRPC.Enabled = false;
-            config.Default.DiscordRPCActive = !config.Default.DiscordRPCActive;
+            if (bDiscordRPC.Enabled)
+            {
+                bDiscordRPC.Enabled = false;
+                config.Default.DiscordRPCActive = !config.Default.DiscordRPCActive;
 
-            if (config.Default.DiscordRPCActive)
-            {
-                DiscordRPCWrapper.Initialize("460490126607384576");
-                Program.game.UpdateDiscordRPC();
-                bDiscordRPC.Text = "Deactivate DiscordRPC";
+                if (config.Default.DiscordRPCActive)
+                {
+                    DiscordRPCWrapper.Initialize("460490126607384576");
+                    Program.game.UpdateDiscordRPC();
+                    bDiscordRPC.Text = "Deactivate DiscordRPC";
+                }
+                else
+                {
+                    DiscordRPCWrapper.Shutdown();
+                    bDiscordRPC.Text = "Activate DiscordRPC";
+                }
+
+                Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(1500);
+                    Program.game.optionsMenu.InvokeIfRequired(() => { bDiscordRPC.Enabled = true; });
+                });
             }
-            else
-            {
-                DiscordRPCWrapper.Shutdown();
-                bDiscordRPC.Text = "Activate DiscordRPC";
-            }
-            
-            Task.Factory.StartNew(() =>
-            {
-                Thread.Sleep(1500);
-                Program.game.optionsMenu.InvokeIfRequired(() => { bDiscordRPC.Enabled = true; });
-            });
         }
 
         private void DownloadBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
                 Download_Click(null, EventArgs.Empty);
+        }
+
+        private void OptionsMenu_Shown(object sender, EventArgs e)
+        {
+            HasBeenShown = true;
         }
     }
 }

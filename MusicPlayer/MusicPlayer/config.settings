@@ -71,5 +71,8 @@
     <Setting Name="SongVolume" Type="System.Single[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AutoStopDiscordRPConGameDetection" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

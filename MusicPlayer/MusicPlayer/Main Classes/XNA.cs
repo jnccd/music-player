@@ -170,6 +170,7 @@ namespace MusicPlayer
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 120.0f);
             //graphics.SynchronizeWithVerticalRetrace = false;
             //IsFixedTimeStep = false;
+            optionsMenu = new OptionsMenu(this);
             IsMouseVisible = true;
         }
         protected override void Initialize()
@@ -1299,13 +1300,13 @@ namespace MusicPlayer
         }
         public void ShowOptions()
         {
-            if (optionsMenu == null || optionsMenu.IsClosed || optionsMenu.IsDisposed)
+            if (optionsMenu == null || optionsMenu.IsClosed || optionsMenu.IsDisposed || !optionsMenu.HasBeenShown)
             {
                 optionsMenu = new OptionsMenu(this);
                 Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
             }
             else
-                optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
+                optionsMenu.InvokeIfRequired(() => { Values.ShowWindow(optionsMenu.Handle, 9); });
         }
         public void UpdateDiscordRPC()
         {

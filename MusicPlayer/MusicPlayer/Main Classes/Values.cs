@@ -18,6 +18,7 @@ using Microsoft.Win32.SafeHandles;
 using System.IO;
 using System.Text;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace MusicPlayer
 {
@@ -429,7 +430,7 @@ namespace MusicPlayer
         [DllImport("Kernel32")]
         public static extern void FreeConsole();
         [DllImport("kernel32.dll")]
-        private static extern bool AttachConsole(uint dwProcessId);
+        public static extern bool AttachConsole(uint dwProcessId);
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetStdHandle(UInt32 nStdHandle);
         [DllImport("kernel32.dll")]
@@ -440,7 +441,7 @@ namespace MusicPlayer
         [DllImport("user32.dll")]
         public static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
         [DllImport("user32.dll")]
-        private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("user32.dll")]
@@ -448,17 +449,65 @@ namespace MusicPlayer
         public static extern bool IsWindowVisible(IntPtr hWnd);
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
         [DllImport("kernel32.dll",
             EntryPoint = "GetStdHandle",
             SetLastError = true,
             CharSet = CharSet.Auto,
             CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr GetStdHandle(int nStdHandle);
-        private const int STD_OUTPUT_HANDLE = -11;
-        private const int MY_CODE_PAGE = 437;
+        public static extern IntPtr GetStdHandle(int nStdHandle);
+        public const int STD_OUTPUT_HANDLE = -11;
+        public const int MY_CODE_PAGE = 437;
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(HandleRef hWnd, [In, Out] ref RECT rect);
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+        public delegate void WinEventDelegate(IntPtr hWinEventHook,
+            uint eventType, IntPtr hwnd, int idObject,
+            int idChild, uint dwEventThread, uint dwmsEventTime);
+        public const uint WINEVENT_OUTOFCONTEXT = 0;
+        public const uint EVENT_SYSTEM_FOREGROUND = 3;
+        [DllImport("user32.dll")]
+        public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWinEventHook(uint eventMin,
+            uint eventMax, IntPtr hmodWinEventProc,
+            WinEventDelegate lpfnWinEventProc, uint idProcess,
+            uint idThread, uint dwFlags);
+        [DllImport("user32.dll")]
+        public static extern int GetWindowText(IntPtr hWnd,
+            StringBuilder lpString, int nMaxCount);
 
-        private struct WINDOWPLACEMENT
+        public static bool IsForegroundFullScreen()
+        {
+            return IsForegroundFullScreen(null);
+        }
+        public static bool IsForegroundFullScreen(Screen screen)
+        {
+            if (screen == null)
+                screen = Screen.PrimaryScreen;
+            RECT rect = new RECT();
+            IntPtr hWnd = (IntPtr)GetForegroundWindow();
+            
+            GetWindowRect(new HandleRef(null, hWnd), ref rect);
+            
+            if (screen.Bounds.Width == (rect.right - rect.left) && screen.Bounds.Height == (rect.bottom - rect.top))
+                return true;
+            else
+                return false;
+        }
+        
+        public struct WINDOWPLACEMENT
         {
             public int length;
             public int flags;
@@ -545,29 +594,6 @@ namespace MusicPlayer
         }
 
     }
-    enum AccentState
-    {
-        ACCENT_DISABLED = 0,
-        ACCENT_ENABLE_GRADIENT = 1,
-        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
-        ACCENT_ENABLE_BLURBEHIND = 3,
-        ACCENT_INVALID_STATE = 4
-    }
-    struct AccentPolicy
-    {
-        public AccentState AccentState;
-    }
-    struct WindowCompositionAttributeData
-    {
-        public WindowCompositionAttribute Attribute;
-        public IntPtr Data;
-        public int SizeOfData;
-    }
-    enum WindowCompositionAttribute
-    {
-        WCA_ACCENT_POLICY = 19
-    }
-    
     public static class FormExtensions
     {
         public static void InvokeIfRequired(this ISynchronizeInvoke obj,
@@ -593,6 +619,29 @@ namespace MusicPlayer
         }
     }
 
+    enum AccentState
+    {
+        ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_GRADIENT = 1,
+        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+        ACCENT_ENABLE_BLURBEHIND = 3,
+        ACCENT_INVALID_STATE = 4
+    }
+    struct AccentPolicy
+    {
+        public AccentState AccentState;
+    }
+    struct WindowCompositionAttributeData
+    {
+        public WindowCompositionAttribute Attribute;
+        public IntPtr Data;
+        public int SizeOfData;
+    }
+    enum WindowCompositionAttribute
+    {
+        WCA_ACCENT_POLICY = 19
+    }
+    
     public class Approximate
     {
         public static float Sqrt(float z)

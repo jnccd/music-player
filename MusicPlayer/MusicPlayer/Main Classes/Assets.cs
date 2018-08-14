@@ -1050,7 +1050,7 @@ namespace MusicPlayer
                 int TotalLike = UpvotedSongData[i].TotalLikes;
                 if (TotalLike < 1)
                     TotalLike = 1;
-                SongInformationArray[i, 3] = (float)TotalLike / UpvotedSongData[i].TotalDislikes;
+                SongInformationArray[i, 3] = TotalLike + "/" + UpvotedSongData[i].TotalDislikes + "=" + ((float)TotalLike / UpvotedSongData[i].TotalDislikes);
                 SongInformationArray[i, 4] = SongAge(i);
             }
             string lastSong = "";

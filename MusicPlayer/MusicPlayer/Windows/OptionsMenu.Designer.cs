@@ -353,6 +353,7 @@
             this.Text = "OptionsMenu";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OptionsMenu_FormClosed);
             this.Load += new System.EventHandler(this.OptionsMenu_Load);
+            this.Shown += new System.EventHandler(this.OptionsMenu_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).EndInit();
             this.ResumeLayout(false);
