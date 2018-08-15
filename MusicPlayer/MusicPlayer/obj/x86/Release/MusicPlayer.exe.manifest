@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="194560">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="196608">
       <assemblyIdentity name="MusicPlayer" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>XVilWP8sqAjtntDsBLURB9RywSU=</dsig:DigestValue>
+        <dsig:DigestValue>Av4T9XAYs86B3hVQ+TeoZS3VPb0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -351,13 +351,13 @@
       <dsig:DigestValue>diNvdcDpDtGEMuMQIHpkKK3qVHc=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="MusicPlayer.exe.config" size="5560">
+  <file name="MusicPlayer.exe.config" size="5683">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>1EF4H2w7/EjictXd3eJE9lGnl/s=</dsig:DigestValue>
+      <dsig:DigestValue>w4D6ZMRVw5PN0l0hsz5WrTbgt2c=</dsig:DigestValue>
     </hash>
   </file>
   <file name="shell32_246.ico" size="46882">

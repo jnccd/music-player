@@ -1306,7 +1306,7 @@ namespace MusicPlayer
                 Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
             }
             else
-                optionsMenu.InvokeIfRequired(() => { Values.ShowWindow(optionsMenu.Handle, 9); });
+                optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
         }
         public void UpdateDiscordRPC()
         {

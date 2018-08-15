@@ -21,8 +21,7 @@ namespace MusicPlayer
         public static bool Closing = false;
         public static FileSystemWatcher weightwatchers;
         public static FileSystemWatcher crackopenthebois;
-        static IntPtr m_hhook;
-
+        
         [STAThread]
         static void Main(string[] args)
         {
@@ -174,6 +173,7 @@ namespace MusicPlayer
                     Values.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero,
                     _WinEvent, 0, 0, Values.WINEVENT_OUTOFCONTEXT);
             #endregion
+
 #if DEBUG
             game = new XNA();
             game.Run();
@@ -185,13 +185,6 @@ namespace MusicPlayer
             }
             catch (Exception ex)
             {
-                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".")
-                    MessageBox.Show("I got brutally murdered by another Program. Please restart me.");
-                else if (ex.Message == "CouldntFindWallpaperFile")
-                    MessageBox.Show("You seem to have moved your Desktop Wallpaper file since you last set it as your Wallpaper.\nPlease set it as your wallpaper again and restart me so I can actually find its file.");
-                else
-                    MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + "\n\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source);
-                
                 string strPath = Values.CurrentExecutablePath + @"\Log.txt";
                 if (!File.Exists(strPath))
                 {
@@ -206,19 +199,61 @@ namespace MusicPlayer
                     sw.WriteLine("Stack Trace: " + ex.StackTrace);
                     sw.WriteLine("=============End=============");
                 }
+
+                DiscordRPCWrapper.Shutdown();
+                InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+                Assets.DisposeNAudioData();
+                if (game.optionsMenu != null)
+                    game.optionsMenu.InvokeIfRequired(game.optionsMenu.Close);
+                if (game.statistics != null)
+                    game.statistics.InvokeIfRequired(game.statistics.Close);
+                Closing = true;
+
+                DialogResult D;
+                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".")
+                    D = MessageBox.Show("I got brutally murdered by another Program. Please restart me.", "Slaughtered by another program", 
+                        MessageBoxButtons.RetryCancel);
+                else if (ex.Message == "CouldntFindWallpaperFile")
+                    D = MessageBox.Show("You seem to have moved your Desktop Wallpaper file since you last set it as your Wallpaper.\n" +
+                        "Please set it as your wallpaper again and restart me so I can actually find its file.", 
+                        "Couldn't find your wallpaper", MessageBoxButtons.RetryCancel);
+                else
+                    D = MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + 
+                        "\n\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source, "Error", MessageBoxButtons.RetryCancel);
+                
+                if (D == DialogResult.Retry)
+                {
+                    string RestartLocation = Values.CurrentExecutablePath + "\\Restart.bat";
+
+                    if (File.Exists(RestartLocation))
+                        File.Delete(RestartLocation);
+
+                    using (StreamWriter sw = File.CreateText(RestartLocation))
+                        sw.WriteLine(@"@echo off
+echo     ____               __                __   _                     
+echo    / __ \ ___   _____ / /_ ____ _ _____ / /_ (_)____   ____ _       
+echo   / /_/ // _ \ / ___// __// __ `// ___// __// // __ \ / __ `/       
+echo  / _, _//  __/(__  )/ /_ / /_/ // /   / /_ / // / / // /_/ /_  _  _ 
+echo /_/ ^|_^| ^\___//____/ \__/ \__,_//_/    \__//_//_/ /_/ \__, /(_)(_)(_)
+echo                                                     /____/          
+ping 127.0.0.1 > nul
+start MusicPlayer.exe");
+
+                    Process.Start(RestartLocation);
+                }
             }
 #endif
         }
 
-        static bool DisabledDiscordRPCcuzGame = false;
+        #region Event Handlers
+        static IntPtr m_hhook;
         static IntPtr hwnd;
         static Values.WinEventDelegate _WinEvent = new Values.WinEventDelegate(WinEventProc);
-        // Event Handlers
         static void WinEventProc(IntPtr hWinEventHook, uint eventType,
             IntPtr hwnd, int idObject, int idChild,
             uint dwEventThread, uint dwmsEventTime)
         {
-            if (eventType == Values.EVENT_SYSTEM_FOREGROUND)
+            if (eventType == Values.EVENT_SYSTEM_FOREGROUND && config.Default.AutoStopDiscordRPConGameDetection)
             {
                 Program.hwnd = hwnd;
                 Task T = Task.Factory.StartNew(() =>
@@ -228,18 +263,16 @@ namespace MusicPlayer
                     Values.GetWindowText(Program.hwnd, sb, sb.Capacity);
 
                     bool gameActive = Values.IsForegroundFullScreen();
-                    Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive + " | " + (game.optionsMenu == null));
+                    Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive);
                     if (config.Default.DiscordRPCActive && gameActive)
                     {
-                        DisabledDiscordRPCcuzGame = true;
                         if (game.optionsMenu != null)
                             game.optionsMenu.InvokeIfRequired(game.optionsMenu.DiscordToggleWrapper);
                     }
-                    if (DisabledDiscordRPCcuzGame && !gameActive)
+                    if (!config.Default.DiscordRPCActive && !gameActive)
                     {
                         if (game.optionsMenu != null)
                             game.optionsMenu.InvokeIfRequired(game.optionsMenu.DiscordToggleWrapper);
-                        DisabledDiscordRPCcuzGame = false;
                     }
                 });
             }
@@ -289,6 +322,7 @@ namespace MusicPlayer
                 }
             }
         }
+        #endregion
     }
 }
 

@@ -55,6 +55,7 @@
             this.history = new System.Windows.Forms.Button();
             this.bBDownloadF = new System.Windows.Forms.Button();
             this.bDiscordRPC = new System.Windows.Forms.Button();
+            this.cDiscRPC = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
@@ -308,7 +309,7 @@
             // 
             // bDiscordRPC
             // 
-            this.bDiscordRPC.Location = new System.Drawing.Point(12, 388);
+            this.bDiscordRPC.Location = new System.Drawing.Point(9, 412);
             this.bDiscordRPC.Name = "bDiscordRPC";
             this.bDiscordRPC.Size = new System.Drawing.Size(416, 23);
             this.bDiscordRPC.TabIndex = 25;
@@ -316,11 +317,23 @@
             this.bDiscordRPC.UseVisualStyleBackColor = true;
             this.bDiscordRPC.Click += new System.EventHandler(this.bDiscordRPC_Click);
             // 
+            // cDiscRPC
+            // 
+            this.cDiscRPC.AutoSize = true;
+            this.cDiscRPC.Location = new System.Drawing.Point(13, 389);
+            this.cDiscRPC.Name = "cDiscRPC";
+            this.cDiscRPC.Size = new System.Drawing.Size(396, 17);
+            this.cDiscRPC.TabIndex = 26;
+            this.cDiscRPC.Text = "Automatic DiscordRPC deactivation when playing a game/activation when not";
+            this.cDiscRPC.UseVisualStyleBackColor = true;
+            this.cDiscRPC.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged_1);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 421);
+            this.ClientSize = new System.Drawing.Size(438, 446);
+            this.Controls.Add(this.cDiscRPC);
             this.Controls.Add(this.bDiscordRPC);
             this.Controls.Add(this.bBDownloadF);
             this.Controls.Add(this.history);
@@ -389,5 +402,6 @@
         private System.Windows.Forms.Button history;
         private System.Windows.Forms.Button bBDownloadF;
         private System.Windows.Forms.Button bDiscordRPC;
+        private System.Windows.Forms.CheckBox cDiscRPC;
     }
 }

@@ -562,7 +562,7 @@ namespace MusicPlayer
 
                         int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
                         Values.VolumeMultiplier = mult;
-                        UpvotedSongData[index].Volume = mult;
+                        UpvotedSongData[index].Volume = sn;
 
                         Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
                         Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn + ", MAX Volume = " + sm);
@@ -799,10 +799,10 @@ namespace MusicPlayer
                 GetNextSong(true, false);
                 return;
             }
-
+            
             int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
             if (index != -1 && UpvotedSongData[index].Volume != -1)
-                Values.VolumeMultiplier = UpvotedSongData[index].Volume;
+                Values.VolumeMultiplier = 0.12f / UpvotedSongData[index].Volume;
 
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
