@@ -41,6 +41,7 @@ namespace MusicPlayer
 
         private void OptionsMenu_Load(object sender, EventArgs e)
         {
+            cDiscRPC.Checked = config.Default.AutoStopDiscordRPConGameDetection;
             if (config.Default.DiscordRPCActive)
                 bDiscordRPC.Text = "Deactivate DiscordRPC";
             else
@@ -368,6 +369,11 @@ namespace MusicPlayer
         private void OptionsMenu_Shown(object sender, EventArgs e)
         {
             HasBeenShown = true;
+        }
+
+        private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
+        {
+            config.Default.AutoStopDiscordRPConGameDetection = cDiscRPC.Checked;
         }
     }
 }

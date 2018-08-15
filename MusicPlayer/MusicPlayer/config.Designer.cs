@@ -303,5 +303,17 @@ namespace MusicPlayer {
                 this["AutoStopDiscordRPConGameDetection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int configVersion {
+            get {
+                return ((int)(this["configVersion"]));
+            }
+            set {
+                this["configVersion"] = value;
+            }
+        }
     }
 }
