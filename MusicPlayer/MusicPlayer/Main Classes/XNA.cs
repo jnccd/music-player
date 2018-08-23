@@ -94,6 +94,7 @@ namespace MusicPlayer
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
         Task SongCheckThread;
+        Task CloseConfirmationThread;
         const float MaxVolume = 0.75f;
         int lastSongRequestCheck = -100;
         public long SkipStartPosition = 0;
@@ -925,18 +926,21 @@ namespace MusicPlayer
                     break;
 
                 case SelectedControl.CloseButton:
-                    if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
+                    if (Control.WasLMBJustPressed() || !WasFocusedLastFrame)
                     {
-                        Task.Factory.StartNew(() =>
+                        if (CloseConfirmationThread == null || CloseConfirmationThread.Status == TaskStatus.RanToCompletion)
                         {
-                            if (MessageBox.Show("Do you really want to close me? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            CloseConfirmationThread = Task.Factory.StartNew(() =>
                             {
-                                Program.Closing = true;
-                                gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
-                                DiscordRPCWrapper.Shutdown();
-                                Application.Exit();
-                            }
-                        });
+                                if (MessageBox.Show("Do you really want to close me? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                {
+                                    Program.Closing = true;
+                                    gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
+                                    DiscordRPCWrapper.Shutdown();
+                                    Application.Exit();
+                                }
+                            });
+                        }
                     }
                     break;
 
