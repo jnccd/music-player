@@ -166,9 +166,11 @@ namespace MusicPlayer
         // NAudio
         public static WaveChannel32 Channel32;
         public static WaveChannel32 Channel32Reader;
+        public static WaveChannel32 Channel32ReaderThreaded;
         public static DirectSoundOut output;
         public static Mp3FileReader mp3;
         public static Mp3FileReader mp3Reader;
+        public static Mp3FileReader mp3ReaderThreaded;
         public static MMDevice device;
         public static MMDeviceEnumerator enumerator;
         //public const int bufferLength = 8192;
@@ -422,6 +424,15 @@ namespace MusicPlayer
                 catch { Debug.WriteLine("Couldn't dispose the reader"); }
                 Channel32Reader = null;
             }
+            if (Channel32ReaderThreaded != null)
+            {
+                try
+                {
+                    Channel32ReaderThreaded.Dispose();
+                }
+                catch { Debug.WriteLine("Couldn't dispose the reader"); }
+                Channel32ReaderThreaded = null;
+            }
             if (mp3 != null)
             {
                 mp3.Dispose();
@@ -439,15 +450,11 @@ namespace MusicPlayer
             {
                 Channel32Reader.Position = Channel32.Position;
 
-                while (true)
+                try
                 {
-                    try
-                    {
-                        int Read = Channel32Reader.Read(buffer, 0, bufferLength);
-                        break;
-                    }
-                    catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
+                    int Read = Channel32Reader.Read(buffer, 0, bufferLength);
                 }
+                catch { Debug.WriteLine("AHAHHAHAHAHA.... ich kann nicht lesen"); }
 
                 // Converting the byte buffer in readable data
                 for (int i = 0; i < bufferLength / 4; i++)
@@ -494,7 +501,7 @@ namespace MusicPlayer
         {
             try
             {
-                lock (Channel32Reader)
+                lock (Channel32ReaderThreaded)
                 {
                     byte[] buffer = new byte[16384];
 
@@ -503,15 +510,15 @@ namespace MusicPlayer
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
 
-                    Channel32Reader.Position = 0;
+                    Channel32ReaderThreaded.Position = 0;
                     EntireSongWaveBuffer = new GigaFloatList();
                     
-                    while (Channel32Reader.Position < Channel32Reader.Length)
+                    while (Channel32ReaderThreaded.Position < Channel32ReaderThreaded.Length)
                     {
                         if (AbortAbort)
                             break;
 
-                        int read = Channel32Reader.Read(buffer, 0, 16384);
+                        int read = Channel32ReaderThreaded.Read(buffer, 0, 16384);
 
                         if (AbortAbort)
                             break;
@@ -527,7 +534,7 @@ namespace MusicPlayer
                         bool noVolumeData = DoesCurrentSongaveNoVolumeData();
 
                         while (Channel32 != null && 
-                            Channel32.Position < Channel32Reader.Position - config.Default.WavePreload * Channel32Reader.Length / 100f &&
+                            Channel32.Position < Channel32ReaderThreaded.Position - config.Default.WavePreload * Channel32ReaderThreaded.Length / 100f &&
                             !noVolumeData)
                         {
                             if (AbortAbort)
@@ -538,7 +545,7 @@ namespace MusicPlayer
 
                     SongBufferThreadWasAborted = AbortAbort;
                     
-                    if (Channel32Reader.Position >= Channel32Reader.Length && DoesCurrentSongaveNoVolumeData())
+                    if (Channel32ReaderThreaded.Position >= Channel32ReaderThreaded.Length && DoesCurrentSongaveNoVolumeData())
                     {
                         float n = 0;
 
@@ -583,19 +590,29 @@ namespace MusicPlayer
         }
         public static void UpdateWaveBufferWithEntireSongWB()
         {
+            bool worked = false;
             try
             {
                 lock (EntireSongWaveBuffer)
                 {
-                    WaveBuffer = new float[bufferLength / 4];
                     if (Channel32 != null && Channel32.CanRead && EntireSongWaveBuffer.Count > Channel32.Position / 4 && Channel32.Position > bufferLength)
+                    {
                         WaveBuffer = EntireSongWaveBuffer.GetRange((int)((Channel32.Position - bufferLength / 2) / 4), bufferLength / 4).ToArray();
+                        worked = true;
+                    }
                     else
+                    {
+                        if (WaveBuffer == null || WaveBuffer.Length != bufferLength / 4)
+                            WaveBuffer = new float[bufferLength / 4];
                         for (int i = 0; i < bufferLength / 4; i++)
                             WaveBuffer[i] = 0;
+                    }
                 }
             }
             catch { }
+
+            if (!worked)
+                UpdateWaveBuffer();
         }
         public static float GetAverageHeight(float[] array, int from, int to)
         {
@@ -813,19 +830,21 @@ namespace MusicPlayer
 
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
-            
-            DisposeNAudioData();
             Program.game.ForceTitleRedraw();
             if (Program.game.DG != null)
                 Program.game.DG.Clear();
+
+            DisposeNAudioData();
 
             if (PathString.Contains("\""))
                 PathString = PathString.Trim(new char[] { '"', ' ' });
             
             mp3 = new Mp3FileReader(PathString);
             mp3Reader = new Mp3FileReader(PathString);
+            mp3ReaderThreaded = new Mp3FileReader(PathString);
             Channel32 = new WaveChannel32(mp3);
             Channel32Reader = new WaveChannel32(mp3Reader);
+            Channel32ReaderThreaded = new WaveChannel32(mp3ReaderThreaded);
 
             output = new DirectSoundOut();
             output.Init(Channel32);
