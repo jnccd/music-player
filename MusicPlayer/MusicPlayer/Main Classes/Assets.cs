@@ -541,23 +541,17 @@ namespace MusicPlayer
                     if (Channel32Reader.Position >= Channel32Reader.Length && DoesCurrentSongaveNoVolumeData())
                     {
                         float n = 0;
-                        float m = 0;
 
                         for (int i = 0; i < EntireSongWaveBuffer.Count; i++)
                         {
                             float f = EntireSongWaveBuffer.Get(i) * EntireSongWaveBuffer.Get(i);
                             n += f;
-                            if (m < f)
-                                m = f;
                         }
                         n /= EntireSongWaveBuffer.Count;
 
                         float sn = Approximate.Sqrt(n);
-                        float sm = Approximate.Sqrt(m);
 
-                        float papr = (float)Math.Log(m/n);
-
-                        float mult = 0.12f / sn;
+                        float mult = Values.BaseVolume / sn;
                         Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
 
                         int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
@@ -565,8 +559,8 @@ namespace MusicPlayer
                         UpvotedSongData[index].Volume = sn;
 
                         Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
-                        Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn + ", MAX Volume = " + sm);
-                        Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult + ", PAPR = " + papr);
+                        Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn);
+                        Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult);
                         Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
                     }
 
@@ -802,7 +796,11 @@ namespace MusicPlayer
             
             int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
             if (index != -1 && UpvotedSongData[index].Volume != -1)
-                Values.VolumeMultiplier = 0.12f / UpvotedSongData[index].Volume;
+            {
+                float mult = Values.BaseVolume / UpvotedSongData[index].Volume;
+                Values.VolumeMultiplier = mult;
+                Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+            }
 
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
@@ -845,6 +843,7 @@ namespace MusicPlayer
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
 
+            AddSongToListIfNotDoneSoFar(currentlyPlayingSongPath);
             Program.game.UpdateDiscordRPC();
         }
         public static void SaveUserSettings(bool SongSwap)

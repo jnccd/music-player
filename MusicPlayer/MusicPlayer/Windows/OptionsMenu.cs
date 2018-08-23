@@ -375,5 +375,12 @@ namespace MusicPlayer
         {
             config.Default.AutoStopDiscordRPConGameDetection = cDiscRPC.Checked;
         }
+
+        private void bDrag_MouseDown(object sender, MouseEventArgs e)
+        {
+            string path = Assets.currentlyPlayingSongPath;
+            string[] files = new string[1]; files[0] = path;
+            bDrag.DoDragDrop(new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
+        }
     }
 }
