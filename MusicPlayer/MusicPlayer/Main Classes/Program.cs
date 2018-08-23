@@ -263,7 +263,7 @@ start MusicPlayer.exe");
                     Values.GetWindowText(Program.hwnd, sb, sb.Capacity);
 
                     bool gameActive = Values.IsForegroundFullScreen();
-                    Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive);
+                    //Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive);
                     if (config.Default.DiscordRPCActive && gameActive)
                     {
                         if (game.optionsMenu != null)
@@ -279,6 +279,7 @@ start MusicPlayer.exe");
         }
         public static void CrackOpen(object source, FileSystemEventArgs ev)
         {
+            Thread.Sleep(50);
             string[] bois = Directory.GetFiles(config.Default.BrowserDownloadFolderPath);
             for (int i = 0; i < bois.Length; i++)
             {

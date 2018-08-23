@@ -56,6 +56,7 @@
             this.bBDownloadF = new System.Windows.Forms.Button();
             this.bDiscordRPC = new System.Windows.Forms.Button();
             this.cDiscRPC = new System.Windows.Forms.CheckBox();
+            this.bDrag = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tSmoothness)).BeginInit();
             this.SuspendLayout();
@@ -311,7 +312,7 @@
             // 
             this.bDiscordRPC.Location = new System.Drawing.Point(9, 412);
             this.bDiscordRPC.Name = "bDiscordRPC";
-            this.bDiscordRPC.Size = new System.Drawing.Size(416, 23);
+            this.bDiscordRPC.Size = new System.Drawing.Size(208, 23);
             this.bDiscordRPC.TabIndex = 25;
             this.bDiscordRPC.Text = "Activate DiscordRPC";
             this.bDiscordRPC.UseVisualStyleBackColor = true;
@@ -328,11 +329,22 @@
             this.cDiscRPC.UseVisualStyleBackColor = true;
             this.cDiscRPC.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged_1);
             // 
+            // bDrag
+            // 
+            this.bDrag.Location = new System.Drawing.Point(223, 412);
+            this.bDrag.Name = "bDrag";
+            this.bDrag.Size = new System.Drawing.Size(202, 23);
+            this.bDrag.TabIndex = 27;
+            this.bDrag.Text = "DragDrop Song";
+            this.bDrag.UseVisualStyleBackColor = true;
+            this.bDrag.MouseDown += new System.Windows.Forms.MouseEventHandler(this.bDrag_MouseDown);
+            // 
             // OptionsMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(438, 446);
+            this.ClientSize = new System.Drawing.Size(438, 449);
+            this.Controls.Add(this.bDrag);
             this.Controls.Add(this.cDiscRPC);
             this.Controls.Add(this.bDiscordRPC);
             this.Controls.Add(this.bBDownloadF);
@@ -403,5 +415,6 @@
         private System.Windows.Forms.Button bBDownloadF;
         private System.Windows.Forms.Button bDiscordRPC;
         private System.Windows.Forms.CheckBox cDiscRPC;
+        private System.Windows.Forms.Button bDrag;
     }
 }

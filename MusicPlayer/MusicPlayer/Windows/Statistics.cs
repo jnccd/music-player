@@ -397,9 +397,11 @@ namespace MusicPlayer
                     })));
 
                 currentMouseOverRow = e.RowIndex;
-
                 m.Show(dataGridView1, new Point(e.X + dataGridView1.GetColumnDisplayRectangle(e.ColumnIndex, true).X, e.Y + dataGridView1.GetRowDisplayRectangle(e.RowIndex, true).Y));
             }
+
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+                currentMouseOverRow = e.RowIndex;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -441,6 +443,48 @@ namespace MusicPlayer
                 }
 
             dataGridView1.FirstDisplayedScrollingRowIndex = index;
+        }
+
+        private void dataGridView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            timerTicks = 0;
+            timer1.Enabled = true;
+            MouseDrag = new Point(e.X, e.Y);
+        }
+
+        int timerTicks = 0;
+        Point MousePos;
+        Point MouseDrag;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timerTicks++;
+            if (timerTicks == 2 && Math.Abs(MousePos.X - MouseDrag.X + MousePos.Y - MouseDrag.Y) < 15)
+            {
+                string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                string[] files = new string[1]; files[0] = path;
+                dataGridView1.DoDragDrop(new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
+                timer1.Enabled = false;
+            }
+        }
+
+        private void dataGridView1_DragEnter(object sender, DragEventArgs e)
+        {
+            //Debug.WriteLine(((string[])e.Data.GetData(typeof(string[])))[0] + " $|$ " + e.Effect);
+        }
+        
+        private void dataGridView1_MouseMove(object sender, MouseEventArgs e)
+        {
+            MousePos = new Point(e.X, e.Y);
+        }
+
+        private void dataGridView1_DragLeave(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void dataGridView1_DragOver(object sender, DragEventArgs e)
+        {
+            
         }
     }
 }

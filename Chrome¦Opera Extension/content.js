@@ -31,7 +31,7 @@ if (check.length == 0) {
 	bs.id = 'text';
 	bs.className = 'style-scope ytd-subscribe-button-renderer';
 	bp.append(bs);
-	var bt = document.createTextNode('Download as Song');
+	var bt = document.createTextNode('Song Download');
 	bs.append(bt);
 	b.removeChild(b.children[0]);
 	
@@ -55,7 +55,7 @@ if (check.length == 0) {
 	bs2.id = 'text';
 	bs2.className = 'style-scope ytd-subscribe-button-renderer';
 	bp2.append(bs2);
-	var bt2 = document.createTextNode('Download as Video');
+	var bt2 = document.createTextNode('Video Download');
 	bs2.append(bt2);
 	b2.removeChild(b2.children[0]);
 	

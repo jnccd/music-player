@@ -927,12 +927,16 @@ namespace MusicPlayer
                 case SelectedControl.CloseButton:
                     if (Control.WasLMBJustPressed() || !WasFocusedLastFrame && gameWindowForm.Focused)
                     {
-                        if (MessageBox.Show("You really want to close me?", "Quit?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        Task.Factory.StartNew(() =>
                         {
-                            Program.Closing = true;
-                            gameWindowForm.Close();
-                            DiscordRPCWrapper.Shutdown();
-                        }
+                            if (MessageBox.Show("Do you really want to close me? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            {
+                                Program.Closing = true;
+                                gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
+                                DiscordRPCWrapper.Shutdown();
+                                Application.Exit();
+                            }
+                        });
                     }
                     break;
 
@@ -1093,8 +1097,19 @@ namespace MusicPlayer
                 Assets.GetNextSong(false, true);
 
             // Close [Esc]
-            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive && MessageBox.Show("Do you really want to close me senpai? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                Exit();
+            if (Control.CurKS.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape) && base.IsActive)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    if (MessageBox.Show("Do you really want to close me? :<", "Quit!?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        Program.Closing = true;
+                        gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
+                        DiscordRPCWrapper.Shutdown();
+                        Application.Exit();
+                    }
+                });
+            }
 
             // Show Music File in Explorer [E]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.E))
