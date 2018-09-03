@@ -32,8 +32,7 @@ namespace MusicPlayer
             for (int i = 0; i < Assets.HistorySongData.Count; i++)
             {
                 dataGridView1.Rows.Add(new object[] { Assets.HistorySongData[i].Name, DateTime.FromBinary(Assets.HistorySongData[i].Date), Assets.HistorySongData[i].Change });
-                if (!Assets.UpvotedSongData.Select(x => x.Name).Contains(Assets.HistorySongData[i].Name.EndsWith(".mp3") ? 
-                    Assets.HistorySongData[i].Name : Assets.HistorySongData[i].Name + ".mp3"))
+                if (!Assets.UpvotedSongData.Select(x => x.Name).Contains(Assets.HistorySongData[i].Name + ".mp3"))
                     dataGridView1.Rows[dataGridView1.Rows.Count - 1].DefaultCellStyle.BackColor = Color.Red;
             }
 
