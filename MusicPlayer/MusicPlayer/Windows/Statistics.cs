@@ -41,12 +41,7 @@ namespace MusicPlayer
 
         private void dataGridView1_Resize(object sender, EventArgs e)
         {
-            dataGridView1.Columns[0].Width = dataGridView1.Width - 460;
-            dataGridView1.Columns[1].Width = 80;
-            dataGridView1.Columns[2].Width = 80;
-            dataGridView1.Columns[3].Width = 80;
-            dataGridView1.Columns[4].Width = 80;
-            dataGridView1.Columns[5].Width = 80;
+            
         }
 
         private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -62,7 +57,7 @@ namespace MusicPlayer
         {
             int RowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
             dataGridView1.Rows.Clear();
-            object[] o = new object[6];
+            object[] o = new object[7];
             object[,] SongInfo = Assets.GetSongInformationList();
 
             for (int i = 0; i < Assets.UpvotedSongData.Count; i++)
@@ -73,6 +68,7 @@ namespace MusicPlayer
                 o[3] = SongInfo[i, 3];
                 o[4] = SongInfo[i, 4];
                 o[5] = SongInfo[i, 5];
+                o[6] = SongInfo[i, 6];
                 dataGridView1.Rows.Add(o);
                 if (o[o.Length - 1] == null)
                     dataGridView1.Rows[dataGridView1.RowCount - 1].DefaultCellStyle.BackColor = Color.Red;
@@ -100,7 +96,7 @@ namespace MusicPlayer
 
             if (dataGridView1.SortOrder != SortOrder.None)
             {
-                if (dataGridView1.SortedColumn.Index == 6)
+                if (dataGridView1.SortedColumn.Index == 7)
                 {
                     textBox1.Text = LastSearched;
                     bSearch_Click(null, EventArgs.Empty);
@@ -274,6 +270,20 @@ namespace MusicPlayer
                             return;
                         else
                             Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
+                m.MenuItems.Add(new MenuItem("Reset Volume Multiplier", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        int UpvotedSongNamesIndex = Assets.UpvotedSongData.FindIndex(x => x.Name == dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString() + ".mp3");
+                        if (UpvotedSongNamesIndex != -1)
+                        {
+                            Assets.UpvotedSongData[UpvotedSongNamesIndex].Volume = -1;
+                            Assets.SaveUserSettings(false);
+                            bRefresh_Click(null, EventArgs.Empty);
+                        }
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));

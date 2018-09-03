@@ -83,6 +83,8 @@ namespace MusicPlayer
         public int TotalDislikes;
         public long AddingDates;
         public float Volume;
+
+        public string Path; // Only used in ExportChooser.cs
     }
 
     public static class Assets
@@ -816,8 +818,10 @@ namespace MusicPlayer
             {
                 float mult = Values.BaseVolume / UpvotedSongData[index].Volume;
                 Values.VolumeMultiplier = mult;
-                Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+                //Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
             }
+            else if (Values.VolumeMultiplier > 2 || Values.VolumeMultiplier < 0.1f)
+                Values.VolumeMultiplier = 1;
 
             config.Default.Preload = Program.game.Preload;
             Program.game.ReHookGlobalKeyHooks();
@@ -1058,7 +1062,7 @@ namespace MusicPlayer
         }
         public static object[,] GetSongInformationList()
         {
-            object[,] SongInformationArray = new object[UpvotedSongData.Count, 6];
+            object[,] SongInformationArray = new object[UpvotedSongData.Count, 7];
             
             for (int i = 0; i < UpvotedSongData.Count; i++)
             {
@@ -1069,8 +1073,12 @@ namespace MusicPlayer
                 if (TotalLike < 1)
                     TotalLike = 1;
                 SongInformationArray[i, 3] = TotalLike + "/" + UpvotedSongData[i].TotalDislikes + "=" + ((float)TotalLike / UpvotedSongData[i].TotalDislikes);
-                SongInformationArray[i, 4] = SongAge(i);
+                if (UpvotedSongData[i].Volume != -1)
+                    SongInformationArray[i, 4] = Values.BaseVolume / UpvotedSongData[i].Volume;
+                SongInformationArray[i, 5] = SongAge(i);
             }
+            
+            int PlayPercentageIndex = 6;
             string lastSong = "";
             int lastIndex = 0;
             float singleTicketWorth = 1f / SongChoosingList.Count * 100;
@@ -1078,7 +1086,7 @@ namespace MusicPlayer
             {
                 if (lastSong == SongChoosingList[i])
                 {
-                    SongInformationArray[lastIndex, 5] = (float)(SongInformationArray[lastIndex, 5]) + singleTicketWorth;
+                    SongInformationArray[lastIndex, PlayPercentageIndex] = (float)(SongInformationArray[lastIndex, PlayPercentageIndex]) + singleTicketWorth;
                 }
                 else
                 {
@@ -1087,10 +1095,10 @@ namespace MusicPlayer
                     string path = Path.GetFileName(SongChoosingList[i]);
                     if (index != -1)
                     {
-                        if (SongInformationArray[index, 5] == null)
-                            SongInformationArray[index, 5] = singleTicketWorth;
+                        if (SongInformationArray[index, PlayPercentageIndex] == null)
+                            SongInformationArray[index, PlayPercentageIndex] = singleTicketWorth;
                         else
-                            SongInformationArray[index, 5] = (float)(SongInformationArray[index, 5]) + singleTicketWorth;
+                            SongInformationArray[index, PlayPercentageIndex] = (float)(SongInformationArray[index, PlayPercentageIndex]) + singleTicketWorth;
 
                         lastIndex = index;
                         lastSong = SongChoosingList[i];

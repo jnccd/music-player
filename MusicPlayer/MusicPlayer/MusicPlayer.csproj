@@ -138,6 +138,12 @@
     <Compile Include="HelperClasses\GigaList.cs" />
     <Compile Include="DynamicGrid\GridPoint.cs" />
     <Compile Include="DynamicGrid\GridSpring.cs" />
+    <Compile Include="Windows\ExportsChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\ExportsChooser.Designer.cs">
+      <DependentUpon>ExportsChooser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\History.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -240,6 +246,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Windows\ExportsChooser.resx">
+      <DependentUpon>ExportsChooser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\History.resx">
       <DependentUpon>History.cs</DependentUpon>
     </EmbeddedResource>

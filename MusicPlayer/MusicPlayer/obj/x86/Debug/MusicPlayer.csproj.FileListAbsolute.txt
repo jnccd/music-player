@@ -50,3 +50,4 @@ C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\Musi
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Debug\MusicPlayer.exe
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Debug\MusicPlayer.pdb
 C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Debug\MusicPlayer.csprojResolveAssemblyReference.cache
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayer\obj\x86\Debug\MusicPlayer.ExportsChooser.resources

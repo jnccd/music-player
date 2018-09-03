@@ -1062,6 +1062,26 @@ namespace MusicPlayer
                 });
             }
 
+            // Restart [R]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.R))
+            {
+                Values.StartSTATask(() =>
+                {
+                    try
+                    {
+                        if (MessageBox.Show("Do you really want to restart?", "Restart?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            Program.Closing = true;
+                            gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
+                            DiscordRPCWrapper.Shutdown();
+                            Application.Exit();
+                            Program.Restart();
+                        }
+                    }
+                    catch (Exception e) { MessageBox.Show("Can't find that song.\n\nException: " + e.ToString()); }
+                });
+            }
+
             // Show Console [K]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.K))
             {
