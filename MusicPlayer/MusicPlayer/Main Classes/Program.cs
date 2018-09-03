@@ -21,10 +21,12 @@ namespace MusicPlayer
         public static bool Closing = false;
         public static FileSystemWatcher weightwatchers;
         public static FileSystemWatcher crackopenthebois;
-        
+
         [STAThread]
         static void Main(string[] args)
         {
+            Console.Title = "MusicPlayer Console";
+
             #region Check for other program instances
             Console.WriteLine("Checking for other MusicPlayer instances...");
             try
@@ -55,7 +57,6 @@ namespace MusicPlayer
             #endregion
 
             // Smol settings
-            Console.Title = "MusicPlayer Console";
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Values.DisableConsoleRezise();
@@ -220,16 +221,22 @@ namespace MusicPlayer
                 else
                     D = MessageBox.Show("Error Message: " + ex.Message + "\n\nStack Trace: \n" + ex.StackTrace + 
                         "\n\nInner Error: " + ex.InnerException + "\n\nSource: " + ex.Source, "Error", MessageBoxButtons.RetryCancel);
-                
+
                 if (D == DialogResult.Retry)
-                {
-                    string RestartLocation = Values.CurrentExecutablePath + "\\Restart.bat";
+                    Restart();
+            }
+#endif
+        }
 
-                    if (File.Exists(RestartLocation))
-                        File.Delete(RestartLocation);
+        public static void Restart()
+        {
+            string RestartLocation = Values.CurrentExecutablePath + "\\Restart.bat";
 
-                    using (StreamWriter sw = File.CreateText(RestartLocation))
-                        sw.WriteLine(@"@echo off
+            if (File.Exists(RestartLocation))
+                File.Delete(RestartLocation);
+
+            using (StreamWriter sw = File.CreateText(RestartLocation))
+                sw.WriteLine(@"@echo off
 echo     ____               __                __   _                     
 echo    / __ \ ___   _____ / /_ ____ _ _____ / /_ (_)____   ____ _       
 echo   / /_/ // _ \ / ___// __// __ `// ___// __// // __ \ / __ `/       
@@ -239,12 +246,8 @@ echo                                                     /____/
 ping 127.0.0.1 > nul
 start MusicPlayer.exe");
 
-                    Process.Start(RestartLocation);
-                }
-            }
-#endif
+            Process.Start(RestartLocation);
         }
-
         #region Event Handlers
         static IntPtr m_hhook;
         static IntPtr hwnd;

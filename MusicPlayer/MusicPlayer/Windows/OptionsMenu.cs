@@ -241,37 +241,31 @@ namespace MusicPlayer
         
         private void bExport_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog choose = new FolderBrowserDialog();
-            DialogResult result = choose.ShowDialog();
-            if (result == DialogResult.OK)
+            ExportsChooser Chooser = new ExportsChooser();
+            Chooser.ShowDialog();
+
+            if (Chooser.Output != null)
             {
-                try
+                FolderBrowserDialog choose = new FolderBrowserDialog();
+                DialogResult result = choose.ShowDialog();
+                if (result == DialogResult.OK)
                 {
-                    if (parent.BackgroundOperationRunning)
+                    try
                     {
-                        MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
-                        return;
-                    }
-
-                    parent.BackgroundOperationRunning = true;
-
-                    List<string> CopyFiles = new List<string>();
-                    for (int i = 0; i < Assets.UpvotedSongData.Count; i++)
-                    {
-                        if (Assets.UpvotedSongData[i].Score > 0 && Assets.UpvotedSongData[i].Streak > 0)
+                        if (parent.BackgroundOperationRunning)
                         {
-                            string path = Assets.GetSongPathFromSongName(Assets.UpvotedSongData[i].Name);
-                            if (File.Exists(path))
-                                CopyFiles.Add(path);
+                            MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
+                            return;
                         }
+                        parent.BackgroundOperationRunning = true;
+
+                        UpdateExports updat = new UpdateExports(Chooser.Output, choose.SelectedPath);
+                        updat.ShowDialog();
+
+                        parent.BackgroundOperationRunning = false;
                     }
-
-                    UpdateExports updat = new UpdateExports(CopyFiles.ToArray(), choose.SelectedPath);
-                    updat.ShowDialog();
-
-                    parent.BackgroundOperationRunning = false;
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); parent.BackgroundOperationRunning = false; }
                 }
-                catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); parent.BackgroundOperationRunning = false; }
             }
         }
 
