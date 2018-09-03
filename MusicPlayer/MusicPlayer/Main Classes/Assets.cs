@@ -52,17 +52,6 @@ namespace MusicPlayer
         public int SongIndex;
         public float SongDifference;
     }
-    public struct SongActionStruct
-    {
-        public SongActionStruct(string SongName, bool hasUpvoted)
-        {
-            this.SongName = SongName;
-            this.hasUpvoted = hasUpvoted;
-        }
-
-        public string SongName;
-        public bool hasUpvoted;
-    }
     public class UpvotedSong
     {
         public UpvotedSong(string Name, float Score, int Streak, int TotalLikes, int TotalDislikes, long AddingDates, float Volume)
@@ -162,7 +151,6 @@ namespace MusicPlayer
         }
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
-        public static LinkedList<SongActionStruct> PlayerUpvoteHistory = new LinkedList<SongActionStruct>();
         public static int PlayerHistoryIndex = 0;
         public static int SongChangedTickTime = -100000;
         public static int SongStartTime;
@@ -946,8 +934,7 @@ namespace MusicPlayer
 
                     LastScoreChange = UpvotedSongData[index].Streak * GetDownvoteWeight(UpvotedSongData[index].Score) * 32 * (1 - percentage);
                     UpvotedSongData[index].Score += UpvotedSongData[index].Streak * GetDownvoteWeight(UpvotedSongData[index].Score) * 32 * (1 - percentage);
-
-                    PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, false));
+                    
                     Program.game.ShowSecondRowMessage("Downvoted  previous  song!", 1.2f);
                     UpvotedSongData[index].TotalDislikes++;
                     SaveUserSettings(false);
@@ -961,7 +948,6 @@ namespace MusicPlayer
             if (IsCurrentSongUpvoted)
             {
                 Program.game.UpvoteSavedAlpha = 1.4f;
-                PlayerUpvoteHistory.AddFirst(new SongActionStruct(currentlyPlayingSongName, true));
 
                 AddSongToListIfNotDoneSoFar(currentlyPlayingSongPath);
 
@@ -1140,7 +1126,6 @@ namespace MusicPlayer
             CurrentDebugTime = Stopwatch.GetTimestamp();
 
             SongChoosingList.Clear();
-            List<SongActionStruct> PlayerUpvoteHistoryList = PlayerUpvoteHistory.ToList();
             float ChanceIncreasePerUpvote = Playlist.Count / 1000;
             for (int i = 0; i < Playlist.Count; i++)
             {
@@ -1160,8 +1145,8 @@ namespace MusicPlayer
 
                     if (UpvotedSongData[index].Score < 50)
                     {
-                        int hisindex = PlayerUpvoteHistoryList.FindIndex(x => x.SongName == UpvotedSongData[index].Name);
-                        if (hisindex != -1 && PlayerUpvoteHistoryList[hisindex].hasUpvoted && hisindex > 2 && hisindex < 8)
+                        int hisindex = HistorySongData.FindIndex(x => x.Name + ".mp3" == UpvotedSongData[index].Name);
+                        if (hisindex != -1 && HistorySongData[hisindex].Change > 0 && hisindex > 2 && hisindex < 8)
                             amount += (int)((100 - UpvotedSongData[index].Score) * (100 - UpvotedSongData[index].Score) * 4);
                     }
 
@@ -1183,7 +1168,7 @@ namespace MusicPlayer
             if (HistorySongData.Count != 0 && currentlyPlayingSongName == HistorySongData[HistorySongData.Count - 1].Name)
                 return;
 
-            HistorySongData.Insert(0, new HistorySong(currentlyPlayingSongName, ScoreChange, DateTime.Now.ToBinary()));
+            HistorySongData.Insert(0, new HistorySong(Path.GetFileNameWithoutExtension(currentlyPlayingSongName), ScoreChange, DateTime.Now.ToBinary()));
 
             SaveUserSettings(false);
         }
