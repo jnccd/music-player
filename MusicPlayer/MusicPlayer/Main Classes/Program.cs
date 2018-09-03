@@ -86,6 +86,52 @@ namespace MusicPlayer
             }
             else if (!config.Default.FirstStart)
                 MessageBox.Show("Song statistics corrupted!\nResetting...");
+
+            Assets.HistorySongData = new List<HistorySong>();
+            string path = Values.CurrentExecutablePath + "\\History.txt";
+            if (File.Exists(path))
+            {
+                string[] Songs = File.ReadLines(path).ToArray();
+
+                for (int i = 0; i < Songs.Length; i++)
+                {
+                    string[] Split = Songs[Songs.Length - i - 1].Split(':');
+                    string Title = "";
+                    long Time = 0;
+                    string ScoreChange = "";
+                    if (Split.Length == 1)
+                    {
+                        Title = Path.GetFileNameWithoutExtension(Songs[Songs.Length - i - 1]);
+                    }
+                    else if (Split.Length == 2)
+                    {
+                        Title = Path.GetFileNameWithoutExtension(Split[0]);
+                        Time = Convert.ToInt64(Split[1]);
+                    }
+                    else if (Split.Length == 3)
+                    {
+                        Title = Path.GetFileNameWithoutExtension(Split[0]);
+                        Time = Convert.ToInt64(Split[1]);
+                        ScoreChange = Split[2];
+                    }
+
+                    Assets.HistorySongData.Add(new HistorySong(Title, Convert.ToSingle(ScoreChange), Time));
+                }
+
+                File.Delete(path);
+            }
+            if (config.Default.HistorySong != null && config.Default.HistoryDate != null && config.Default.HistoryDate.Length == config.Default.HistorySong.Length &&
+                config.Default.HistoryChange != null && config.Default.HistoryChange.Length == config.Default.HistorySong.Length)
+            {
+                for (int i = 0; i < config.Default.HistorySong.Length; i++)
+                    Assets.HistorySongData.Add(new HistorySong(config.Default.HistorySong[i], config.Default.HistoryChange[i], config.Default.HistoryDate[i]));
+            }
+            else if (!config.Default.FirstStart)
+                MessageBox.Show("Song history corrupted!");
+
+            Assets.HistorySongData.Sort(delegate (HistorySong x, HistorySong y) {
+                return -DateTime.FromBinary(x.Date).CompareTo(DateTime.FromBinary(y.Date));
+            });
             #endregion
 
             Console.Clear();

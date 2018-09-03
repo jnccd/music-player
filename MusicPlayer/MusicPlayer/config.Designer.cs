@@ -306,13 +306,34 @@ namespace MusicPlayer {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int configVersion {
+        public string[] HistorySong {
             get {
-                return ((int)(this["configVersion"]));
+                return ((string[])(this["HistorySong"]));
             }
             set {
-                this["configVersion"] = value;
+                this["HistorySong"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public float[] HistoryChange {
+            get {
+                return ((float[])(this["HistoryChange"]));
+            }
+            set {
+                this["HistoryChange"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public long[] HistoryDate {
+            get {
+                return ((long[])(this["HistoryDate"]));
+            }
+            set {
+                this["HistoryDate"] = value;
             }
         }
     }

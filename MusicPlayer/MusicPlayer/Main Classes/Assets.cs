@@ -86,6 +86,19 @@ namespace MusicPlayer
 
         public string Path; // Only used in ExportChooser.cs
     }
+    public class HistorySong
+    {
+        public HistorySong(string Name, float Change, long Date)
+        {
+            this.Name = Name;
+            this.Change = Change;
+            this.Date = Date;
+        }
+
+        public string Name;
+        public float Change;
+        public long Date;
+    }
 
     public static class Assets
     {
@@ -160,6 +173,7 @@ namespace MusicPlayer
 
         // Song Data
         public static List<UpvotedSong> UpvotedSongData = new List<UpvotedSong>();
+        public static List<HistorySong> HistorySongData = new List<HistorySong>();
 
         // MultiThreading
         public static Task T = null;
@@ -877,8 +891,7 @@ namespace MusicPlayer
                 SaveCurrentSongToHistoryFile(LastScoreChange);
                 LastScoreChange = 0;
             }
-
-            // Sorting
+            
             UpvotedSongData.Sort(delegate (UpvotedSong x, UpvotedSong y) {
                 return -x.Score.CompareTo(y.Score);
             });
@@ -890,6 +903,10 @@ namespace MusicPlayer
             config.Default.SongTotalDislikes = UpvotedSongData.Select(x => x.TotalDislikes).ToArray();
             config.Default.SongDate = UpvotedSongData.Select(x => x.AddingDates).ToArray();
             config.Default.SongVolume = UpvotedSongData.Select(x => x.Volume).ToArray();
+
+            config.Default.HistorySong = HistorySongData.Select(x => x.Name).ToArray();
+            config.Default.HistoryDate = HistorySongData.Select(x => x.Date).ToArray();
+            config.Default.HistoryChange = HistorySongData.Select(x => x.Change).ToArray();
 
             config.Default.Background = (int)Program.game.BgModes;
             config.Default.Vis = (int)Program.game.VisSetting;
@@ -1163,23 +1180,12 @@ namespace MusicPlayer
         private static void SaveCurrentSongToHistoryFile(float ScoreChange)
         {
             try { string s = currentlyPlayingSongName; } catch { return; }
-
-            string path = Values.CurrentExecutablePath + "\\History.txt";
-            string write = currentlyPlayingSongName + ":" + DateTime.Now.ToBinary() + ":" + ScoreChange;
-            
-            // This text is added only once to the file.
-            if (!File.Exists(path))
-                // Create a file to write to.
-                using (StreamWriter sw = File.CreateText(path))
-                    sw.WriteLine(write);
-
-            if (write == File.ReadLines(Values.CurrentExecutablePath + "\\History.txt").Last())
+            if (HistorySongData.Count != 0 && currentlyPlayingSongName == HistorySongData[HistorySongData.Count - 1].Name)
                 return;
 
-            // This text is always added, making the file longer over time
-            // if it is not deleted.
-            using (StreamWriter sw = File.AppendText(path))
-                sw.WriteLine(write);
+            HistorySongData.Insert(0, new HistorySong(currentlyPlayingSongName, ScoreChange, DateTime.Now.ToBinary()));
+
+            SaveUserSettings(false);
         }
 
         // Draw Methods
