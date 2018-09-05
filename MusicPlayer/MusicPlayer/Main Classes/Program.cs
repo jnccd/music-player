@@ -257,7 +257,7 @@ namespace MusicPlayer
                 Closing = true;
 
                 DialogResult D;
-                if (ex.Message == "Auf das verworfene Objekt kann nicht zugegriffen werden.\nObjektname: \"WindowsGameForm\".")
+                if (ex.Message.Contains("WindowsGameForm"))
                     D = MessageBox.Show("I got brutally murdered by another Program. Please restart me.", "Slaughtered by another program", 
                         MessageBoxButtons.RetryCancel);
                 else if (ex.Message == "CouldntFindWallpaperFile")
