@@ -138,6 +138,59 @@ namespace MusicPlayer
         // ContextMenu
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            // Up / Downvote Menu
+            if (e != null && e.Button == MouseButtons.Right && e.RowIndex == -1 && e.ColumnIndex == 3)
+            {
+                ContextMenu m = new ContextMenu();
+                m.MenuItems.Add(new MenuItem("Sort by Upvotes", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                        {
+                            dataGridView1.Rows[i].Cells[dataGridView1.Rows[i].Cells.Count - 1].Value = Convert.ToInt32(((string)dataGridView1.Rows[i].Cells[3].Value).Split('/').First());
+                        }
+
+                        dataGridView1.ClearSelection();
+                        dataGridView1.Sort(dataGridView1.Columns[dataGridView1.Columns.Count - 1], ListSortDirection.Descending);
+                        dataGridView1.FirstDisplayedScrollingRowIndex = 0;
+                    }
+                    catch { }
+                })));
+                m.MenuItems.Add(new MenuItem("Sort by Downvotes", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                        {
+                            dataGridView1.Rows[i].Cells[dataGridView1.Rows[i].Cells.Count - 1].Value = Convert.ToInt32(((string)dataGridView1.Rows[i].Cells[3].Value).Split('/').Last().Split('=').First());
+                        }
+
+                        dataGridView1.ClearSelection();
+                        dataGridView1.Sort(dataGridView1.Columns[dataGridView1.Columns.Count - 1], ListSortDirection.Descending);
+                        dataGridView1.FirstDisplayedScrollingRowIndex = 0;
+                    }
+                    catch { }
+                })));
+                m.MenuItems.Add(new MenuItem("Sort by Ratio", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                        {
+                            dataGridView1.Rows[i].Cells[dataGridView1.Rows[i].Cells.Count - 1].Value = Convert.ToSingle(((string)dataGridView1.Rows[i].Cells[3].Value).Split('=').Last());
+                        }
+
+                        dataGridView1.ClearSelection();
+                        dataGridView1.Sort(dataGridView1.Columns[dataGridView1.Columns.Count - 1], ListSortDirection.Descending);
+                        dataGridView1.FirstDisplayedScrollingRowIndex = 0;
+                    }
+                    catch { }
+                })));
+                m.Show(dataGridView1, new Point(e.X + dataGridView1.GetColumnDisplayRectangle(e.ColumnIndex, true).X, e.Y));
+            }
+
+            // Normal Context Menu
             if (e != null && e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 for (int x = 0; x < dataGridView1.RowCount; x++)
