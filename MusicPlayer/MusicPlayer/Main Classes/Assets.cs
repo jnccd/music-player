@@ -157,6 +157,7 @@ namespace MusicPlayer
         public static bool IsCurrentSongUpvoted;
         public static int LastUpvotedSongStreak;
         static List<string> SongChoosingList = new List<string>();
+        static int lastSongChoosingListLength = 0;
         public static float LastScoreChange = 0;
 
         // Song Data
@@ -583,9 +584,12 @@ namespace MusicPlayer
             catch (Exception e)
             {
                 LastSongBufferThreadException = e;
+                bool knownSongName = false;
+                try { string s = currentlyPlayingSongName; knownSongName = true; } catch { }
 
                 Debug.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
+                if (knownSongName)
+                    Debug.WriteLine("Couldn't load " + currentlyPlayingSongPath);
                 Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                 Debug.WriteLine("Exception: " + e);
@@ -690,7 +694,7 @@ namespace MusicPlayer
                     DistancePerSong[] LDistances = new DistancePerSong[Choosing.Count];
                     for (int i = 0; i < LDistances.Length; i++)
                     {
-                        LDistances[i].SongDifference = Values.OwnDistanceWrapper(sPath, Path.GetFileNameWithoutExtension(Choosing[i]));
+                        LDistances[i].SongDifference = Values.LevenshteinDistanceWrapper(sPath, Path.GetFileNameWithoutExtension(Choosing[i]));
                         LDistances[i].SongIndex = i;
                     }
 
@@ -796,14 +800,38 @@ namespace MusicPlayer
             CurrentDebugTime = Stopwatch.GetTimestamp();
 
             int SongChoosingListIndex = 0;
+            
+            if (Values.RDM.NextDouble() < 0.6)
+            {
+                do
+                    SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
+                while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
 
-            do
-                SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
-            while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
+                PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
+                PlayerHistoryIndex = PlayerHistory.Count - 1;
+                PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+            }
+            else
+            {
+                int index = UpvotedSongData.FindIndex(x => x.Streak == 0);
+                if (index != -1)
+                {
+                    PlayerHistory.Add(GetSongPathFromSongName(UpvotedSongData[index].Name));
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                }
+                else
+                {
+                    do
+                        SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
+                    while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
 
-            PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
-            PlayerHistoryIndex = PlayerHistory.Count - 1;
-            PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                    PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                }
+            }
+            
             Debug.WriteLine("New Song calc time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
         }
         private static void PlaySongByPath(string PathString)
@@ -990,7 +1018,7 @@ namespace MusicPlayer
                 DistancePerSong[] LDistances = new DistancePerSong[Playlist.Count];
                 for (int i = 0; i < LDistances.Length; i++)
                 {
-                    LDistances[i].SongDifference = Values.OwnDistanceWrapper(Song, Path.GetFileNameWithoutExtension(Playlist[i]));
+                    LDistances[i].SongDifference = Values.LevenshteinDistanceWrapper(Song, Path.GetFileNameWithoutExtension(Playlist[i]));
                     LDistances[i].SongIndex = i;
                 }
 
@@ -1072,10 +1100,7 @@ namespace MusicPlayer
                 SongInformationArray[i, 0] = Path.GetFileNameWithoutExtension(UpvotedSongData[i].Name);
                 SongInformationArray[i, 1] = UpvotedSongData[i].Score;
                 SongInformationArray[i, 2] = UpvotedSongData[i].Streak;
-                int TotalLike = UpvotedSongData[i].TotalLikes;
-                if (TotalLike < 1)
-                    TotalLike = 1;
-                SongInformationArray[i, 3] = TotalLike + "/" + UpvotedSongData[i].TotalDislikes + "=" + ((float)TotalLike / UpvotedSongData[i].TotalDislikes);
+                SongInformationArray[i, 3] = UpvotedSongData[i].TotalLikes + "/" + UpvotedSongData[i].TotalDislikes + "=" + ((float)UpvotedSongData[i].TotalLikes / UpvotedSongData[i].TotalDislikes);
                 if (UpvotedSongData[i].Volume != -1)
                     SongInformationArray[i, 4] = Values.BaseVolume / UpvotedSongData[i].Volume;
                 SongInformationArray[i, 5] = SongAge(i);
@@ -1131,14 +1156,18 @@ namespace MusicPlayer
             {
                 SongChoosingList.Add(Playlist[i]);
 
-                int amount = 0;
+                float amount = 0;
 
                 int index = UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last());
                 if (index >= 0)
                 {
-                    if (UpvotedSongData[index].Score > 0)
-                        amount += (int)(Math.Ceiling(UpvotedSongData[index].Score * UpvotedSongData[index].Score * ChanceIncreasePerUpvote));
+                    amount += (Values.Sigmoid((float)UpvotedSongData[index].TotalLikes / UpvotedSongData[index].TotalDislikes / 200) - 0.5f) * 100 * ChanceIncreasePerUpvote;
+                    if (float.IsNaN(amount))
+                        amount = 0;
 
+                    if (UpvotedSongData[index].Score > 0)
+                        amount += (int)(Math.Ceiling(UpvotedSongData[index].Score * ChanceIncreasePerUpvote / 4));
+                    
                     float age = SongAge(index);
                     if (age < 7)
                         amount += (int)((30 - age) * ChanceIncreasePerUpvote * 60f / 30f);
@@ -1146,21 +1175,22 @@ namespace MusicPlayer
                     if (UpvotedSongData[index].Score < 50)
                     {
                         int hisindex = HistorySongData.FindIndex(x => x.Name + ".mp3" == UpvotedSongData[index].Name);
-                        if (hisindex != -1 && HistorySongData[hisindex].Change > 0 && hisindex > 2 && hisindex < 8)
-                            amount += (int)((100 - UpvotedSongData[index].Score) * (100 - UpvotedSongData[index].Score) * 4);
+                        if (hisindex != -1 && HistorySongData[hisindex].Change > 0 && hisindex > 1 && hisindex < 8)
+                            amount += (int)((100 - UpvotedSongData[index].Score) * 4);
                     }
-
-                    if (UpvotedSongData[index].Streak == 0)
-                        amount += (int)(130 * 130 * ChanceIncreasePerUpvote);
                 }
-
-                amount /= 4;
+                
+                if (lastSongChoosingListLength != 0)
+                    amount = amount * 100000f / lastSongChoosingListLength;
 
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
             }
 
-            Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
+            if (lastSongChoosingListLength == 0)
+                lastSongChoosingListLength = SongChoosingList.Count;
+
+            Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime) + " length: " + SongChoosingList.Count);
         }
         private static void SaveCurrentSongToHistoryFile(float ScoreChange)
         {

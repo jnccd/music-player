@@ -201,7 +201,7 @@ namespace MusicPlayer
             else
                 return 1000;
         } //useless but I kept it for nostalgia
-        public static float OwnDistanceWrapper(string Input, string SongName)
+        public static float LevenshteinDistanceWrapper(string Input, string SongName)
         {
             if (Input == null || Input == "" || SongName == "" || SongName == null)
                 return float.MaxValue;
@@ -416,6 +416,11 @@ namespace MusicPlayer
 
             RegistryKey commandKey = key.CreateSubKey(@"shell\open\command");
             commandKey.SetValue("", "\"" + CurrentExecutablePath + "\\MusicPlayer.exe" + "\" \"%1\"");
+        }
+
+        public static float Sigmoid(double value)
+        {
+            return (float)(1.0 / (1.0 + Math.Pow(Math.E, -value)));
         }
 
         [DllImport("user32.dll", SetLastError = true)]
