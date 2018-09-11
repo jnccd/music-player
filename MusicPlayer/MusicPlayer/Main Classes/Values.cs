@@ -19,6 +19,7 @@ using System.IO;
 using System.Text;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace MusicPlayer
 {
@@ -35,7 +36,7 @@ namespace MusicPlayer
             }
         }
 
-        public static string CurrentExecutablePath = System.Reflection.Assembly.GetExecutingAssembly().Location.Substring(0, System.Reflection.Assembly.GetExecutingAssembly().Location.LastIndexOf("\\MusicPlayer.exe"));
+        public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static float OutputVolume = 0;
         public static float LastOutputVolume = 0;
