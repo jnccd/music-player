@@ -36,8 +36,14 @@ namespace MusicPlayer
             }
         }
 
-        public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        // Console Constants
+        const int MF_BYCOMMAND = 0x00000000;
+        const int SC_CLOSE = 0xF060;
+        const int SC_MINIMIZE = 0xF020;
+        const int SC_MAXIMIZE = 0xF030;
+        const int SC_SIZE = 0xF000;
 
+        // Volumes
         public static float OutputVolume = 0;
         public static float LastOutputVolume = 0;
         public static float OutputVolumeIncrease = 0;
@@ -56,7 +62,9 @@ namespace MusicPlayer
         public static float BaseVolume = 0.12f;
         
         public static int Timer = 0;
+        public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+        // String DIstances
         public static int LevenshteinDistance(string s, string t)
         {
             if (string.IsNullOrEmpty(s))
@@ -242,6 +250,7 @@ namespace MusicPlayer
             return Distances.Min();
         }
 
+        // Averages
         public static float GetAverageAmplitude(float[] samples)
         {
             if (samples != null)
@@ -307,10 +316,136 @@ namespace MusicPlayer
                 return 0;
         }
 
+        // Math Functions
         public static float AnimationFunction(float x)
         {
             return (float)((Math.Pow(2, -1.5 * (x - 1) * (x - 1)) / 10f + 1) * (-Math.Pow(5, -x) + 1));
         }
+        public static float Sigmoid(double value)
+        {
+            return (float)(1.0 / (1.0 + Math.Pow(Math.E, -value)));
+        }
+
+        // Simple Geometry
+        public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
+        {
+            Vector2 HelpingVector = new Vector2(-(Line1.Y - Line2.Y), Line1.X - Line2.X);
+            Vector2 Intersection = IntersectionPoint(Line1, Line2, Point, HelpingVector);
+            return (Point - Intersection).Length();
+        }
+        public static Vector2 IntersectionPoint(Vector2 A1, Vector2 A2, Vector2 B1, Vector2 B2)
+        {
+            // Nutze hier die Cramerschen Regel:
+            return new Vector2(((B2.X - B1.X) * (A2.X * A1.Y - A1.X * A2.Y) - (A2.X - A1.X) * (B2.X * B1.Y - B1.X * B2.Y)) / 
+                                ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)),
+
+                                ((A1.Y - A2.Y) * (B2.X * B1.Y - B1.X * B2.Y) - (B1.Y - B2.Y) * (A2.X * A1.Y - A1.X * A2.Y)) / 
+                                ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
+        }
+        
+        // Form Methods
+        public static Screen TheWindowsMainScreen(Rectangle WindowBounds)
+        {
+            System.Drawing.Point P = new System.Drawing.Point(WindowBounds.X + WindowBounds.Width / 2,
+                WindowBounds.Y + WindowBounds.Height / 2);
+
+            for (int i = 0; i < Screen.AllScreens.Length; i++)
+                if (Screen.AllScreens[i].Bounds.Contains(P))
+                    return Screen.AllScreens[i];
+
+            int[] d = new int[Screen.AllScreens.Length];
+            for (int i = 0; i < d.Length; i++)
+                d[i] = P.X - Screen.AllScreens[i].Bounds.X - Screen.AllScreens[i].Bounds.Width / 2 +
+                     P.Y - Screen.AllScreens[i].Bounds.Y - Screen.AllScreens[i].Bounds.Height / 2;
+
+            int LowestDindex = 0;
+            for (int i = 0; i < d.Length; i++)
+                if (Math.Abs(d[i]) < Math.Abs(d[LowestDindex]))
+                    LowestDindex = i;
+
+            return Screen.AllScreens[LowestDindex];
+        }
+        public static void RestoreFromMinimzied(Form form)
+        {
+            const int WPF_RESTORETOMAXIMIZED = 0x2;
+            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+            placement.length = Marshal.SizeOf(placement);
+            GetWindowPlacement(form.Handle, ref placement);
+
+            if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
+                form.WindowState = FormWindowState.Maximized;
+            else
+                form.WindowState = FormWindowState.Normal;
+        }
+        
+        // Console Methods
+        public static void GivConsole()
+        {
+            AllocConsole();
+            IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+            SafeFileHandle safeFileHandle = new SafeFileHandle(stdHandle, true);
+            FileStream fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+            Encoding encoding = System.Text.Encoding.GetEncoding(MY_CODE_PAGE);
+            StreamWriter standardOutput = new StreamWriter(fileStream, encoding);
+            standardOutput.AutoFlush = true;
+            Console.SetOut(standardOutput);
+        }
+        public static void HideConsole() { ShowWindow(GetConsoleWindow(), 0); }
+        public static void MinimizeConsole() { ShowWindow(GetConsoleWindow(), 2); }
+        public static void ShowConsole() { ShowWindow(GetConsoleWindow(), 5); }
+        public static void DisableConsoleRezise()
+        {
+            IntPtr handle = GetConsoleWindow();
+            IntPtr sysMenu = GetSystemMenu(handle, false);
+
+            if (handle != IntPtr.Zero)
+            {
+                DeleteMenu(sysMenu, SC_MAXIMIZE, MF_BYCOMMAND);
+                DeleteMenu(sysMenu, SC_SIZE, MF_BYCOMMAND);
+            }
+        }
+        public static bool AttachToConsole()
+        {
+            const uint ParentProcess = 0xFFFFFFFF;
+            if (!AttachConsole(ParentProcess))
+                return false;
+
+            return true;
+        }
+
+        // Extensions
+        public static void EnableBlur(this Form @this)
+        {
+            var accent = new AccentPolicy();
+            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
+            var accentStructSize = Marshal.SizeOf(accent);
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            Marshal.StructureToPtr(accent, accentPtr, false);
+            var Data = new WindowCompositionAttributeData();
+            Data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+            Data.SizeOfData = accentStructSize;
+            Data.Data = accentPtr;
+            SetWindowCompositionAttribute(@this.Handle, ref Data);
+            Marshal.FreeHGlobal(accentPtr);
+        }
+        public static void InvokeIfRequired(this ISynchronizeInvoke obj, MethodInvoker action)
+        {
+            if (obj.InvokeRequired)
+            {
+                var args = new object[0];
+                obj.Invoke(action, args);
+            }
+            else
+            {
+                action();
+            }
+        }
+        public static bool Contains(this String str, String substring, StringComparison comp)
+        {
+            return str.IndexOf(substring, comp) >= 0;
+        }
+
+        // Other
         public static string AsTime(double seconds)
         {
             int s = (int)(seconds % 60);
@@ -340,44 +475,6 @@ namespace MusicPlayer
             else
                 return y + ":" + d + ":" + h + ":" + mS + ":" + sS;
         }
-
-        public static float DistanceFromLineToPoint(Vector2 Line1, Vector2 Line2, Vector2 Point)
-        {
-            Vector2 HelpingVector = new Vector2(-(Line1.Y - Line2.Y), Line1.X - Line2.X);
-            Vector2 Intersection = IntersectionPoint(Line1, Line2, Point, HelpingVector);
-            return (Point - Intersection).Length();
-        }
-        public static Vector2 IntersectionPoint(Vector2 A1, Vector2 A2, Vector2 B1, Vector2 B2)
-        {
-            // Nutze hier die Cramerschen Regel:
-            return new Vector2(((B2.X - B1.X) * (A2.X * A1.Y - A1.X * A2.Y) - (A2.X - A1.X) * (B2.X * B1.Y - B1.X * B2.Y)) / 
-                                ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)),
-
-                                ((A1.Y - A2.Y) * (B2.X * B1.Y - B1.X * B2.Y) - (B1.Y - B2.Y) * (A2.X * A1.Y - A1.X * A2.Y)) / 
-                                ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
-        }
-        public static Screen TheWindowsMainScreen(Rectangle WindowBounds)
-        {
-            System.Drawing.Point P = new System.Drawing.Point(WindowBounds.X + WindowBounds.Width / 2, 
-                WindowBounds.Y + WindowBounds.Height / 2);
-
-            for (int i = 0; i < Screen.AllScreens.Length; i++)
-                if (Screen.AllScreens[i].Bounds.Contains(P))
-                    return Screen.AllScreens[i];
-
-            int[] d = new int[Screen.AllScreens.Length];
-            for (int i = 0; i < d.Length; i++)
-                d[i] = P.X - Screen.AllScreens[i].Bounds.X - Screen.AllScreens[i].Bounds.Width / 2 +
-                     P.Y - Screen.AllScreens[i].Bounds.Y - Screen.AllScreens[i].Bounds.Height / 2;
-
-            int LowestDindex = 0;
-            for (int i = 0; i < d.Length; i++)
-                if (Math.Abs(d[i]) < Math.Abs(d[LowestDindex]))
-                    LowestDindex = i;
-
-            return Screen.AllScreens[LowestDindex];
-        }
-
         public static Task StartSTATask(Action func)
         {
             var tcs = new TaskCompletionSource<object>();
@@ -397,7 +494,6 @@ namespace MusicPlayer
             thread.Start();
             return tcs.Task;
         }
-
         public static void RegisterUriScheme()
         {
             string UriScheme = "MusicPlayerScheme";
@@ -418,12 +514,28 @@ namespace MusicPlayer
             RegistryKey commandKey = key.CreateSubKey(@"shell\open\command");
             commandKey.SetValue("", "\"" + CurrentExecutablePath + "\\MusicPlayer.exe" + "\" \"%1\"");
         }
-
-        public static float Sigmoid(double value)
+        public static bool IsForegroundFullScreen()
         {
-            return (float)(1.0 / (1.0 + Math.Pow(Math.E, -value)));
+            return IsForegroundFullScreen(null);
+        }
+        public static bool IsForegroundFullScreen(Screen screen)
+        {
+            if (screen == null)
+                screen = Screen.PrimaryScreen;
+            RECT rect = new RECT();
+            IntPtr hWnd = (IntPtr)GetForegroundWindow();
+
+            GetWindowRect(new HandleRef(null, hWnd), ref rect);
+
+            if (screen.Bounds.Width == (rect.right - rect.left) && screen.Bounds.Height == (rect.bottom - rect.top))
+                return true;
+            else
+                return false;
         }
 
+        #region Imports
+        [DllImport("user32.dll")]
+        static internal extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
         [DllImport("kernel32.dll")]
@@ -494,161 +606,10 @@ namespace MusicPlayer
         [DllImport("user32.dll")]
         public static extern int GetWindowText(IntPtr hWnd,
             StringBuilder lpString, int nMaxCount);
-
-        public static bool IsForegroundFullScreen()
-        {
-            return IsForegroundFullScreen(null);
-        }
-        public static bool IsForegroundFullScreen(Screen screen)
-        {
-            if (screen == null)
-                screen = Screen.PrimaryScreen;
-            RECT rect = new RECT();
-            IntPtr hWnd = (IntPtr)GetForegroundWindow();
-            
-            GetWindowRect(new HandleRef(null, hWnd), ref rect);
-            
-            if (screen.Bounds.Width == (rect.right - rect.left) && screen.Bounds.Height == (rect.bottom - rect.top))
-                return true;
-            else
-                return false;
-        }
-        
-        public struct WINDOWPLACEMENT
-        {
-            public int length;
-            public int flags;
-            public int showCmd;
-            public System.Drawing.Point ptMinPosition;
-            public System.Drawing.Point ptMaxPosition;
-            public System.Drawing.Rectangle rcNormalPosition;
-        }
-
-        public static void RestoreFromMinimzied(Form form)
-        {
-            const int WPF_RESTORETOMAXIMIZED = 0x2;
-            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-            placement.length = Marshal.SizeOf(placement);
-            GetWindowPlacement(form.Handle, ref placement);
-
-            if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
-                form.WindowState = FormWindowState.Maximized;
-            else
-                form.WindowState = FormWindowState.Normal;
-        }
-
-        public static void GivConsole()
-        {
-            AllocConsole();
-            IntPtr stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-            SafeFileHandle safeFileHandle = new SafeFileHandle(stdHandle, true);
-            FileStream fileStream = new FileStream(safeFileHandle, FileAccess.Write);
-            Encoding encoding = System.Text.Encoding.GetEncoding(MY_CODE_PAGE);
-            StreamWriter standardOutput = new StreamWriter(fileStream, encoding);
-            standardOutput.AutoFlush = true;
-            Console.SetOut(standardOutput);
-        }
-        
-        const int MF_BYCOMMAND = 0x00000000;
-        const int SC_CLOSE = 0xF060;
-        const int SC_MINIMIZE = 0xF020;
-        const int SC_MAXIMIZE = 0xF030;
-        const int SC_SIZE = 0xF000;
-
-        public static void HideConsole() { ShowWindow(GetConsoleWindow(), 0); }
-        public static void MinimizeConsole() { ShowWindow(GetConsoleWindow(), 2); }
-        public static void ShowConsole() { ShowWindow(GetConsoleWindow(), 5); }
-        public static void DisableConsoleRezise()
-        {
-            IntPtr handle = GetConsoleWindow();
-            IntPtr sysMenu = GetSystemMenu(handle, false);
-
-            if (handle != IntPtr.Zero)
-            {
-                DeleteMenu(sysMenu, SC_MAXIMIZE, MF_BYCOMMAND);
-                DeleteMenu(sysMenu, SC_SIZE, MF_BYCOMMAND);
-            }
-        }
-
-        public static bool AttachToConsole()
-        {
-            const uint ParentProcess = 0xFFFFFFFF;
-            if (!AttachConsole(ParentProcess))
-                return false;
-
-            return true;
-        }
+        #endregion
     }
 
-    public static class WindowExtension
-    {
-        [DllImport("user32.dll")]
-        static internal extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-
-        public static void EnableBlur(this Form @this)
-        {
-            var accent = new AccentPolicy();
-            accent.AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND;
-            var accentStructSize = Marshal.SizeOf(accent);
-            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-            Marshal.StructureToPtr(accent, accentPtr, false);
-            var Data = new WindowCompositionAttributeData();
-            Data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-            Data.SizeOfData = accentStructSize;
-            Data.Data = accentPtr;
-            SetWindowCompositionAttribute(@this.Handle, ref Data);
-            Marshal.FreeHGlobal(accentPtr);
-        }
-
-    }
-    public static class FormExtensions
-    {
-        public static void InvokeIfRequired(this ISynchronizeInvoke obj,
-                                         MethodInvoker action)
-        {
-            if (obj.InvokeRequired)
-            {
-                var args = new object[0];
-                obj.Invoke(action, args);
-            }
-            else
-            {
-                action();
-            }
-        }
-    }
-    public static class StringExtensions
-    {
-        public static bool Contains(this String str, String substring,
-                                    StringComparison comp)
-        {
-            return str.IndexOf(substring, comp) >= 0;
-        }
-    }
-
-    enum AccentState
-    {
-        ACCENT_DISABLED = 0,
-        ACCENT_ENABLE_GRADIENT = 1,
-        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
-        ACCENT_ENABLE_BLURBEHIND = 3,
-        ACCENT_INVALID_STATE = 4
-    }
-    struct AccentPolicy
-    {
-        public AccentState AccentState;
-    }
-    struct WindowCompositionAttributeData
-    {
-        public WindowCompositionAttribute Attribute;
-        public IntPtr Data;
-        public int SizeOfData;
-    }
-    enum WindowCompositionAttribute
-    {
-        WCA_ACCENT_POLICY = 19
-    }
-    
+    // Approximate Math Functions
     public class Approximate
     {
         public static float Sqrt(float z)
@@ -678,4 +639,38 @@ namespace MusicPlayer
             public int tmp;
         }
     }
+
+    #region struct and enum dump
+    enum AccentState
+    {
+        ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_GRADIENT = 1,
+        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+        ACCENT_ENABLE_BLURBEHIND = 3,
+        ACCENT_INVALID_STATE = 4
+    }
+    struct AccentPolicy
+    {
+        public AccentState AccentState;
+    }
+    struct WindowCompositionAttributeData
+    {
+        public WindowCompositionAttribute Attribute;
+        public IntPtr Data;
+        public int SizeOfData;
+    }
+    enum WindowCompositionAttribute
+    {
+        WCA_ACCENT_POLICY = 19
+    }
+    public struct WINDOWPLACEMENT
+    {
+        public int length;
+        public int flags;
+        public int showCmd;
+        public System.Drawing.Point ptMinPosition;
+        public System.Drawing.Point ptMaxPosition;
+        public System.Drawing.Rectangle rcNormalPosition;
+    }
+    #endregion
 }
