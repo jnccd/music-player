@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>+R2xaGXc5WwwxZUavE1jA48SUR8=</dsig:DigestValue>
+        <dsig:DigestValue>5yD4m8gafHK2ZlN8MMoHs8iQUyE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -162,6 +162,15 @@
       </hash>
     </dependentAssembly>
   </dependency>
+  <file name="BuildDate.txt" size="25">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>TQom0Lt0oKwVKsqAOeZ03mHJ0aU=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Close.xnb" size="334">
     <hash>
       <dsig:Transforms>

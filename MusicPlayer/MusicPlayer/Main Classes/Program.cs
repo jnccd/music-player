@@ -139,6 +139,7 @@ namespace MusicPlayer
             // Actual start
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Created with \"Microsoft XNA Game Studio 4.0\" and \"NAudio\"");
+            Console.WriteLine("Build from: " + File.ReadAllText(Values.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n'));
 
             Program.args = args;
 

@@ -7,14 +7,14 @@
     <framework targetVersion="4.0" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="MusicPlayer.exe.manifest" size="19160">
+    <dependentAssembly dependencyType="install" codebase="MusicPlayer.exe.manifest" size="19531">
       <assemblyIdentity name="MusicPlayer.exe" version="1.0.0.2" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>CgofGnW1hUJuUOZvYdF66fSk2f0=</dsig:DigestValue>
+        <dsig:DigestValue>iA+J8d8d7tITZiJuDKTKNHUBUas=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
