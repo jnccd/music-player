@@ -321,6 +321,11 @@ namespace MusicPlayer
         {
             return (float)((Math.Pow(2, -1.5 * (x - 1) * (x - 1)) / 10f + 1) * (-Math.Pow(5, -x) + 1));
         }
+        public static double AnimationFunction2(double x)
+        {
+            x += Math.PI;
+            return Math.Pow(1.2, -x / 2) * Math.Sin(x * 1.8);
+        }
         public static float Sigmoid(double value)
         {
             return (float)(1.0 / (1.0 + Math.Pow(Math.E, -value)));

@@ -802,7 +802,7 @@ namespace MusicPlayer
             int SongChoosingListIndex = 0;
 
             double random = Values.RDM.NextDouble();
-            if (random < 0.5)
+            if (random < 0.8)
             {
                 // Just get a song from the Choosing List
                 do
@@ -813,7 +813,7 @@ namespace MusicPlayer
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
                 PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
             }
-            else if (random < 0.7)
+            else if (random < 0.9)
             {
                 // Play a song that hasnt been played yet
                 int index = UpvotedSongData.FindIndex(x => x.Streak == 0);
