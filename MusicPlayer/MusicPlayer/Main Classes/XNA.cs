@@ -1401,7 +1401,11 @@ namespace MusicPlayer
                 details = SongName;
                 state = "";
             }
-            if (SongName.Length <= 15 && IsPlaying || SongName.Length <= 10 && !IsPlaying)
+#if DEBUG
+            details = details.Insert(0, "[DEBUG-VERSION] ");
+            bigimagekey = "debugiconv1";
+#endif
+            if (details.Length < state.Length)
             {
                 details += time;
             }
@@ -1410,11 +1414,6 @@ namespace MusicPlayer
                 state += time;
                 state = state.TrimStart(' ');
             }
-
-#if DEBUG
-            details = details.Insert(0, "[DEBUG-VERSION] ");
-            bigimagekey = "debugiconv1";
-#endif
 
             DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
