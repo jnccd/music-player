@@ -737,6 +737,7 @@ namespace MusicPlayer
             return true;
         }
 
+        // Update
         protected override void Update(GameTime gameTime)
         {
             //CurrentDebugTime = Stopwatch.GetTimestamp();
@@ -1078,7 +1079,7 @@ namespace MusicPlayer
                             Program.Restart();
                         }
                     }
-                    catch (Exception e) { MessageBox.Show("Can't find that song.\n\nException: " + e.ToString()); }
+                    catch (Exception e) { MessageBox.Show("Can't restart.\n\nException: " + e.ToString()); }
                 });
             }
 
@@ -1418,6 +1419,7 @@ namespace MusicPlayer
             DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
 
+        // Draw
         protected override void Draw(GameTime gameTime)
         {
             //CurrentDebugTime = Stopwatch.GetTimestamp();

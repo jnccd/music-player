@@ -800,9 +800,11 @@ namespace MusicPlayer
             CurrentDebugTime = Stopwatch.GetTimestamp();
 
             int SongChoosingListIndex = 0;
-            
-            if (Values.RDM.NextDouble() < 0.6)
+
+            double random = Values.RDM.NextDouble();
+            if (random < 0.5)
             {
+                // Just get a song from the Choosing List
                 do
                     SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
                 while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
@@ -811,17 +813,55 @@ namespace MusicPlayer
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
                 PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
             }
-            else
+            else if (random < 0.7)
             {
+                // Play a song that hasnt been played yet
                 int index = UpvotedSongData.FindIndex(x => x.Streak == 0);
                 if (index != -1)
                 {
+                    // If there is one play it
                     PlayerHistory.Add(GetSongPathFromSongName(UpvotedSongData[index].Name));
                     PlayerHistoryIndex = PlayerHistory.Count - 1;
                     PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
                 }
                 else
                 {
+                    // No unplayed song found
+                    do
+                        SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
+                    while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
+
+                    PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                }
+            }
+            else
+            {
+                // Play a song that has been upvoted recently
+                List<string> RecentlyPlayedChoosingList = new List<string>();
+                for (int i = 4; i < 10; i++)
+                {
+                    if (HistorySongData.Count > i && HistorySongData[i].Change > 0)
+                    {
+                        UpvotedSong S = UpvotedSongData.Find(X => X.Name == HistorySongData[i].Name + ".mp3");
+                        if (S != null && S.Score < 70)
+                        {
+                            for (int j = 0; j < HistorySongData[i].Change * 50; j++)
+                                RecentlyPlayedChoosingList.Add(HistorySongData[i].Name);
+                        }
+                    }
+                }
+                if (RecentlyPlayedChoosingList.Count > 0)
+                {
+                    // Play a recently upvoted song
+                    PlayerHistory.Add(GetSongPathFromSongName(RecentlyPlayedChoosingList[Values.RDM.Next(RecentlyPlayedChoosingList.Count)]));
+                    PlayerHistoryIndex = PlayerHistory.Count - 1;
+                    PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
+                }
+                else
+                {
+                    // No recently upvoted song found
                     do
                         SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
                     while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
@@ -1138,11 +1178,11 @@ namespace MusicPlayer
         }
         public static string GetSongPathFromSongName(string SongName)
         {
-            if (!SongName.Contains(".mp3"))
+            if (!SongName.EndsWith(".mp3"))
                 SongName += ".mp3";
 
             foreach (string s in Playlist)
-                if (s.Split('\\').Last() == SongName)
+                if (s.Split('\\').Last() == SongName && File.Exists(s))
                     return s;
             return "";
         }
@@ -1161,25 +1201,22 @@ namespace MusicPlayer
                 int index = UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last());
                 if (index >= 0)
                 {
+                    // Give songs with good ratio extra chance
                     amount += (Values.Sigmoid((float)UpvotedSongData[index].TotalLikes / UpvotedSongData[index].TotalDislikes / 200) - 0.5f) * 100 * ChanceIncreasePerUpvote;
                     if (float.IsNaN(amount))
                         amount = 0;
 
+                    // Give songs with good score extra chance
                     if (UpvotedSongData[index].Score > 0)
                         amount += (int)(Math.Ceiling(UpvotedSongData[index].Score * ChanceIncreasePerUpvote / 4));
                     
+                    // Give young songs extra chance
                     float age = SongAge(index);
                     if (age < 7)
                         amount += (int)((30 - age) * ChanceIncreasePerUpvote * 60f / 30f);
-
-                    if (UpvotedSongData[index].Score < 50)
-                    {
-                        int hisindex = HistorySongData.FindIndex(x => x.Name + ".mp3" == UpvotedSongData[index].Name);
-                        if (hisindex != -1 && HistorySongData[hisindex].Change > 0 && hisindex > 1 && hisindex < 8)
-                            amount += (int)((100 - UpvotedSongData[index].Score) * 4);
-                    }
                 }
                 
+                // make sure the list is about 100000 elements long
                 if (lastSongChoosingListLength != 0)
                     amount = amount * 100000f / lastSongChoosingListLength;
 

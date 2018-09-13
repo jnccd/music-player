@@ -376,5 +376,24 @@ namespace MusicPlayer
             string[] files = new string[1]; files[0] = path;
             bDrag.DoDragDrop(new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Values.StartSTATask(() =>
+            {
+                try
+                {
+                    if (MessageBox.Show("Do you really want to restart?", "Restart?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        Program.Closing = true;
+                        Program.game.gameWindowForm.InvokeIfRequired(Program.game.gameWindowForm.Close);
+                        DiscordRPCWrapper.Shutdown();
+                        Application.Exit();
+                        Program.Restart();
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show("Can't restart.\n\nException: " + ex.ToString()); }
+            });
+        }
     }
 }
