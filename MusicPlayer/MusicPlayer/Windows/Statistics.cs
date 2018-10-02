@@ -19,6 +19,9 @@ namespace MusicPlayer
         int currentMouseOverRow;
         public bool IsClosed = false;
         string LastSearched = "";
+        int timerTicks = 0;
+        Point MousePos;
+        Point MouseDrag;
 
         public Statistics(XNA parent)
         {
@@ -33,26 +36,12 @@ namespace MusicPlayer
             InitializeComponent();
             this.parent = parent;
         }
-
         private void Statistics_Load(object sender, EventArgs e)
         {
             bRefresh_Click(this, EventArgs.Empty);
         }
-
-        private void dataGridView1_Resize(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                if (e.RowIndex >= 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
-                    MessageBox.Show("This entry isnt linked to a mp3 file!");
-            }
-        }
-
+        
+        // Button Events
         private void bRefresh_Click(object sender, EventArgs e)
         {
             int RowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
@@ -107,7 +96,6 @@ namespace MusicPlayer
             if (RowIndex != -1)
                 dataGridView1.FirstDisplayedScrollingRowIndex = RowIndex;
         }
-
         private void bSearch_Click(object sender, EventArgs e)
         {
             dataGridView1.Sort(dataGridView1.Columns[0], ListSortDirection.Ascending); //randomly sorted lists will have random search orders for hits with the same score
@@ -128,11 +116,29 @@ namespace MusicPlayer
             dataGridView1.Sort(dataGridView1.Columns[dataGridView1.Columns.Count - 1], ListSortDirection.Ascending);
             dataGridView1.FirstDisplayedScrollingRowIndex = 0;
         }
-
-        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        private void toPlaying_Click(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-                bSearch_Click(this, EventArgs.Empty);
+            toSong(Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName));
+        }
+
+        // Data Grid View Events
+        private void dataGridView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            timerTicks = 0;
+            timer1.Enabled = true;
+            MouseDrag = new Point(e.X, e.Y);
+        }
+        private void dataGridView1_MouseMove(object sender, MouseEventArgs e)
+        {
+            MousePos = new Point(e.X, e.Y);
+        }
+        private void dataGridView1_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                if (e.RowIndex >= 0 && !Assets.PlayPlaylistSong(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3"))
+                    MessageBox.Show("This entry isnt linked to a mp3 file!");
+            }
         }
 
         // ContextMenu
@@ -274,7 +280,7 @@ namespace MusicPlayer
                                 string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
                                 ResultURL = "https://www.youtube.com" + cuthtml;
                             }
-                            
+
                             Uri U = new Uri(ResultURL);
                             Process.Start(U.ToString());
                         });
@@ -283,37 +289,37 @@ namespace MusicPlayer
                 })));
                 if (dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString().Equals(Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName)))
                     m.MenuItems.Add(new MenuItem("Open in Browser with timestamp", ((object s, EventArgs ev) =>
-                {
-                    try
                     {
-                        Task.Factory.StartNew(() =>
+                        try
                         {
-                            // Get fitting youtube video
-                            string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                            req.KeepAlive = false;
-                            WebResponse W = req.GetResponse();
-                            string ResultURL;
-                            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                            Task.Factory.StartNew(() =>
                             {
-                                string html = sr.ReadToEnd();
-                                int index = html.IndexOf("href=\"/watch?");
-                                string startcuthtml = html.Remove(0, index + 6);
-                                index = startcuthtml.IndexOf('"');
-                                string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                                ResultURL = "https://www.youtube.com" + cuthtml;
-                            }
+                                // Get fitting youtube video
+                                string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                                req.KeepAlive = false;
+                                WebResponse W = req.GetResponse();
+                                string ResultURL;
+                                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                                {
+                                    string html = sr.ReadToEnd();
+                                    int index = html.IndexOf("href=\"/watch?");
+                                    string startcuthtml = html.Remove(0, index + 6);
+                                    index = startcuthtml.IndexOf('"');
+                                    string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                                    ResultURL = "https://www.youtube.com" + cuthtml;
+                                }
 
-                            int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
-                            Uri U = new Uri(ResultURL + "&t=" + seconds + "s");
-                            Process.Start(U.ToString());
+                                int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
+                                Uri U = new Uri(ResultURL + "&t=" + seconds + "s");
+                                Process.Start(U.ToString());
 
-                            if (Assets.IsPlaying())
-                                Assets.PlayPause();
-                        });
-                    }
-                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                })));
+                                if (Assets.IsPlaying())
+                                    Assets.PlayPause();
+                            });
+                        }
+                        catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                    })));
                 m.MenuItems.Add(new MenuItem("Open in Explorer", ((object s, EventArgs ev) =>
                 {
                     try
@@ -394,7 +400,8 @@ namespace MusicPlayer
 
                                 Assets.UpdateSongChoosingList();
                                 bRefresh_Click(null, EventArgs.Empty);
-                            } catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                            }
+                            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
                         }
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
@@ -445,6 +452,17 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
+                m.MenuItems.Add(new MenuItem("Filter for...", ((object s, EventArgs ev) =>
+                {
+                    try
+                    {
+                        stringDialog dia = new stringDialog("What do you want to filter for?", "");
+                        dia.ShowDialog();
+                        if (dia.result != "" && dia.result != null)
+                            filterFor(dia.result);
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
                 if (dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.ColumnCount - 2].Value == null)
                     m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
                     {
@@ -467,32 +485,26 @@ namespace MusicPlayer
                 currentMouseOverRow = e.RowIndex;
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        // Other Events
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-
+            if (e.KeyCode == Keys.Enter)
+                bSearch_Click(this, EventArgs.Empty);
         }
-
         private void Statistics_FormClosed(object sender, FormClosedEventArgs e)
         {
             IsClosed = true;
         }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)
         {
-
-        }
-
-        private void toPlaying_Click(object sender, EventArgs e)
-        {
-            int index = 0;
-            for (int i = 0; i < dataGridView1.Rows.Count; i++)
-                if (Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName).Equals(dataGridView1.Rows[i].Cells[0].Value))
-                {
-                    index = i;
-                    break;
-                }
-
-            dataGridView1.FirstDisplayedScrollingRowIndex = index;
+            timerTicks++;
+            if (timerTicks == 2 && Math.Abs(MousePos.X - MouseDrag.X + MousePos.Y - MouseDrag.Y) < 15)
+            {
+                string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
+                string[] files = new string[1]; files[0] = path;
+                dataGridView1.DoDragDrop(new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
+                timer1.Enabled = false;
+            }
         }
 
         public void toSong(string Song)
@@ -507,47 +519,16 @@ namespace MusicPlayer
 
             dataGridView1.FirstDisplayedScrollingRowIndex = index;
         }
-
-        private void dataGridView1_MouseDown(object sender, MouseEventArgs e)
+        public void filterFor(string filter)
         {
-            timerTicks = 0;
-            timer1.Enabled = true;
-            MouseDrag = new Point(e.X, e.Y);
-        }
-
-        int timerTicks = 0;
-        Point MousePos;
-        Point MouseDrag;
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timerTicks++;
-            if (timerTicks == 2 && Math.Abs(MousePos.X - MouseDrag.X + MousePos.Y - MouseDrag.Y) < 15)
+            List<DataGridViewRow> Rows = new List<DataGridViewRow>();
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
-                string path = Assets.GetSongPathFromSongName(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                string[] files = new string[1]; files[0] = path;
-                dataGridView1.DoDragDrop(new DataObject(DataFormats.FileDrop, files), DragDropEffects.Copy);
-                timer1.Enabled = false;
+                if (dataGridView1.Rows[i].Cells[0].Value.ToString().Contains(filter))
+                    Rows.Add(dataGridView1.Rows[i]);
             }
-        }
-
-        private void dataGridView1_DragEnter(object sender, DragEventArgs e)
-        {
-            //Debug.WriteLine(((string[])e.Data.GetData(typeof(string[])))[0] + " $|$ " + e.Effect);
-        }
-        
-        private void dataGridView1_MouseMove(object sender, MouseEventArgs e)
-        {
-            MousePos = new Point(e.X, e.Y);
-        }
-
-        private void dataGridView1_DragLeave(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void dataGridView1_DragOver(object sender, DragEventArgs e)
-        {
-            
+            dataGridView1.Rows.Clear();
+            dataGridView1.Rows.AddRange(Rows.ToArray());
         }
     }
 }

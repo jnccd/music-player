@@ -338,7 +338,6 @@ start MusicPlayer.exe");
                 {
                     string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.PlayRequest";
                     string crackedOpenBoi = File.ReadAllText(boi);
-                    File.Delete(boi);
                     game.PauseConsoleInputThread = true;
                     Task.Factory.StartNew(() => {
                         string down = crackedOpenBoi;
@@ -350,6 +349,7 @@ start MusicPlayer.exe");
                         }
                     });
                     Thread.Sleep(200);
+                    File.Delete(boi);
                     Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
                     Values.SetForegroundWindow(Values.GetConsoleWindow());
                     SendKeys.SendWait("SUCCCCC");
@@ -359,13 +359,13 @@ start MusicPlayer.exe");
                 {
                     string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.VideoDownloadRequest";
                     string crackedOpenBoi = File.ReadAllText(boi);
-                    File.Delete(boi);
                     game.PauseConsoleInputThread = true;
                     Task.Factory.StartNew(() => {
                         string down = crackedOpenBoi;
                         game.DownloadAsVideo(down);
                     });
                     Thread.Sleep(200);
+                    File.Delete(boi);
                     Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
                     Values.SetForegroundWindow(Values.GetConsoleWindow());
                     SendKeys.SendWait("SUCCCCC");

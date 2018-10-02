@@ -1270,7 +1270,7 @@ namespace MusicPlayer
             WindowPoints[2] = new Point(VirtualWindow.X, VirtualWindow.Y + VirtualWindow.Height);
             WindowPoints[3] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y + VirtualWindow.Height);
 
-            Screen Main = Values.TheWindowsMainScreen(VirtualWindow);
+            Screen Main = Screen.FromRectangle(gameWindowForm.Bounds);
             if (Main == null)
                 Main = Screen.PrimaryScreen;
 
@@ -1336,7 +1336,7 @@ namespace MusicPlayer
                 Values.StartSTATask(() => { statistics.ShowDialog(); });
             }
             else
-                statistics.InvokeIfRequired(() => { Values.RestoreFromMinimzied(statistics); Values.SetForegroundWindow(statistics.Handle); });
+                statistics.InvokeIfRequired(() => { statistics.RestoreFromMinimzied(); Values.SetForegroundWindow(statistics.Handle); });
         }
         public void ShowOptions()
         {
@@ -1346,7 +1346,7 @@ namespace MusicPlayer
                 Values.StartSTATask(() => { optionsMenu.ShowDialog(); });
             }
             else
-                optionsMenu.InvokeIfRequired(() => { Values.RestoreFromMinimzied(optionsMenu); Values.SetForegroundWindow(optionsMenu.Handle); });
+                optionsMenu.InvokeIfRequired(() => { optionsMenu.RestoreFromMinimzied(); Values.SetForegroundWindow(optionsMenu.Handle); });
         }
         public void UpdateDiscordRPC()
         {
