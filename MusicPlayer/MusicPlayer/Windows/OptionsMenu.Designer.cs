@@ -301,7 +301,7 @@
             // 
             // bBDownloadF
             // 
-            this.bBDownloadF.Location = new System.Drawing.Point(12, 359);
+            this.bBDownloadF.Location = new System.Drawing.Point(12, 360);
             this.bBDownloadF.Name = "bBDownloadF";
             this.bBDownloadF.Size = new System.Drawing.Size(205, 23);
             this.bBDownloadF.TabIndex = 24;
@@ -311,9 +311,9 @@
             // 
             // bDiscordRPC
             // 
-            this.bDiscordRPC.Location = new System.Drawing.Point(9, 412);
+            this.bDiscordRPC.Location = new System.Drawing.Point(12, 412);
             this.bDiscordRPC.Name = "bDiscordRPC";
-            this.bDiscordRPC.Size = new System.Drawing.Size(208, 23);
+            this.bDiscordRPC.Size = new System.Drawing.Size(205, 23);
             this.bDiscordRPC.TabIndex = 25;
             this.bDiscordRPC.Text = "Activate DiscordRPC";
             this.bDiscordRPC.UseVisualStyleBackColor = true;
@@ -322,7 +322,7 @@
             // cDiscRPC
             // 
             this.cDiscRPC.AutoSize = true;
-            this.cDiscRPC.Location = new System.Drawing.Point(13, 389);
+            this.cDiscRPC.Location = new System.Drawing.Point(12, 389);
             this.cDiscRPC.Name = "cDiscRPC";
             this.cDiscRPC.Size = new System.Drawing.Size(396, 17);
             this.cDiscRPC.TabIndex = 26;
@@ -334,7 +334,7 @@
             // 
             this.bDrag.Location = new System.Drawing.Point(223, 412);
             this.bDrag.Name = "bDrag";
-            this.bDrag.Size = new System.Drawing.Size(202, 23);
+            this.bDrag.Size = new System.Drawing.Size(205, 23);
             this.bDrag.TabIndex = 27;
             this.bDrag.Text = "DragDrop Song";
             this.bDrag.UseVisualStyleBackColor = true;
@@ -342,7 +342,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(220, 359);
+            this.button2.Location = new System.Drawing.Point(223, 360);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(205, 23);
             this.button2.TabIndex = 28;
