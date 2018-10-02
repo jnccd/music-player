@@ -348,41 +348,6 @@ namespace MusicPlayer
                                 ((B2.Y - B1.Y) * (A2.X - A1.X) - (A2.Y - A1.Y) * (B2.X - B1.X)));
         }
         
-        // Form Methods
-        public static Screen TheWindowsMainScreen(Rectangle WindowBounds)
-        {
-            System.Drawing.Point P = new System.Drawing.Point(WindowBounds.X + WindowBounds.Width / 2,
-                WindowBounds.Y + WindowBounds.Height / 2);
-
-            for (int i = 0; i < Screen.AllScreens.Length; i++)
-                if (Screen.AllScreens[i].Bounds.Contains(P))
-                    return Screen.AllScreens[i];
-
-            int[] d = new int[Screen.AllScreens.Length];
-            for (int i = 0; i < d.Length; i++)
-                d[i] = P.X - Screen.AllScreens[i].Bounds.X - Screen.AllScreens[i].Bounds.Width / 2 +
-                     P.Y - Screen.AllScreens[i].Bounds.Y - Screen.AllScreens[i].Bounds.Height / 2;
-
-            int LowestDindex = 0;
-            for (int i = 0; i < d.Length; i++)
-                if (Math.Abs(d[i]) < Math.Abs(d[LowestDindex]))
-                    LowestDindex = i;
-
-            return Screen.AllScreens[LowestDindex];
-        }
-        public static void RestoreFromMinimzied(Form form)
-        {
-            const int WPF_RESTORETOMAXIMIZED = 0x2;
-            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-            placement.length = Marshal.SizeOf(placement);
-            GetWindowPlacement(form.Handle, ref placement);
-
-            if ((placement.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED)
-                form.WindowState = FormWindowState.Maximized;
-            else
-                form.WindowState = FormWindowState.Normal;
-        }
-        
         // Console Methods
         public static void GivConsole()
         {
@@ -432,6 +397,10 @@ namespace MusicPlayer
             Data.Data = accentPtr;
             SetWindowCompositionAttribute(@this.Handle, ref Data);
             Marshal.FreeHGlobal(accentPtr);
+        }
+        public static void RestoreFromMinimzied(this Form form)
+        {
+            form.WindowState = FormWindowState.Normal;
         }
         public static void InvokeIfRequired(this ISynchronizeInvoke obj, MethodInvoker action)
         {
@@ -571,9 +540,6 @@ namespace MusicPlayer
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindowVisible(IntPtr hWnd);
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
         [DllImport("kernel32.dll",
             EntryPoint = "GetStdHandle",
             SetLastError = true,
@@ -667,15 +633,6 @@ namespace MusicPlayer
     enum WindowCompositionAttribute
     {
         WCA_ACCENT_POLICY = 19
-    }
-    public struct WINDOWPLACEMENT
-    {
-        public int length;
-        public int flags;
-        public int showCmd;
-        public System.Drawing.Point ptMinPosition;
-        public System.Drawing.Point ptMaxPosition;
-        public System.Drawing.Rectangle rcNormalPosition;
     }
     #endregion
 }
