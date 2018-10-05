@@ -664,13 +664,12 @@ namespace MusicPlayer
                 if (output.PlaybackState == PlaybackState.Playing)
                 {
                     output.Pause();
-                    Program.game.UpdateDiscordRPC();
                 }
                 else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
                 {
                     output.Play();
-                    Program.game.UpdateDiscordRPC();
                 }
+                Program.game.UpdateDiscordRPC();
             }
         }
         public static bool IsPlaying()

@@ -64,7 +64,7 @@ namespace MusicPlayer
         public static int Timer = 0;
         public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        // String DIstances
+        // String Distances
         public static int LevenshteinDistance(string s, string t)
         {
             if (string.IsNullOrEmpty(s))
