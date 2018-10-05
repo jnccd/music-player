@@ -468,6 +468,8 @@ namespace MusicPlayer
                 PauseConsoleInputThread = true;
                 Values.ShowConsole();
 
+                PlaybackState PlayState = Assets.output.PlaybackState;
+
                 if (download.StartsWith("https://www.youtube.com/watch?v="))
                     download = download.Remove(0, "https://www.youtube.com/watch?v=".Length);
                 if (download.StartsWith("-"))
@@ -631,6 +633,9 @@ namespace MusicPlayer
                     Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
                     Assets.PlayNewSong(outM.Filename);
                     originY = Console.CursorTop;
+                    
+                    if (PlayState == PlaybackState.Paused || PlayState == PlaybackState.Stopped)
+                        Assets.PlayPause();
                 }
 
                 BackgroundOperationRunning = false;
