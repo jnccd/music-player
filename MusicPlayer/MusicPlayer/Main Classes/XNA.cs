@@ -915,7 +915,10 @@ namespace MusicPlayer
                 selectedControl = SelectedControl.None;
             }
             if (Control.CurMS.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
+            {
+                ForceBackgroundRedraw();
                 selectedControl = SelectedControl.None;
+            }
 
             switch (selectedControl)
             {
@@ -977,6 +980,9 @@ namespace MusicPlayer
 
                     newPos.X = gameWindowForm.Location.X + Control.CurMS.X - MouseClickedPos.X;
                     newPos.Y = gameWindowForm.Location.Y + Control.CurMS.Y - MouseClickedPos.Y;
+
+                    if (newPos.X % 50 == 0)
+                        GetHashCode();
                     
                     config.Default.WindowPos = newPos;
                     KeepWindowInScreen();
@@ -1262,18 +1268,24 @@ namespace MusicPlayer
         }
         public void KeepWindowInScreen()
         {
-            Rectangle VirtualWindow = new Rectangle(config.Default.WindowPos.X, config.Default.WindowPos.Y,
-                gameWindowForm.Bounds.Width, gameWindowForm.Bounds.Height);
+            TempRect.X = config.Default.WindowPos.X;
+            TempRect.Y = config.Default.WindowPos.Y;
+            TempRect.Width = gameWindowForm.Bounds.Width;
+            TempRect.Height = gameWindowForm.Bounds.Height;
+            config.Default.WindowPos = KeepWindowInScreen(TempRect);
+        }
+        public System.Drawing.Point KeepWindowInScreen(Rectangle WindowBounds)
+        {
             Rectangle[] ScreenBoxes = new Rectangle[Screen.AllScreens.Length];
 
             for (int i = 0; i < ScreenBoxes.Length; i++)
                 ScreenBoxes[i] = new Rectangle(Screen.AllScreens[i].WorkingArea.X, Screen.AllScreens[i].WorkingArea.Y,
                     Screen.AllScreens[i].WorkingArea.Width, Screen.AllScreens[i].WorkingArea.Height - 56);
             
-            WindowPoints[0] = new Point(VirtualWindow.X, VirtualWindow.Y);
-            WindowPoints[1] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y);
-            WindowPoints[2] = new Point(VirtualWindow.X, VirtualWindow.Y + VirtualWindow.Height);
-            WindowPoints[3] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y + VirtualWindow.Height);
+            WindowPoints[0] = new Point(WindowBounds.X, WindowBounds.Y);
+            WindowPoints[1] = new Point(WindowBounds.X + WindowBounds.Width, WindowBounds.Y);
+            WindowPoints[2] = new Point(WindowBounds.X, WindowBounds.Y + WindowBounds.Height);
+            WindowPoints[3] = new Point(WindowBounds.X + WindowBounds.Width, WindowBounds.Y + WindowBounds.Height);
 
             Screen Main = Screen.FromRectangle(gameWindowForm.Bounds);
             if (Main == null)
@@ -1286,16 +1298,16 @@ namespace MusicPlayer
 
                     if (Diff != new Point(0, 0))
                     {
-                        VirtualWindow = new Rectangle(VirtualWindow.X + Diff.X, VirtualWindow.Y + Diff.Y, VirtualWindow.Width, VirtualWindow.Height);
+                        WindowBounds = new Rectangle(WindowBounds.X + Diff.X, WindowBounds.Y + Diff.Y, WindowBounds.Width, WindowBounds.Height);
 
-                        WindowPoints[0] = new Point(VirtualWindow.X, VirtualWindow.Y);
-                        WindowPoints[1] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y);
-                        WindowPoints[2] = new Point(VirtualWindow.X, VirtualWindow.Y + VirtualWindow.Height);
-                        WindowPoints[3] = new Point(VirtualWindow.X + VirtualWindow.Width, VirtualWindow.Y + VirtualWindow.Height);
+                        WindowPoints[0] = new Point(WindowBounds.X, WindowBounds.Y);
+                        WindowPoints[1] = new Point(WindowBounds.X + WindowBounds.Width, WindowBounds.Y);
+                        WindowPoints[2] = new Point(WindowBounds.X, WindowBounds.Y + WindowBounds.Height);
+                        WindowPoints[3] = new Point(WindowBounds.X + WindowBounds.Width, WindowBounds.Y + WindowBounds.Height);
                     }
                 }
 
-            config.Default.WindowPos = new System.Drawing.Point(VirtualWindow.X, VirtualWindow.Y);
+            return new System.Drawing.Point(WindowBounds.X, WindowBounds.Y);
         }
         static bool RectanglesContainPoint(Point P, Rectangle[] R)
         {
@@ -1493,8 +1505,10 @@ namespace MusicPlayer
                     // Blurred Background
                     foreach (Screen S in Screen.AllScreens)
                     {
-                        TempRect.X = S.Bounds.X - gameWindowForm.Location.X + 50;
-                        TempRect.Y = S.Bounds.Y - gameWindowForm.Location.Y + 50;
+                        newPos = KeepWindowInScreen(new Rectangle(newPos.X - oldPos.X + newPos.X, newPos.Y - oldPos.Y + newPos.Y,
+                            gameWindowForm.Width, gameWindowForm.Height));
+                        TempRect.X = S.Bounds.X - newPos.X + 50;
+                        TempRect.Y = S.Bounds.Y - newPos.Y + 50;
                         TempRect.Width = S.Bounds.Width;
                         TempRect.Height = S.Bounds.Height;
                         spriteBatch.Draw(Assets.bg, TempRect, Color.White);
@@ -1509,8 +1523,8 @@ namespace MusicPlayer
                     // Blurred Background
                     foreach (Screen S in Screen.AllScreens)
                     {
-                        TempRect.X = S.Bounds.X - gameWindowForm.Location.X + 50;
-                        TempRect.Y = S.Bounds.Y - gameWindowForm.Location.Y + 50;
+                        TempRect.X = S.Bounds.X - gameWindowForm.Location.X + 50 + oldPos.X - newPos.X;
+                        TempRect.Y = S.Bounds.Y - gameWindowForm.Location.Y + 50 + oldPos.Y - newPos.Y;
                         TempRect.Width = S.Bounds.Width;
                         TempRect.Height = S.Bounds.Height;
                         spriteBatch.Draw(Assets.bg, TempRect, Color.White);
@@ -1585,6 +1599,7 @@ namespace MusicPlayer
 
                 spriteBatch.End();
                 ForcedBackgroundRedraw = false;
+                ForcedCoverBackgroundRedraw = false;
             }
             #endregion
 
