@@ -93,6 +93,7 @@ namespace MusicPlayer
         public bool BackgroundOperationRunning = false;
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
+        Thread ConsoleManagerThread;
         Task SongCheckThread;
         Task CloseConfirmationThread;
         const float MaxVolume = 0.75f;
@@ -103,7 +104,7 @@ namespace MusicPlayer
         bool ForcedTitleRedraw = false;
         bool ForcedBackgroundRedraw = false;
         public bool ForcedCoverBackgroundRedraw = false;
-        System.Drawing.Point newPos;
+        System.Drawing.Point newPos = new System.Drawing.Point(config.Default.WindowPos.X, config.Default.WindowPos.Y);
         System.Drawing.Point oldPos;
         Point Diff = new Point();
         Point[] WindowPoints = new Point[4];
@@ -240,6 +241,7 @@ namespace MusicPlayer
         {
             ConsoleManager = Task.Factory.StartNew(() =>
             {
+                ConsoleManagerThread = Thread.CurrentThread;
                 while (true)
                 {
                     string Path = "";
@@ -916,7 +918,8 @@ namespace MusicPlayer
             }
             if (Control.CurMS.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released)
             {
-                ForceBackgroundRedraw();
+                if (selectedControl == SelectedControl.DragWindow)
+                    ForceBackgroundRedraw();
                 selectedControl = SelectedControl.None;
             }
 
@@ -946,6 +949,7 @@ namespace MusicPlayer
                                     Program.Closing = true;
                                     gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
                                     DiscordRPCWrapper.Shutdown();
+                                    ConsoleManagerThread.Abort();
                                     Application.Exit();
                                 }
                             });
@@ -1260,7 +1264,7 @@ namespace MusicPlayer
             {
                 ActualVolumeBar.X = Values.WindowSize.X - 25 - 75;
                 ActualVolumeBar.Y = 24;
-                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume / Values.VolumeMultiplier);
+                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume);
                 if (ActualVolumeBar.Width > 75)
                     ActualVolumeBar.Width = 75;
                 ActualVolumeBar.Height = 8;

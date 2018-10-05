@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>dXSINvGw21E64OXT6VLvSHJx9wE=</dsig:DigestValue>
+        <dsig:DigestValue>/+mlNLmvAAIaRzlyCeFuOJQCMTw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -168,7 +168,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>s4TXYQQ5DMiewkVGn7yDEr7CZsI=</dsig:DigestValue>
+      <dsig:DigestValue>Lhd5ikibn4AKJix7GgA8nkY9U8M=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">
