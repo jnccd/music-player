@@ -6,6 +6,6 @@ https://www.microsoft.com/de-de/download/details.aspx?id=34429
 
 https://www.microsoft.com/en-us/download/details.aspx?id=20914
 
-If something doesnt work (which is likely given that I only tested this on like 2 computers) contact me on discord: PressMforMemes#7787
+If something doesnt work (which is likely given that I only tested this on like 2 computers) contact me on discord: ╲⎝⧹Niklas⧸⎠╱#7787
 # Installing the Browser Extension
 After unzipping the downloaded file you will find a folder named "Chrome¦Opera Extension" just drag and drop it on your browsers extension tab.
