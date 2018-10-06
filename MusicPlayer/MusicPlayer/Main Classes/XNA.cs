@@ -187,6 +187,7 @@ namespace MusicPlayer
         {
             gameWindowForm.FormClosing += (object sender, FormClosingEventArgs e) =>
             {
+                Program.Closing = true;
                 InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
                 Assets.DisposeNAudioData();
                 Assets.SaveUserSettings(true);
@@ -194,7 +195,6 @@ namespace MusicPlayer
                     optionsMenu.InvokeIfRequired(optionsMenu.Close);
                 if (statistics != null)
                     statistics.InvokeIfRequired(statistics.Close);
-                Program.Closing = true;
             };
             Console.CancelKeyPress += ((object o, ConsoleCancelEventArgs e) =>
             {
@@ -229,7 +229,7 @@ namespace MusicPlayer
             Console.WriteLine("Finished Loading!");
             StartSongInputLoop();
 
-            ShowSecondRowMessage("Found " + Assets.Playlist.Count + " Songs!", 3);
+            ShowSecondRowMessage("Found  " + Assets.Playlist.Count + "  Songs!", 3);
 
             KeepWindowInScreen();
             Shadow = new DropShadow(gameWindowForm, true);
@@ -263,6 +263,9 @@ namespace MusicPlayer
                         Console.Write(Path);
                         
                         ConsoleKeyInfo e = Console.ReadKey();
+
+                        if (Program.Closing)
+                            break;
 
                         if (PauseConsoleInputThread) { Console.CursorLeft = 0; }
                         while (PauseConsoleInputThread) { }
@@ -849,6 +852,7 @@ namespace MusicPlayer
 
                 SongCheckThread = Task.Factory.StartNew(() =>
                 {
+                    Thread.CurrentThread.Name = "Check For Requested Songs Thread";
                     bool Worked = false;
                     while (!Worked && lastSongRequestCheck < Values.Timer - 5)
                     {
@@ -950,8 +954,10 @@ namespace MusicPlayer
                                     Program.Closing = true;
                                     gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
                                     DiscordRPCWrapper.Shutdown();
-                                    ConsoleManagerThread.Abort();
-                                    Application.Exit();
+
+                                    // Sending keyinput to console so it closes
+                                    Values.ShowConsole();
+                                    SendKeys.Send("T");
                                 }
                             });
                         }
