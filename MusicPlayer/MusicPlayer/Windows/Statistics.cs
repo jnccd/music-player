@@ -398,7 +398,7 @@ namespace MusicPlayer
 
                                 Assets.Playlist[PlaylistIndex] = dest;
 
-                                Assets.UpdateSongChoosingList();
+                                Assets.CreateSongChoosingList();
                                 bRefresh_Click(null, EventArgs.Empty);
                             }
                             catch (Exception ex) { MessageBox.Show(ex.ToString()); }

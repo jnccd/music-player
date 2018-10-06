@@ -151,7 +151,7 @@ namespace MusicPlayer
         }
         public static List<string> Playlist = new List<string>();
         public static List<string> PlayerHistory = new List<string>();
-        public static int PlayerHistoryIndex = 0;
+        public static int PlayerHistoryIndex = -1;
         public static int SongChangedTickTime = -100000;
         public static int SongStartTime;
         public static bool IsCurrentSongUpvoted;
@@ -314,7 +314,7 @@ namespace MusicPlayer
             }
 
             Console.WriteLine("Starting first Song...");
-            UpdateSongChoosingList();
+            CreateSongChoosingList();
             if (Playlist.Count > 0)
             {
                 if (Program.args.Length > 0)
@@ -981,7 +981,7 @@ namespace MusicPlayer
         }
         private static void DownvoteCurrentSongIfNeccesary(bool DownVoteCurrentSongForUserSkip)
         {
-            if (PlayerHistoryIndex > 0)
+            if (PlayerHistoryIndex != -1)
             {
                 int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
 
@@ -1006,7 +1006,7 @@ namespace MusicPlayer
                     UpvotedSongData[index].TotalDislikes++;
                     SaveUserSettings(false);
 
-                    UpdateSongChoosingList();
+                    UpdateSongChoosingList(currentlyPlayingSongPath);
                 }
             }
         }
@@ -1041,7 +1041,7 @@ namespace MusicPlayer
 
                 UpvotedSongData[index].TotalLikes++;
 
-                UpdateSongChoosingList();
+                UpdateSongChoosingList(currentlyPlayingSongPath);
             }
             IsCurrentSongUpvoted = false;
         }
@@ -1185,7 +1185,7 @@ namespace MusicPlayer
                     return s;
             return "";
         }
-        public static void UpdateSongChoosingList() // This determines the song chances
+        public static void CreateSongChoosingList() // This determines the song chances
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
 
@@ -1194,39 +1194,62 @@ namespace MusicPlayer
             for (int i = 0; i < Playlist.Count; i++)
             {
                 SongChoosingList.Add(Playlist[i]);
-
-                float amount = 0;
-
-                int index = UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last());
-                if (index >= 0)
-                {
-                    // Give songs with good ratio extra chance
-                    amount += (Values.Sigmoid((float)UpvotedSongData[index].TotalLikes / UpvotedSongData[index].TotalDislikes / 200) - 0.5f) * 100 * ChanceIncreasePerUpvote;
-                    if (float.IsNaN(amount))
-                        amount = 0;
-
-                    // Give songs with good score extra chance
-                    if (UpvotedSongData[index].Score > 0)
-                        amount += (int)(Math.Ceiling(UpvotedSongData[index].Score * ChanceIncreasePerUpvote / 4));
-                    
-                    // Give young songs extra chance
-                    float age = SongAge(index);
-                    if (age < 7)
-                        amount += (int)((30 - age) * ChanceIncreasePerUpvote * 60f / 30f);
-                }
                 
-                // make sure the list is about 100000 elements long
-                if (lastSongChoosingListLength != 0)
-                    amount = amount * 100000f / lastSongChoosingListLength;
+                float amount = GetSongChoosingAmount(UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last()));
 
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
             }
 
-            if (lastSongChoosingListLength == 0)
-                lastSongChoosingListLength = SongChoosingList.Count;
-
             Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime) + " length: " + SongChoosingList.Count);
+        }
+        public static void UpdateSongChoosingList(string SongPath)
+        {
+            string SongName = SongPath.Split('\\').Last();
+
+            // Getting Choosing List Count
+            int index = SongChoosingList.FindIndex(x => x == SongPath);
+            if (index == -1)
+            {
+                Console.WriteLine("oi that song doesnt even exist lol");
+                return;
+            }
+            int i = index;
+            while (SongChoosingList[i] == SongPath)
+                i++;
+            int count = i - index;
+
+            // Getting target Count
+            int amount = (int)GetSongChoosingAmount(UpvotedSongData.FindIndex(x => x.Name == SongName)) + 1;
+            
+            for (int j = 0; j < amount - count; j++)
+                SongChoosingList.Insert(index, SongPath);
+            for (int j = 0; j < count - amount; j++)
+                SongChoosingList.RemoveAt(index);
+
+            //int finalAmount = (int)GetSongChoosingAmount(UpvotedSongData.FindIndex(x => x.Name == SongName)) + 1;
+        }
+        static float GetSongChoosingAmount(int UpvotedSongDataIndex)
+        {
+            float amount = 0;
+            float ChanceIncreasePerUpvote = Playlist.Count / 700;
+            if (UpvotedSongDataIndex >= 0)
+            {
+                // Give songs with good ratio extra chance
+                amount += (Values.Sigmoid((float)UpvotedSongData[UpvotedSongDataIndex].TotalLikes / UpvotedSongData[UpvotedSongDataIndex].TotalDislikes / 200) - 0.5f) * 100 * ChanceIncreasePerUpvote;
+                if (float.IsNaN(amount))
+                    amount = 0;
+
+                // Give songs with good score extra chance
+                if (UpvotedSongData[UpvotedSongDataIndex].Score > 0)
+                    amount += (int)(Math.Ceiling(UpvotedSongData[UpvotedSongDataIndex].Score * ChanceIncreasePerUpvote));
+
+                // Give young songs extra chance
+                float age = SongAge(UpvotedSongDataIndex);
+                if (age < 7)
+                    amount += (int)((30 - age) * ChanceIncreasePerUpvote * 60f / 30f);
+            }
+            return amount;
         }
         private static void SaveCurrentSongToHistoryFile(float ScoreChange)
         {
