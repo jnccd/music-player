@@ -242,6 +242,7 @@ namespace MusicPlayer
             ConsoleManager = Task.Factory.StartNew(() =>
             {
                 ConsoleManagerThread = Thread.CurrentThread;
+                ConsoleManagerThread.Name = "Console Manager Thread";
                 while (true)
                 {
                     string Path = "";

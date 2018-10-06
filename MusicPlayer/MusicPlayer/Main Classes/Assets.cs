@@ -504,6 +504,7 @@ namespace MusicPlayer
         }
         public static void UpdateEntireSongBuffers()
         {
+            Thread.CurrentThread.Name = "Song Buffer Loading Thread";
             try
             {
                 lock (Channel32ReaderThreaded)
