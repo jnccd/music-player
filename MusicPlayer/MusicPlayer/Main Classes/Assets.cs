@@ -1259,8 +1259,6 @@ namespace MusicPlayer
                 return;
 
             HistorySongData.Insert(0, new HistorySong(Path.GetFileNameWithoutExtension(currentlyPlayingSongName), ScoreChange, DateTime.Now.ToBinary()));
-
-            SaveUserSettings(false);
         }
 
         // Draw Methods
