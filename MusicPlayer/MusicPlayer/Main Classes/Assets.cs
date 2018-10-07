@@ -1186,12 +1186,11 @@ namespace MusicPlayer
                     return s;
             return "";
         }
-        public static void CreateSongChoosingList() // This determines the song chances
+        public static void CreateSongChoosingList()
         {
             CurrentDebugTime = Stopwatch.GetTimestamp();
-
+            
             SongChoosingList.Clear();
-            float ChanceIncreasePerUpvote = Playlist.Count / 1000;
             for (int i = 0; i < Playlist.Count; i++)
             {
                 SongChoosingList.Add(Playlist[i]);
@@ -1230,7 +1229,7 @@ namespace MusicPlayer
 
             //int finalAmount = (int)GetSongChoosingAmount(UpvotedSongData.FindIndex(x => x.Name == SongName)) + 1;
         }
-        static float GetSongChoosingAmount(int UpvotedSongDataIndex)
+        public static float GetSongChoosingAmount(int UpvotedSongDataIndex)
         {
             float amount = 0;
             float ChanceIncreasePerUpvote = Playlist.Count / 700;

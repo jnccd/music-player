@@ -14,6 +14,7 @@ namespace MusicPlayer
     {
         public List<UpvotedSong> SelectedSongs = new List<UpvotedSong>();
         public List<UpvotedSong> SongsToChooseFrom = new List<UpvotedSong>();
+        public float[] ChanceAmounts;
         public string[] Output;
 
         public ExportsChooser()
@@ -44,6 +45,20 @@ namespace MusicPlayer
             tTrend.Maximum = SongsToChooseFrom.Max(x => x.Streak);
             tRatio.Minimum = SongsToChooseFrom.Min(x => x.TotalDislikes == 0 ? max + 1 : x.TotalLikes / x.TotalDislikes);
             tRatio.Maximum = SongsToChooseFrom.Max(x => x.TotalDislikes == 0 ? max + 1 : x.TotalLikes / x.TotalDislikes);
+
+            int sum = 0;
+            ChanceAmounts = new float[SongsToChooseFrom.Count];
+            for (int i = 0; i < SongsToChooseFrom.Count; i++)
+            {
+                int amount = (int)Assets.GetSongChoosingAmount(i) + 1;
+                sum += amount;
+                ChanceAmounts[i] = amount;
+            }
+            for (int i = 0; i < SongsToChooseFrom.Count; i++)
+                ChanceAmounts[i] = ChanceAmounts[i] * 1000 / sum;
+
+            tChance.Minimum = 0;
+            tChance.Maximum = (int)(ChanceAmounts.Max() * 1000);
             
             UpdateSelectedSongs();
         }
@@ -51,9 +66,12 @@ namespace MusicPlayer
         private void UpdateSelectedSongs()
         {
             SelectedSongs.Clear();
-            foreach (UpvotedSong s in SongsToChooseFrom)
+            for (int i = 0; i < SongsToChooseFrom.Count; i++)
             {
-                if (s.Score >= tScore.Value && s.Streak >= tTrend.Value && (s.TotalDislikes == 0 ? int.MaxValue : s.TotalLikes / s.TotalDislikes) >= tRatio.Value)
+                UpvotedSong s = SongsToChooseFrom[i];
+                if (s.Score >= tScore.Value && s.Streak >= tTrend.Value && 
+                    (s.TotalDislikes == 0 ? int.MaxValue : s.TotalLikes / s.TotalDislikes) >= tRatio.Value &&
+                    ChanceAmounts[i] > tChance.Value / 1000f)
                     SelectedSongs.Add(s);
             }
 
@@ -82,6 +100,12 @@ namespace MusicPlayer
         {
             UpdateSelectedSongs();
             lRatio.Text = "Minimal Ratio: " + tRatio.Value;
+        }
+
+        private void tChance_Scroll(object sender, EventArgs e)
+        {
+            UpdateSelectedSongs();
+            lChance.Text = "Minimal Play-Chance: " + tChance.Value / 1000f;
         }
     }
 }
