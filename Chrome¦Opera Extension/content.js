@@ -1,18 +1,9 @@
+var b, b2;
 window.ontransitionend = function () { 
 var check = document.getElementsByClassName('cutom-music-player-download-button');
 if (check.length == 0) {
-	/// default button
-    /* var btn = document.createElement("BUTTON");
-	btn.addEventListener("click", function(){
-		download('MusicPlayer.PlayRequest', window.location.href);
-	});
-	var t = document.createTextNode("Download");
-	btn.appendChild(t);
-	btn.style.font = "bold 20px arial,serif";
-	btn.style.fontSize = '15px'; */
-	
 	/// aesthetic song download button
-	var b = document.createElement('ytd-subscribe-button-renderer');
+	b = document.createElement('ytd-subscribe-button-renderer');
 	b.className = 'cutom-music-player-download-button';
 	b.setAttribute('is-icon-button', '');
 	b.addEventListener("click", function(){
@@ -36,7 +27,7 @@ if (check.length == 0) {
 	b.removeChild(b.children[0]);
 	
 	/// aesthetic video download button
-	var b2 = document.createElement('ytd-subscribe-button-renderer');
+	b2 = document.createElement('ytd-subscribe-button-renderer');
 	b2.className = 'cutom-music-player-download-button';
 	b2.setAttribute('is-icon-button', '');
 	b2.addEventListener("click", function(){
@@ -60,17 +51,21 @@ if (check.length == 0) {
 	b2.removeChild(b2.children[0]);
 	
 	/// add buttons to document
-	var list = document.getElementsByClassName('style-scope ytd-menu-renderer');
-	for (var i = 0; i < list.length; i++) {
-		if (list[i].childNodes.length == 4)
-		{
-			///list[i].appendChild(btn);
-			list[i].insertBefore(b, list[i].children[3]);
-			list[i].insertBefore(b2, list[i].children[4]);
-		}
-	}
+	var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
+	container.appendChild(container.children[1].cloneNode());
+	container.children[3].appendChild(b);
+	container.children[3].appendChild(b2);
+	updateButtonSize();
+	window.addEventListener('resize', updateButtonSize);
+	
 	console.log('MusicPlayer buttons added!');
 	}
+}
+
+function updateButtonSize() {
+    var p = document.getElementById('primary-inner');
+	b.children[1].style.width = p.offsetWidth/2+'px';
+	b2.children[1].style.width = p.offsetWidth/2+'px';
 }
 
 function download(filename, text) {
