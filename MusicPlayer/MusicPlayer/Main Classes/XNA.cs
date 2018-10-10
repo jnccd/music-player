@@ -94,6 +94,7 @@ namespace MusicPlayer
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
         Thread ConsoleManagerThread;
+        Thread MainThread;
         Task SongCheckThread;
         Task CloseConfirmationThread;
         const float MaxVolume = 0.75f;
@@ -172,6 +173,7 @@ namespace MusicPlayer
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 120.0f);
             //graphics.SynchronizeWithVerticalRetrace = false;
             //IsFixedTimeStep = false;
+            MainThread = Thread.CurrentThread;
             optionsMenu = new OptionsMenu(this);
             IsMouseVisible = true;
         }
@@ -341,6 +343,19 @@ namespace MusicPlayer
                                 Console.WriteLine("\nWas aborted: " + Assets.SongBufferThreadWasAborted);
                                 Console.WriteLine("\nLast exception: " + Assets.LastSongBufferThreadException.ToString());
                                 Console.WriteLine("\nLast exception stack trace: " + Assets.LastSongBufferThreadException.StackTrace + "\n");
+
+                                Path = "";
+                                originY = Console.CursorTop + 1;
+                            }
+                            else if (Path.StartsWith("/stack"))
+                            {
+                                Console.CursorTop++;
+                                try
+                                {
+                                    MainThread.Suspend();
+                                    Console.WriteLine(new StackTrace(MainThread, true));
+                                } catch { }
+                                finally { MainThread.Resume(); }
 
                                 Path = "";
                                 originY = Console.CursorTop + 1;
@@ -957,7 +972,7 @@ namespace MusicPlayer
 
                                     // Sending keyinput to console so it closes
                                     Values.ShowConsole();
-                                    SendKeys.Send("T");
+                                    SendKeys.SendWait("T");
                                 }
                             });
                         }
