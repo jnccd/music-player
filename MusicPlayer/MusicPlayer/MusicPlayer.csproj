@@ -202,8 +202,8 @@
     <Content Include="BuildDate.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Chrome¦Opera Extension\content.js" />
-    <Content Include="Chrome¦Opera Extension\styles.css" />
+    <Content Include="Browser Extension\content.js" />
+    <Content Include="Browser Extension\styles.css" />
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
@@ -235,7 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Chrome¦Opera Extension\manifest.json" />
+    <None Include="Browser Extension\manifest.json" />
     <None Include="config.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>config.Designer.cs</LastGenOutput>
