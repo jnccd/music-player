@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="218624">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="219136">
       <assemblyIdentity name="MusicPlayer" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Q62Bxq+/Q42O1KEhrdEaFdtFGhs=</dsig:DigestValue>
+        <dsig:DigestValue>j6k8pBdD72bGrvqStPu8Gh4kPxo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -168,7 +168,25 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>o4tnb3MWN3WLT19HE1kRluDjWAo=</dsig:DigestValue>
+      <dsig:DigestValue>9KzChuPfnUfNw5dgnKehL15kCzc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Chrome¦Opera Extension\content.js" size="2851">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>1l6+i+YqOfueutGySnMeQRlb3Pw=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Chrome¦Opera Extension\styles.css" size="11">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>NI6omtkELGh8j9y3cV11MU+c5bg=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">

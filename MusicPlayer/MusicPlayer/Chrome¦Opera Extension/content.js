@@ -64,8 +64,8 @@ if (check.length == 0) {
 
 function updateButtonSize() {
     var p = document.getElementById('primary-inner');
-	b.children[1].style.width = p.offsetWidth/2+'px';
-	b2.children[1].style.width = p.offsetWidth/2+'px';
+	b.children[1].style.width = (p.offsetWidth/2 - 8)+'px';
+	b2.children[1].style.width = b.children[1].style.width;
 }
 
 function download(filename, text) {
