@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>j6k8pBdD72bGrvqStPu8Gh4kPxo=</dsig:DigestValue>
+        <dsig:DigestValue>H6OUFe5v0sqzD/n7nt2vezLRs+k=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -162,31 +162,31 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="BuildDate.txt" size="25">
+  <file name="Browser Extension\content.js" size="2851">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>9KzChuPfnUfNw5dgnKehL15kCzc=</dsig:DigestValue>
+      <dsig:DigestValue>kkxtX0l1VW1tmiW5/oV7uJpvgBs=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Chrome¦Opera Extension\content.js" size="2851">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>1l6+i+YqOfueutGySnMeQRlb3Pw=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Chrome¦Opera Extension\styles.css" size="11">
+  <file name="Browser Extension\styles.css" size="11">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>NI6omtkELGh8j9y3cV11MU+c5bg=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="BuildDate.txt" size="25">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>pmjKyWUwALQOt/S+IUw7ASwaUrg=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">

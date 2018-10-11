@@ -505,6 +505,7 @@ namespace MusicPlayer
         public static void UpdateEntireSongBuffers()
         {
             Thread.CurrentThread.Name = "Song Buffer Loading Thread";
+            Program.game.SongBufferLoaderThread = Thread.CurrentThread;
             try
             {
                 lock (Channel32ReaderThreaded)
@@ -897,8 +898,7 @@ namespace MusicPlayer
             Program.game.ReHookGlobalKeyHooks();
             if (T != null && T.Status == TaskStatus.Running)
             {
-                if (AbortAbort == false)
-                    AbortAbort = true;
+                AbortAbort = true;
                 T.Wait();
             }
 

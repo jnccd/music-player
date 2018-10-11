@@ -94,6 +94,7 @@ namespace MusicPlayer
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
         Thread ConsoleManagerThread;
+        public Thread SongBufferLoaderThread;
         Thread MainThread;
         Task SongCheckThread;
         Task CloseConfirmationThread;
@@ -295,162 +296,180 @@ namespace MusicPlayer
                         if (e.Key == ConsoleKey.Enter)
                         {
                             #region ConsoleCommands
-                            if (Path == "/cls")
+                            if (Path.StartsWith("/"))
                             {
-                                LastConsoleInput.Add(Path);
-                                Path = "";
-                                Console.Clear();
-                                originY = 0;
-                            }
-                            else if (Path == "/f")
-                            {
-                                LastConsoleInput.Add(Path);
-                                Path = "";
-                                FocusWindow = true;
-                                originY++;
-                            }
-                            else if (Path == "/s")
-                            {
-                                Console.WriteLine("Target Volume: " + Values.TargetVolume + ", Output Volume: " + Values.OutputVolume);
-                                originY = Console.CursorTop + 1;
-                            }
-                            else if (Path == "/t" || Path == "/time")
-                            {
-                                LastConsoleInput.Add(Path);
-                                originY++;
-                                Path = "";
-                                Console.SetCursorPosition(0, originY);
-                                Console.WriteLine(Values.AsTime((Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds)
-                                    + " / " + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds));
-                                originY++;
-                            }
-                            else if (Path.StartsWith("/settime "))
-                            {
-                                LastConsoleInput.Add(Path);
-                                Path = Path.Remove(0, "/settime ".Length);
-
-                                try
+                                if (Path == "/cls")
                                 {
-                                    Assets.Channel32.Position = (long)(Convert.ToInt32(Path) * (Assets.Channel32.Length / Assets.Channel32.TotalTime.TotalSeconds));
-                                }
-                                catch (Exception ex) { Console.WriteLine(ex.ToString()); }
-
-                                Path = "";
-                                originY = Console.CursorTop + 1;
-                            }
-                            else if (Path.StartsWith("/songbufferstate"))
-                            {
-                                Console.WriteLine("\nWas aborted: " + Assets.SongBufferThreadWasAborted);
-                                Console.WriteLine("\nLast exception: " + Assets.LastSongBufferThreadException.ToString());
-                                Console.WriteLine("\nLast exception stack trace: " + Assets.LastSongBufferThreadException.StackTrace + "\n");
-
-                                Path = "";
-                                originY = Console.CursorTop + 1;
-                            }
-                            else if (Path.StartsWith("/stack"))
-                            {
-                                Console.CursorTop++;
-                                try
-                                {
-                                    MainThread.Suspend();
-                                    Console.WriteLine(new StackTrace(MainThread, true));
-                                } catch { }
-                                finally { MainThread.Resume(); }
-
-                                Path = "";
-                                originY = Console.CursorTop + 1;
-                            }
-                            else if (Path == "/showinweb" || Path == "/showinnet" || Path == "/net" || Path == "/web")
-                            {
-                                LastConsoleInput.Add(Path);
-                                originY++;
-                                Path = "";
-                                Console.SetCursorPosition(0, originY);
-                                Console.WriteLine("Searching for " + Assets.currentlyPlayingSongName.Split('.').First() + "...");
-                                originY++;
-
-                                Task.Factory.StartNew(() =>
-                                {
-                                    // Use the I'm Feeling Lucky URL
-                                    string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Assets.currentlyPlayingSongName.Split('.').First());
-                                    url = url.Replace(' ', '+');
-                                    WebRequest req = HttpWebRequest.Create(url);
-                                    Uri U = req.GetResponse().ResponseUri;
-
-                                    Process.Start(U.ToString());
-                                });
-                            }
-                            else if (Path == "/help")
-                            {
-                                LastConsoleInput.Add(Path);
-                                Path = "";
-                                Console.WriteLine();
-                                Console.WriteLine("All currently implemented cammands: ");
-                                Console.WriteLine();
-                                Console.WriteLine("/f - focuses the main window");
-                                Console.WriteLine();
-                                Console.WriteLine("/cls - clears the console");
-                                Console.WriteLine();
-                                Console.WriteLine("/download | /d | /D - Searches for the current song on youtube, converts it to  mp3 and puts it into the standard folder");
-                                Console.WriteLine();
-                                Console.WriteLine("/showinweb | /showinnet | /net | /web - will search google for the current      songs name and display the first result in the standard browser");
-                                Console.WriteLine();
-                                Console.WriteLine("/queue | /q - adds a song to the queue");
-                                Console.WriteLine();
-                                Console.WriteLine("/time | /t - shows the current song play time");
-                                Console.WriteLine();
-                                Console.WriteLine("/settime - sets the current play time");
-                                Console.WriteLine();
-                                Console.WriteLine("/s - shows volumes");
-                                Console.WriteLine();
-                                originY = Console.CursorTop;
-                            }
-                            else if (Path.StartsWith("/d") || Path.StartsWith("/D") || Path.StartsWith("https://www.youtube.com/watch?v="))
-                            {
-                                try
-                                {
-                                    Console.WriteLine();
                                     LastConsoleInput.Add(Path);
-                                    string download;
-                                    if (Path.StartsWith("/download"))
-                                        download = Path.Remove(0, "/download".Length + 1);
-                                    else if (!Path.StartsWith("https://www.youtube.com/watch?v="))
-                                        download = Path.Remove(0, "/d".Length + 1);
-                                    else
-                                        download = Path;
-                                    
-                                    Download(download);
                                     Path = "";
+                                    Console.Clear();
+                                    originY = 0;
                                 }
-                                catch (Exception ex)
+                                else if (Path == "/f")
                                 {
-                                    Console.WriteLine(ex.ToString());
-                                    BackgroundOperationRunning = false;
-                                }
-
-                                originY = Console.CursorTop;
-                            }
-                            else if (Path.StartsWith("/q"))
-                            {
-                                try
-                                {
-                                    Console.WriteLine();
                                     LastConsoleInput.Add(Path);
-                                    string queue;
-                                    if (Path.StartsWith("/queue"))
-                                        queue = Path.Remove(0, "/queue".Length + 1);
-                                    else
-                                        queue = Path.Remove(0, "/q".Length + 1);
                                     Path = "";
-
-                                    Assets.QueueNewSong(Path, true);
+                                    FocusWindow = true;
+                                    originY++;
                                 }
-                                catch (Exception ex)
+                                else if (Path == "/s")
                                 {
-                                    Console.WriteLine(ex.ToString());
+                                    Console.WriteLine("Target Volume: " + Values.TargetVolume + ", Output Volume: " + Values.OutputVolume);
+                                    originY = Console.CursorTop + 1;
                                 }
+                                else if (Path == "/t" || Path == "/time")
+                                {
+                                    LastConsoleInput.Add(Path);
+                                    originY++;
+                                    Path = "";
+                                    Console.SetCursorPosition(0, originY);
+                                    Console.WriteLine(Values.AsTime((Assets.Channel32.Position / (double)Assets.Channel32.Length) * Assets.Channel32.TotalTime.TotalSeconds)
+                                        + " / " + Values.AsTime(Assets.Channel32.TotalTime.TotalSeconds));
+                                    originY++;
+                                }
+                                else if (Path.StartsWith("/settime "))
+                                {
+                                    LastConsoleInput.Add(Path);
+                                    Path = Path.Remove(0, "/settime ".Length);
 
-                                originY = Console.CursorTop;
+                                    try
+                                    {
+                                        Assets.Channel32.Position = (long)(Convert.ToInt32(Path) * (Assets.Channel32.Length / Assets.Channel32.TotalTime.TotalSeconds));
+                                    }
+                                    catch (Exception ex) { Console.WriteLine(ex.ToString()); }
+
+                                    Path = "";
+                                    originY = Console.CursorTop + 1;
+                                }
+                                else if (Path.StartsWith("/songbufferstate"))
+                                {
+                                    Console.WriteLine("\nWas aborted: " + Assets.SongBufferThreadWasAborted);
+                                    Console.WriteLine("\nLast exception: " + Assets.LastSongBufferThreadException.ToString());
+                                    Console.WriteLine("\nLast exception stack trace: " + Assets.LastSongBufferThreadException.StackTrace + "\n");
+
+                                    Path = "";
+                                    originY = Console.CursorTop + 1;
+                                }
+                                else if (Path.StartsWith("/stack"))
+                                {
+                                    Console.CursorTop++;
+                                    try
+                                    {
+                                        MainThread.Suspend();
+                                        Console.WriteLine(new StackTrace(MainThread, true));
+                                    }
+                                    catch { }
+                                    finally { MainThread.Resume(); }
+
+                                    Path = "";
+                                    originY = Console.CursorTop + 1;
+                                }
+                                else if (Path.StartsWith("/stopBufferLoading"))
+                                {
+                                    Console.CursorTop++;
+
+                                    SongBufferLoaderThread.Abort();
+
+                                    Path = "";
+                                    originY = Console.CursorTop + 1;
+                                }
+                                else if (Path == "/showinweb" || Path == "/showinnet" || Path == "/net" || Path == "/web")
+                                {
+                                    LastConsoleInput.Add(Path);
+                                    originY++;
+                                    Path = "";
+                                    Console.SetCursorPosition(0, originY);
+                                    Console.WriteLine("Searching for " + Assets.currentlyPlayingSongName.Split('.').First() + "...");
+                                    originY++;
+
+                                    Task.Factory.StartNew(() =>
+                                    {
+                                        // Use the I'm Feeling Lucky URL
+                                        string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Assets.currentlyPlayingSongName.Split('.').First());
+                                        url = url.Replace(' ', '+');
+                                        WebRequest req = HttpWebRequest.Create(url);
+                                        Uri U = req.GetResponse().ResponseUri;
+
+                                        Process.Start(U.ToString());
+                                    });
+                                }
+                                else if (Path == "/help")
+                                {
+                                    LastConsoleInput.Add(Path);
+                                    Path = "";
+                                    Console.WriteLine();
+                                    Console.WriteLine("All currently implemented cammands: ");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/f - focuses the main window");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/cls - clears the console");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/download | /d | /D - Searches for the current song on youtube, converts it to  mp3 and puts it into the standard folder");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/showinweb | /showinnet | /net | /web - will search google for the current      songs name and display the first result in the standard browser");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/queue | /q - adds a song to the queue");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/time | /t - shows the current song play time");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/settime - sets the current play time");
+                                    Console.WriteLine();
+                                    Console.WriteLine("/s - shows volumes");
+                                    Console.WriteLine();
+                                    originY = Console.CursorTop;
+                                }
+                                else if (Path.StartsWith("/d") || Path.StartsWith("/D") || Path.StartsWith("https://www.youtube.com/watch?v="))
+                                {
+                                    try
+                                    {
+                                        Console.WriteLine();
+                                        LastConsoleInput.Add(Path);
+                                        string download;
+                                        if (Path.StartsWith("/download"))
+                                            download = Path.Remove(0, "/download".Length + 1);
+                                        else if (!Path.StartsWith("https://www.youtube.com/watch?v="))
+                                            download = Path.Remove(0, "/d".Length + 1);
+                                        else
+                                            download = Path;
+
+                                        Download(download);
+                                        Path = "";
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.ToString());
+                                        BackgroundOperationRunning = false;
+                                    }
+
+                                    originY = Console.CursorTop;
+                                }
+                                else if (Path.StartsWith("/q"))
+                                {
+                                    try
+                                    {
+                                        Console.WriteLine();
+                                        LastConsoleInput.Add(Path);
+                                        string queue;
+                                        if (Path.StartsWith("/queue"))
+                                            queue = Path.Remove(0, "/queue".Length + 1);
+                                        else
+                                            queue = Path.Remove(0, "/q".Length + 1);
+                                        Path = "";
+
+                                        Assets.QueueNewSong(Path, true);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.ToString());
+                                    }
+
+                                    originY = Console.CursorTop;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("I dont know that comamnd");
+                                    originY = Console.CursorTop;
+                                }
                             }
                             else
                                 break;
