@@ -827,10 +827,9 @@ namespace MusicPlayer
                 if (Assets.Channel32 != null && Assets.Channel32.Position > Assets.Channel32.Length - Assets.bufferLength / 2)
                     Assets.GetNextSong(false, false);
 
-                if (config.Default.Preload)
+                if (config.Default.Preload && Assets.EntireSongWaveBuffer != null)
                 {
-                    if (Assets.EntireSongWaveBuffer != null)
-                        Assets.UpdateWaveBufferWithEntireSongWB();
+                    Assets.UpdateWaveBufferWithEntireSongWB();
                 }
                 else
                     Assets.UpdateWaveBuffer();

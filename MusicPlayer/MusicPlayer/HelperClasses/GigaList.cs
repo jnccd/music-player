@@ -29,17 +29,20 @@ namespace MusicPlayer
 
         public void Add(float item)
         {
-            int ListIndex = 0;
-            foreach (List<float> L in List)
+            lock (List)
             {
-                if (L.Count > LIST_LENGTH)
-                    ListIndex++;
-                else
-                    break;
-            }
+                int ListIndex = 0;
+                foreach (List<float> L in List)
+                {
+                    if (L.Count >= LIST_LENGTH)
+                        ListIndex++;
+                    else
+                        break;
+                }
 
-            count++;
-            List[ListIndex].Add(item);
+                count++;
+                List[ListIndex].Add(item);
+            }
         }
         public float Get(long index)
         {
@@ -64,6 +67,12 @@ namespace MusicPlayer
             }
             else
                 return null;
+        }
+        public void updateCount()
+        {
+            count = 0;
+            for (int i = 0; i < List.Length; i++)
+                count += List[i].Count;
         }
     }
 }
