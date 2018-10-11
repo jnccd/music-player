@@ -235,7 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Browser Extension\manifest.json" />
+    <Content Include="Browser Extension\manifest.json" />
     <None Include="config.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>config.Designer.cs</LastGenOutput>

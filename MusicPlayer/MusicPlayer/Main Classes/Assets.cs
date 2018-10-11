@@ -553,30 +553,7 @@ namespace MusicPlayer
                     SongBufferThreadWasAborted = AbortAbort;
                     
                     if (Channel32ReaderThreaded.Position >= Channel32ReaderThreaded.Length && DoesCurrentSongaveNoVolumeData())
-                    {
-                        float n = 0;
-
-                        for (int i = 0; i < EntireSongWaveBuffer.Count; i++)
-                        {
-                            float f = EntireSongWaveBuffer.Get(i) * EntireSongWaveBuffer.Get(i);
-                            n += f;
-                        }
-                        n /= EntireSongWaveBuffer.Count;
-
-                        float sn = Approximate.Sqrt(n);
-
-                        float mult = Values.BaseVolume / sn;
-                        Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
-
-                        int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
-                        Values.VolumeMultiplier = mult;
-                        UpvotedSongData[index].Volume = sn;
-
-                        Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
-                        Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn);
-                        Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult);
-                        Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
-                    }
+                        UpdateCurrentSongVolume();
 
                     Debug.WriteLine("SongBuffer Length: " + EntireSongWaveBuffer.Count + " Memory: " + GC.GetTotalMemory(true));
                     Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
@@ -596,6 +573,9 @@ namespace MusicPlayer
                 Debug.WriteLine("Memory per SongBuffer Length: " + (GC.GetTotalMemory(true) / (double)EntireSongWaveBuffer.Count));
                 Debug.WriteLine("Exception: " + e);
                 Debug.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                if (EntireSongWaveBuffer.Count > 70000000 && DoesCurrentSongaveNoVolumeData())
+                    UpdateCurrentSongVolume();
             }
         }
         public static void UpdateWaveBufferWithEntireSongWB()
@@ -656,6 +636,30 @@ namespace MusicPlayer
                     max = array[i];
 
             return max;
+        }
+        public static void UpdateCurrentSongVolume()
+        {
+            EntireSongWaveBuffer.updateCount();
+
+            float n = 0;
+
+            for (int i = 0; i < EntireSongWaveBuffer.Count; i++)
+                n += EntireSongWaveBuffer.Get(i) * EntireSongWaveBuffer.Get(i);
+            n /= EntireSongWaveBuffer.Count;
+
+            float sn = Approximate.Sqrt(n);
+
+            float mult = Values.BaseVolume / sn;
+            Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+
+            int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
+            Values.VolumeMultiplier = mult;
+            UpvotedSongData[index].Volume = sn;
+
+            Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
+            Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn);
+            Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult);
+            Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
         }
 
         // Music Player Managment
