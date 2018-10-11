@@ -309,8 +309,16 @@ start MusicPlayer.exe");
                 Task T = Task.Factory.StartNew(() =>
                 {
                     Thread.Sleep(1500);
-                    StringBuilder sb = new StringBuilder(500);
-                    Values.GetWindowText(Program.hwnd, sb, sb.Capacity);
+                    //try
+                    //{
+                    //    StringBuilder sb = new StringBuilder(500);
+                    //    Values.GetWindowText(Program.hwnd, sb, sb.Capacity);
+                    //    string text = sb.ToString();
+                    //    uint id = 0;
+                    //    Values.GetWindowThreadProcessId(Program.hwnd, out id);
+                    //    Process P = Process.GetProcessById((int)id);
+                    //    P.GetHashCode();
+                    //} catch { }
 
                     bool gameActive = Values.IsForegroundFullScreen();
                     //Debug.WriteLine("Switched to: " + sb.ToString() + "\t\t| IsFullscreen: " + gameActive);
