@@ -50,6 +50,11 @@ if (check.length == 0) {
 	bs2.append(bt2);
 	b2.removeChild(b2.children[0]);
 	
+	b.children[1].style.height = '35px';
+	b2.children[1].style.height = b.children[1].style.height;
+	b.children[1].setAttribute("subscribed", "");
+	b2.children[1].setAttribute("subscribed", "");
+	
 	/// add buttons to document
 	var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
 	container.appendChild(container.children[1].cloneNode());
