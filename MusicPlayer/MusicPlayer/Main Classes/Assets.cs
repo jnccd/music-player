@@ -655,7 +655,7 @@ namespace MusicPlayer
             int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
             Values.VolumeMultiplier = mult;
             UpvotedSongData[index].Volume = sn;
-
+            
             Debug.WriteLine("---------------------------------------------------------------------------------------------------------");
             Debug.WriteLine("RMS Volume for " + currentlyPlayingSongName + " = " + sn);
             Debug.WriteLine("Volume multiplier for " + currentlyPlayingSongName + " = " + mult);
