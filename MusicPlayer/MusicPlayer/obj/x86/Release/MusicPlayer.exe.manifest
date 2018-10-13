@@ -122,7 +122,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>vPjqwu7RVFtpvgkTiwqBAoXAFGU=</dsig:DigestValue>
+        <dsig:DigestValue>Aig3fCui9QKVlVsosnNVlpkAovE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -162,13 +162,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Browser Extension\content.js" size="2851">
+  <file name="Browser Extension\content.js" size="3045">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>kkxtX0l1VW1tmiW5/oV7uJpvgBs=</dsig:DigestValue>
+      <dsig:DigestValue>qnqZBnEcCxPZ6wYcJlnSXqd23bc=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Browser Extension\manifest.json" size="273">
@@ -195,7 +195,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>LfhEZ08uKt4CYdz3jss77Th8DWw=</dsig:DigestValue>
+      <dsig:DigestValue>6mVCbxu4hdhMMsoS1VV3VngQgqw=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">

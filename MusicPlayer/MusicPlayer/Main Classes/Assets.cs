@@ -163,6 +163,7 @@ namespace MusicPlayer
         // Song Data
         public static List<UpvotedSong> UpvotedSongData = new List<UpvotedSong>();
         public static List<HistorySong> HistorySongData = new List<HistorySong>();
+        public static UpvotedSong currentlyPlayingSongData;
 
         // MultiThreading
         public static Task T = null;
@@ -940,6 +941,7 @@ namespace MusicPlayer
             SongStartTime = Values.Timer;
             Channel32.Position = bufferLength / 2;
 
+            currentlyPlayingSongData = UpvotedSongData.Find(x => x.Name == currentlyPlayingSongName);
             AddSongToListIfNotDoneSoFar(currentlyPlayingSongPath);
             Program.game.UpdateDiscordRPC();
         }
@@ -1103,9 +1105,8 @@ namespace MusicPlayer
         }
         public static bool DoesCurrentSongaveNoVolumeData()
         {
-            int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
-            if (index != -1)
-                return UpvotedSongData[index].Volume == -1;
+            if (currentlyPlayingSongData != null)
+                return currentlyPlayingSongData.Volume == -1;
             return false;
         }
         // For Statistics
