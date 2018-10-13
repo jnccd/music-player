@@ -864,7 +864,7 @@ namespace MusicPlayer
                 if (config.Default.AutoVolume)
                     Assets.Channel32.Volume = (1 - Values.OutputVolume) * Values.TargetVolume * Values.VolumeMultiplier; // Null pointer exception? 13.02.18 13:36 / 27.02.18 01:35
                 else
-                    Assets.Channel32.Volume = Values.TargetVolume;
+                    Assets.Channel32.Volume = 0.75f * Values.TargetVolume * Values.VolumeMultiplier;
             }
             catch { }
 
@@ -1304,7 +1304,7 @@ namespace MusicPlayer
             {
                 ActualVolumeBar.X = Values.WindowSize.X - 25 - 75;
                 ActualVolumeBar.Y = 24;
-                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / MaxVolume);
+                ActualVolumeBar.Width = (int)(75 * Assets.Channel32.Volume / Values.VolumeMultiplier / MaxVolume);
                 if (ActualVolumeBar.Width > 75)
                     ActualVolumeBar.Width = 75;
                 ActualVolumeBar.Height = 8;
