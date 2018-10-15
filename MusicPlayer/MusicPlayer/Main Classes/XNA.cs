@@ -701,7 +701,7 @@ namespace MusicPlayer
                 return false;
             }
 
-            if (!youtubepath.StartsWith("https://www.youtube.com/watch?v="))
+            if (!youtubepath.StartsWith("https://www.youtube.com/watch?"))
             {
                 MessageBox.Show("This doesn't look like a youtube video path to me");
                 return false;
