@@ -666,18 +666,21 @@ namespace MusicPlayer
         // Music Player Managment
         public static void PlayPause()
         {
-            if (output != null)
+            Task PlayPause = Task.Factory.StartNew(() =>
             {
-                if (output.PlaybackState == PlaybackState.Playing)
+                if (output != null)
                 {
-                    output.Pause();
+                    if (output.PlaybackState == PlaybackState.Playing)
+                    {
+                        output.Pause(); // NAudio can get stuck here for some reason, which stopped the main thread in older versions
+                    }
+                    else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
+                    {
+                        output.Play();
+                    }
+                    Program.game.UpdateDiscordRPC();
                 }
-                else if (output.PlaybackState == PlaybackState.Paused || output.PlaybackState == PlaybackState.Stopped)
-                {
-                    output.Play();
-                }
-                Program.game.UpdateDiscordRPC();
-            }
+            });
         }
         public static bool IsPlaying()
         {
