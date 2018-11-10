@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="219648">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MusicPlayer.exe" size="220160">
       <assemblyIdentity name="MusicPlayer" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>ccqGlBRrO7xm/V+g4zhdnYhMdzk=</dsig:DigestValue>
+        <dsig:DigestValue>DtYZyVv05Ai5Ji3rLjA8BqOliYU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -195,7 +195,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>7/fhbv+nRA20ic/b3tcuNLgsT1o=</dsig:DigestValue>
+      <dsig:DigestValue>7JOXHXCVtU9OfsTRy8vSYIKGJFY=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">
@@ -279,13 +279,13 @@
       <dsig:DigestValue>ASw2Dq+GBS4B7VgFbpYr4L2tQ3w=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Content\TitleFadeout.xnb" size="824">
+  <file name="Content\TitleFadeout.xnb" size="920">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>QyK0M5mxIzFDj75PxDYjTIRza8w=</dsig:DigestValue>
+      <dsig:DigestValue>0OQFSX4bpfkgzBQOkzuxPIIG7O0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\trumpetboy.xnb" size="105172">

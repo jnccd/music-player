@@ -264,6 +264,7 @@ namespace MusicPlayer
             {
                 throw new Exception("CouldntFindWallpaperFile");
             }
+            RefreshBGtex(GD);
             SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler((object o, UserPreferenceChangedEventArgs target) =>
             {
                 RefreshBGtex(GD);
@@ -388,7 +389,6 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        //Thread.Sleep(400);
                         RegistryKey UserWallpaper = Registry.CurrentUser.OpenSubKey("Control Panel\\Desktop", false);
                         if (Convert.ToInt32(UserWallpaper.GetValue("WallpaperStyle")) != 2)
                         {
@@ -749,7 +749,7 @@ namespace MusicPlayer
                     GetNextSong(true, false);
                 }
 
-                SongChangedTickTime = Values.Timer;
+                SongChangedTickTime = (int)Values.Timer;
                 return true;
             }
             return false;
@@ -784,7 +784,7 @@ namespace MusicPlayer
                 else
                     PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
 
-                SongChangedTickTime = Values.Timer;
+                SongChangedTickTime = (int)Values.Timer;
             }
         }
         public static void GetPreviousSong()
@@ -801,7 +801,7 @@ namespace MusicPlayer
                     PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
                 }
 
-                SongChangedTickTime = Values.Timer;
+                SongChangedTickTime = (int)Values.Timer;
             }
         }
         private static void GetNewPlaylistSong()
@@ -941,7 +941,7 @@ namespace MusicPlayer
             
             output.Play();
             Channel32.Volume = 0;
-            SongStartTime = Values.Timer;
+            SongStartTime = (int)Values.Timer;
             Channel32.Position = bufferLength / 2;
 
             currentlyPlayingSongData = UpvotedSongData.Find(x => x.Name == currentlyPlayingSongName);
