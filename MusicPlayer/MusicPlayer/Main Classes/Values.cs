@@ -61,7 +61,7 @@ namespace MusicPlayer
         public static float VolumeMultiplier = 1;
         public static float BaseVolume = 0.12f;
         
-        public static int Timer = 0;
+        public static long Timer = 0;
         public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         // String Distances

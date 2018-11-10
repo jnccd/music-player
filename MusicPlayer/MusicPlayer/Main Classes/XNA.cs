@@ -73,6 +73,7 @@ namespace MusicPlayer
         public ColorDialog LeDialog;
         public bool ShowingColorDialog = false;
         DropShadow Shadow;
+        bool LongTitle;
 
         // Stuff
         System.Drawing.Point MouseClickedPos = new System.Drawing.Point();
@@ -110,6 +111,9 @@ namespace MusicPlayer
         System.Drawing.Point oldPos;
         Point Diff = new Point();
         Point[] WindowPoints = new Point[4];
+        string Title;
+        float X1;
+        float X2;
 
         public OptionsMenu optionsMenu;
         public Statistics statistics;
@@ -246,6 +250,7 @@ namespace MusicPlayer
             {
                 ConsoleManagerThread = Thread.CurrentThread;
                 ConsoleManagerThread.Name = "Console Manager Thread";
+                Thread.CurrentThread.IsBackground = true;
                 while (true)
                 {
                     string Path = "";
@@ -309,7 +314,7 @@ namespace MusicPlayer
                                 {
                                     LastConsoleInput.Add(Path);
                                     Path = "";
-                                    FocusWindow = true;
+                                    gameWindowForm.InvokeIfRequired(() => { gameWindowForm.BringToFront(); gameWindowForm.Activate(); });
                                     originY++;
                                 }
                                 else if (Path == "/s")
@@ -790,17 +795,11 @@ namespace MusicPlayer
             Control.Update();
             if (gameWindowForm.Focused)
                 ComputeControls();
-
-            if (ConsoleManager.IsFaulted)
-                MessageBox.Show("The Console-Input Thread died! May it rest in pieces./nError Message: " + ConsoleManager.Exception);
-
             // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
             if (Control.ScrollWheelWentDown())
                 Assets.GetPreviousSong();
             if (Control.ScrollWheelWentUp())
                 Assets.GetNextSong(false, true);
-
-            if (FocusWindow) { gameWindowForm.BringToFront(); gameWindowForm.Activate(); FocusWindow = false; }
 
             if (Assets.IsCurrentSongUpvoted) {
                 if (UpvoteIconAlpha < 1)
@@ -895,7 +894,7 @@ namespace MusicPlayer
                             RequestedSong.Default.Reload();
                             if (RequestedSong.Default.RequestedSongString != "")
                             {
-                                lastSongRequestCheck = Values.Timer;
+                                lastSongRequestCheck = (int)Values.Timer;
                                 Assets.PlayNewSong(RequestedSong.Default.RequestedSongString);
                                 RequestedSong.Default.RequestedSongString = "";
                                 RequestedSong.Default.Save();
@@ -918,7 +917,6 @@ namespace MusicPlayer
                 ReHookGlobalKeyHooks();
                 MouseClickedPos.X = Control.CurMS.X;
                 MouseClickedPos.Y = Control.CurMS.Y;
-                WindowLocation = gameWindowForm.Location;
 
                 if (Values.GetWindow(gameWindowForm.Handle, 2) != Shadow.Handle)
                 {
@@ -987,10 +985,6 @@ namespace MusicPlayer
                                     Program.Closing = true;
                                     gameWindowForm.InvokeIfRequired(gameWindowForm.Close);
                                     DiscordRPCWrapper.Shutdown();
-
-                                    // Sending keyinput to console so it closes
-                                    Values.ShowConsole();
-                                    SendKeys.SendWait("T");
                                 }
                             });
                         }
@@ -1489,24 +1483,12 @@ namespace MusicPlayer
             // Song Title
             if (ForcedTitleRedraw || TitleTarget == null || TitleTarget.IsContentLost || TitleTarget.IsDisposed)
             {
-                string Title;
-                if (Assets.currentlyPlayingSongName.Contains(".mp3"))
-                {
-                    Title = Assets.currentlyPlayingSongName.TrimEnd(new char[] { '3' });
-                    Title = Title.TrimEnd(new char[] { 'p' });
-                    Title = Title.TrimEnd(new char[] { 'm' });
-                    Title = Title.TrimEnd(new char[] { '.' });
-                }
+                if (Assets.currentlyPlayingSongName.EndsWith(".mp3"))
+                    Title = Assets.currentlyPlayingSongName.Remove(Assets.currentlyPlayingSongName.Length - 4);
                 else
                     Title = Assets.currentlyPlayingSongName;
 
-                TitleTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X - 166, (int)Assets.Title.MeasureString("III()()()III").Y);
-                GraphicsDevice.SetRenderTarget(TitleTarget);
-                GraphicsDevice.Clear(Color.Transparent);
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
-
                 char[] arr = Title.ToCharArray();
-
                 for (int i = 0; i < arr.Length; i++)
                 {
                     if (arr[i] >= 32 && arr[i] <= 216
@@ -1517,14 +1499,59 @@ namespace MusicPlayer
                     else
                         arr[i] = (char)10060;
                 }
-
                 Title = new string(arr);
 
-                try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(5), Color.Black * 0.6f); } catch { }
-                try { spriteBatch.DrawString(Assets.Title, Title, Vector2.Zero, Color.White); } catch { }
+                if (TitleTarget == null)
+                    TitleTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X - 166, (int)Assets.Title.MeasureString("III()()()III").Y);
 
+                int length = (int)Assets.Title.MeasureString(Title).X;
+                if (length > TitleTarget.Bounds.Width)
+                {
+                    float abstand = 35;
+                    float startX = 10;
+                    float speed = 0.35f;
+
+                    if (!LongTitle)
+                    {
+                        X1 = startX;
+                        X2 = X1 + length + abstand;
+                    }
+                    LongTitle = true;
+                    X1 -= speed;
+                    X2 -= speed;
+
+                    if (X1 < -length)
+                        X1 = X2 + length + abstand;
+                    if (X2 < -length)
+                        X2 = X1 + length + abstand;
+
+                    GraphicsDevice.SetRenderTarget(TitleTarget);
+                    GraphicsDevice.Clear(Color.Transparent);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
+                    
+                    try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X1 + 5, 5), Color.Black * 0.6f); } catch { }
+                    try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X1, 0), Color.White); } catch { }
+
+                    try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X2 + 5, 5), Color.Black * 0.6f); } catch { }
+                    try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X2, 0), Color.White); } catch { }
+
+                    ForcedTitleRedraw = true; // Continuously draw title for the animation
+                }
+                else
+                {
+                    LongTitle = false;
+
+                    GraphicsDevice.SetRenderTarget(TitleTarget);
+                    GraphicsDevice.Clear(Color.Transparent);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone);
+
+                    try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(5), Color.Black * 0.6f); } catch { }
+                    try { spriteBatch.DrawString(Assets.Title, Title, Vector2.Zero, Color.White); } catch { }
+
+                    ForcedTitleRedraw = false;
+                }
+                
                 spriteBatch.End();
-                ForcedTitleRedraw = false;
             }
 
             // FFT Diagram
@@ -1542,6 +1569,9 @@ namespace MusicPlayer
             // Background
             if (ForcedBackgroundRedraw || BackgroundTarget == null || BackgroundTarget.IsContentLost || BackgroundTarget.IsDisposed || ForcedCoverBackgroundRedraw)
             {
+                if (oldPos.X == 0 && oldPos.Y == 0)
+                    oldPos = newPos;
+
                 if (BgModes == BackGroundModes.Blur || BgModes == BackGroundModes.BlurVignette)
                 {
                     BeginBlur();
@@ -1922,20 +1952,35 @@ namespace MusicPlayer
 
                     //FPSCounter.Draw(spriteBatch);
 
-                    spriteBatch.End(); // CRAHES AGAIN, IDK MAN, 05.03.18 22:18 (just after boot)
+                    spriteBatch.End();
 
                     // Title
                     lock (TitleTarget)
                     {
-                        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
-                        RasterizerState.CullNone, Assets.TitleFadeout);
-                        if (TitleTarget != null)
+                        if (!LongTitle)
                         {
-                            TempVector.X = 24;
-                            TempVector.Y = 13;
-                            spriteBatch.Draw(TitleTarget, TempVector, Color.White);
+                            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, RasterizerState.CullNone);
+                            if (TitleTarget != null)
+                            {
+                                TempVector.X = 24;
+                                TempVector.Y = 13;
+                                spriteBatch.Draw(TitleTarget, TempVector, Color.White);
+                            }
+                            spriteBatch.End();
                         }
-                        spriteBatch.End(); // crash 28.02.18 4:28 (ich geh ja gleich zu bett)
+                        else
+                        {
+                            // Loooong loooooong title man
+                            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default,
+                                RasterizerState.CullNone, Assets.TitleFadeout);
+                            if (TitleTarget != null)
+                            {
+                                TempVector.X = 24;
+                                TempVector.Y = 13;
+                                spriteBatch.Draw(TitleTarget, TempVector, Color.White);
+                            }
+                            spriteBatch.End();
+                        }
                     }
                     #endregion
                 }
