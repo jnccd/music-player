@@ -149,7 +149,7 @@
             this.ShowBrowser.Name = "ShowBrowser";
             this.ShowBrowser.Size = new System.Drawing.Size(205, 23);
             this.ShowBrowser.TabIndex = 8;
-            this.ShowBrowser.Text = "Show in Browser";
+            this.ShowBrowser.Text = "Show in Browser [I]";
             this.ShowBrowser.UseVisualStyleBackColor = true;
             this.ShowBrowser.Click += new System.EventHandler(this.ShowBrowser_Click);
             // 

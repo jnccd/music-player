@@ -134,22 +134,29 @@ namespace MusicPlayer
         }
         private void ShowBrowser_Click(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() =>
+            Values.StartSTATask(() =>
             {
                 try
                 {
-                    // Use the I'm Feeling Lucky URL
-                    string url = string.Format("https://www.google.com/search?num=100&site=&source=hp&q={0}&btnI=1", Assets.currentlyPlayingSongName.Split('.').First());
-                    url = url.Replace(' ', '+');
-                    WebRequest req = HttpWebRequest.Create(url);
-                    Uri U = req.GetResponse().ResponseUri;
+                    // Get fitting youtube video
+                    string url = string.Format("https://www.youtube.com/results?search_query=" + Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName));
+                    HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                    req.KeepAlive = false;
+                    WebResponse W = req.GetResponse();
+                    string ResultURL;
+                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                    {
+                        string html = sr.ReadToEnd();
+                        int index = html.IndexOf("href=\"/watch?");
+                        string startcuthtml = html.Remove(0, index + 6);
+                        index = startcuthtml.IndexOf('"');
+                        string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                        ResultURL = "https://www.youtube.com" + cuthtml;
+                    }
 
-                    Process.Start(U.ToString());
+                    Process.Start(ResultURL);
                 }
-                catch
-                {
-                    MessageBox.Show("Couldn't open Song in Webbrowser!");
-                }
+                catch (Exception ex) { MessageBox.Show("Can't find that song.\n\nException: " + ex.ToString()); }
             });
         }
         private void SwapVisualisations_Click(object sender, EventArgs e)
