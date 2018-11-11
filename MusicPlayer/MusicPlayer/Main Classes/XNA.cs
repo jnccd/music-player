@@ -1194,6 +1194,35 @@ namespace MusicPlayer
                     Process.Start("explorer.exe", "/select, \"" + Assets.currentlyPlayingSongPath + "\"");
             }
 
+            // Show Music File in Browser [I]
+            if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.I))
+            {
+                Values.StartSTATask(() =>
+                {
+                    try
+                    {
+                        // Get fitting youtube video
+                        string url = string.Format("https://www.youtube.com/results?search_query=" + Path.GetFileNameWithoutExtension(Assets.currentlyPlayingSongName));
+                        HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                        req.KeepAlive = false;
+                        WebResponse W = req.GetResponse();
+                        string ResultURL;
+                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                        {
+                            string html = sr.ReadToEnd();
+                            int index = html.IndexOf("href=\"/watch?");
+                            string startcuthtml = html.Remove(0, index + 6);
+                            index = startcuthtml.IndexOf('"');
+                            string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                            ResultURL = "https://www.youtube.com" + cuthtml;
+                        }
+
+                        Process.Start(ResultURL);
+                    }
+                    catch (Exception e) { MessageBox.Show("Can't find that song.\n\nException: " + e.ToString()); }
+                });
+            }
+
             // Show Statistics [S]
             if (Control.WasKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.S))
                 ShowStatistics();
