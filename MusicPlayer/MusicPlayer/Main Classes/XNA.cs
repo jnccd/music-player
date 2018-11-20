@@ -583,7 +583,7 @@ namespace MusicPlayer
                 // Download Video File
                 Process P = new Process();
                 string b = Values.CurrentExecutablePath;
-                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"/Downloads/File.mp4\" " + ResultURL)
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f 137+140 -o \"/Downloads/File.mp4\" " + ResultURL)
                 {
                     UseShellExecute = false
                 };
@@ -762,7 +762,7 @@ namespace MusicPlayer
                 foreach (char c in Path.GetInvalidFileNameChars())
                     VideoTitle = VideoTitle.Replace(c, '_');
                 VideoTitle = VideoTitle.Replace('.', '_');
-                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-o \"" + config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4" + "\" " + youtubepath)
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f 137+140 -o \"" + config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4" + "\" " + youtubepath)
                 {
                     UseShellExecute = false
                 };
