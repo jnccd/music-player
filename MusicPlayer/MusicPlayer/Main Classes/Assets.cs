@@ -490,7 +490,7 @@ namespace MusicPlayer
 
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 FastFourierTransform.FFT(true, TempBufferLengthLog2, tempbuffer);
-                //Debug.WriteLine("UpdateFFTbuffer 3 " + (Stopwatch.GetTimestamp() - CurrentDebugTime)); g
+                //Debug.WriteLine("UpdateFFTbuffer 3 " + (Stopwatch.GetTimestamp() - CurrentDebugTime));
 
                 //CurrentDebugTime = Stopwatch.GetTimestamp();
                 FFToutput = new float[tempbuffer.Length / 2 - 1];
