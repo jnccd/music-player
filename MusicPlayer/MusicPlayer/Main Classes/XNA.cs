@@ -62,6 +62,9 @@ namespace MusicPlayer
         public RenderTarget2D BlurredTex;
         public RenderTarget2D TitleTarget;
         public RenderTarget2D BackgroundTarget;
+        const float abstand = 35;
+        const float startX = 10;
+        const float speed = 0.35f;
 
         // Visualization
         public Visualizations VisSetting = (Visualizations)config.Default.Vis;
@@ -815,6 +818,9 @@ namespace MusicPlayer
             Values.LastOutputVolume = Values.OutputVolume;
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)
             {
+                if (LongTitle)
+                    ForcedTitleRedraw = true;
+
                 if (Assets.WaveBuffer != null)
                     Values.OutputVolume = Values.GetRootMeanSquareApproximation(Assets.WaveBuffer);
 
@@ -1530,21 +1536,19 @@ namespace MusicPlayer
                 }
                 Title = new string(arr);
 
+                int length = 0;
                 if (TitleTarget == null)
+                {
                     TitleTarget = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X - 166, (int)Assets.Title.MeasureString("III()()()III").Y);
+                    length = (int)Assets.Title.MeasureString(Title).X;
+                    X1 = startX;
+                    X2 = X1 + length + abstand;
+                }
 
-                int length = (int)Assets.Title.MeasureString(Title).X;
+                if (length == 0)
+                    length = (int)Assets.Title.MeasureString(Title).X;
                 if (length > TitleTarget.Bounds.Width)
                 {
-                    float abstand = 35;
-                    float startX = 10;
-                    float speed = 0.35f;
-
-                    if (!LongTitle)
-                    {
-                        X1 = startX;
-                        X2 = X1 + length + abstand;
-                    }
                     LongTitle = true;
                     X1 -= speed;
                     X2 -= speed;
@@ -1563,8 +1567,6 @@ namespace MusicPlayer
 
                     try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X2 + 5, 5), Color.Black * 0.6f); } catch { }
                     try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(X2, 0), Color.White); } catch { }
-
-                    ForcedTitleRedraw = true; // Continuously draw title for the animation
                 }
                 else
                 {
@@ -1576,10 +1578,10 @@ namespace MusicPlayer
 
                     try { spriteBatch.DrawString(Assets.Title, Title, new Vector2(5), Color.Black * 0.6f); } catch { }
                     try { spriteBatch.DrawString(Assets.Title, Title, Vector2.Zero, Color.White); } catch { }
-
-                    ForcedTitleRedraw = false;
                 }
-                
+
+                ForcedTitleRedraw = false;
+
                 spriteBatch.End();
             }
 
@@ -2033,6 +2035,7 @@ namespace MusicPlayer
         public void ForceTitleRedraw()
         {
             ForcedTitleRedraw = true;
+            TitleTarget = null;
         }
         public void ForceBackgroundRedraw()
         {
