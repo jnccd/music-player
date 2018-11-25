@@ -317,6 +317,9 @@ namespace MusicPlayer
             }
 
             Console.WriteLine("Starting first Song...");
+            foreach (UpvotedSong s in Assets.UpvotedSongData)
+                s.Path = GetSongPathFromSongName(s.Name);
+            HighestSongRatioInR = UpvotedSongData.Max(x => float.IsInfinity(x.TotalLikes / (float)x.TotalDislikes) ? int.MinValue : (int)(x.TotalLikes / (float)x.TotalDislikes));
             CreateSongChoosingList();
             if (Playlist.Count > 0)
             {
@@ -351,12 +354,6 @@ namespace MusicPlayer
                 Console.WriteLine("Playlist empty!");
 
             Console.WriteLine("Loading GUI...");
-
-            // Last preperations
-            HighestSongRatioInR = UpvotedSongData.Max(x => float.IsInfinity(x.TotalLikes / (float)x.TotalDislikes) ? int.MinValue : (int)(x.TotalLikes / (float)x.TotalDislikes));
-            foreach (UpvotedSong s in Assets.UpvotedSongData)
-                s.Path = GetSongPathFromSongName(s.Name);
-
             Values.MinimizeConsole();
         }
         public static void FindAllMp3FilesInDir(string StartDir, bool ConsoleOutput)
@@ -1169,23 +1166,27 @@ namespace MusicPlayer
         }
         public static void CreateSongChoosingList()
         {
-            CurrentDebugTime = Stopwatch.GetTimestamp();
+            //CurrentDebugTime = Stopwatch.GetTimestamp();
             
             SongChoosingList.Clear();
             for (int i = 0; i < Playlist.Count; i++)
             {
                 SongChoosingList.Add(Playlist[i]);
                 
-                float amount = GetSongChoosingAmount(UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last()));
+                float amount = GetSongChoosingAmount(UpvotedSongData.Select(x => x.Name).ToList().IndexOf(Playlist[i].Split('\\').Last())) + 1;
 
                 for (int k = 0; k < amount; k++)
                     SongChoosingList.Add(Playlist[i]);
             }
-
-            Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime) + " length: " + SongChoosingList.Count);
+#if DEBUG
+            // testing shit
+            TestChoosingListIntegrity();
+#endif
+            //Debug.WriteLine("SongChoosing List update time: " + (Stopwatch.GetTimestamp() - CurrentDebugTime) + " length: " + SongChoosingList.Count);
         }
         public static void UpdateSongChoosingList(string SongPath)
         {
+            // TODO: Fix doubled chance
             string SongName = SongPath.Split('\\').Last();
 
             // Getting Choosing List Count
@@ -1207,12 +1208,10 @@ namespace MusicPlayer
                 SongChoosingList.Insert(index, SongPath);
             for (int j = 0; j < count - amount; j++)
                 SongChoosingList.RemoveAt(index);
-
-            //// testing shit
-            //int finalAmount = (int)GetSongChoosingAmount(UpvotedSongData.FindIndex(x => x.Name == SongName)) + 1;
-            //int count2 = SongChoosingList.FindAll(x => x == SongPath).Count;
-            //if (finalAmount != count2)
-            //    UpvotedSongData.GetHashCode();
+#if DEBUG
+            // testing shit
+            TestChoosingListIntegrity();
+#endif
         }
         public static float GetSongChoosingAmount(int UpvotedSongDataIndex)
         {
@@ -1257,7 +1256,14 @@ namespace MusicPlayer
         }
         private static void TestChoosingListIntegrity()
         {
+            for (int i = 0; i < UpvotedSongData.Count; i++)
+            {
+                float count = SongChoosingList.FindAll(x => x == UpvotedSongData[i].Path).Count;
+                float target = GetSongChoosingAmount(i) + 1;
 
+                if (Math.Abs(count - target) > 1  && UpvotedSongData[i].Path != null)
+                    UpvotedSongData.GetHashCode(); // Breakpoint here
+            }
         }
 
         // Draw Methods
