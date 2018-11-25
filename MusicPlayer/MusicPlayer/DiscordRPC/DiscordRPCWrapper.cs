@@ -98,13 +98,13 @@ namespace MusicPlayer
             {
                 if (ElapsedTime)
                 {
-                    presence.startTimestamp = DateTimeToTimestamp(startTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+                    presence.startTimestamp = DateTimeToTimestamp(startTimestamp.Subtract(new TimeSpan(1, 0, 0)));
                     presence.endTimestamp = 0;
                 }
                 else
                 {
                     presence.startTimestamp = DateTimeToTimestamp(startTimestamp);
-                    presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(2, 0, 0)));
+                    presence.endTimestamp = DateTimeToTimestamp(endTimestamp.Subtract(new TimeSpan(1, 0, 0)));
                 }
             }
             else
