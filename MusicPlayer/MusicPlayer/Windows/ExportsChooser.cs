@@ -31,11 +31,8 @@ namespace MusicPlayer
         private void ExportsChooser_Load(object sender, EventArgs e)
         {
             foreach (UpvotedSong s in Assets.UpvotedSongData)
-            {
-                s.Path = Assets.GetSongPathFromSongName(s.Name);
                 if (File.Exists(s.Path))
                     SongsToChooseFrom.Add(s);
-            }
 
             int max = SongsToChooseFrom.Max(x => x.TotalDislikes == 0 ? int.MinValue : x.TotalLikes / x.TotalDislikes);
 
