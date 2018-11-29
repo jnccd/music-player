@@ -195,7 +195,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>j8ZgmCii3axl2y7hL4lYHJi0wVY=</dsig:DigestValue>
+      <dsig:DigestValue>PJP/LqO33L8Sd5YUSoREz5QcDGE=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Close.xnb" size="334">
