@@ -410,7 +410,7 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        if (parent.BackgroundOperationRunning)
+                        if (parent.BackgroundOperationRunning || parent.ConsoleBackgroundOperationRunning)
                         {
                             MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
                             return;

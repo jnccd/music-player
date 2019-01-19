@@ -95,6 +95,7 @@ namespace MusicPlayer
         float[] values;
         bool WasFocusedLastFrame = true;
         public bool BackgroundOperationRunning = false;
+        public bool ConsoleBackgroundOperationRunning = false;
         public bool PauseConsoleInputThread = false;
         public Task ConsoleManager;
         Thread ConsoleManagerThread;
@@ -218,6 +219,7 @@ namespace MusicPlayer
                     }
                     Console.WriteLine("Canceled by user!");
                     Program.game.PauseConsoleInputThread = false;
+                    ConsoleBackgroundOperationRunning = false;
                     originY = Console.CursorTop;
                 }
             });
@@ -497,14 +499,16 @@ namespace MusicPlayer
                             Path += e.KeyChar;
                     }
                     Console.WriteLine();
-                    if (Assets.PlayNewSong(Path))
+                    if (Path.StartsWith("https://"))
+                        Download(Path);
+                    else if (Assets.PlayNewSong(Path))
                         LastConsoleInput.Add(Path.Trim('"'));
                 }
             });
         }
         public bool Download(string download)
         {
-            if (BackgroundOperationRunning)
+            if (BackgroundOperationRunning || ConsoleBackgroundOperationRunning)
             {
                 MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
                 return false;
@@ -512,31 +516,37 @@ namespace MusicPlayer
 
             try
             {
-                BackgroundOperationRunning = true;
+                ConsoleBackgroundOperationRunning = true;
                 PauseConsoleInputThread = true;
                 Values.ShowConsole();
 
                 PlaybackState PlayState = Assets.output.PlaybackState;
 
-                if (download.StartsWith("https://www.youtube.com/watch?v="))
-                    download = download.Remove(0, "https://www.youtube.com/watch?v=".Length);
-                if (download.StartsWith("-"))
-                    download = "\"" + download + "\"";
+                string url, ResultURL;
+                HttpWebRequest req;
+                WebResponse W;
 
-                // Get fitting youtube video
-                string url = string.Format("https://www.youtube.com/results?search_query=" + download);
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                req.KeepAlive = false;
-                WebResponse W = req.GetResponse();
-                string ResultURL;
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                if (download.StartsWith("https://www.youtube.com/watch?v="))
+                    ResultURL = download;
+                else
                 {
-                    string html = sr.ReadToEnd();
-                    int index = html.IndexOf("href=\"/watch?");
-                    string startcuthtml = html.Remove(0, index + 6);
-                    index = startcuthtml.IndexOf('"');
-                    string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                    ResultURL = "https://www.youtube.com" + cuthtml;
+                    if (download.StartsWith("-"))
+                        download = "\"" + download + "\"";
+
+                    // Get fitting youtube video
+                    url = string.Format("https://www.youtube.com/results?search_query=" + download);
+                    req = (HttpWebRequest)HttpWebRequest.Create(url);
+                    req.KeepAlive = false;
+                    W = req.GetResponse();
+                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                    {
+                        string html = sr.ReadToEnd();
+                        int index = html.IndexOf("href=\"/watch?");
+                        string startcuthtml = html.Remove(0, index + 6);
+                        index = startcuthtml.IndexOf('"');
+                        string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
+                        ResultURL = "https://www.youtube.com" + cuthtml;
+                    }
                 }
 
                 // Get video title
@@ -590,7 +600,8 @@ namespace MusicPlayer
 
                 P.Start();
 
-                foreach (char c in Path.GetInvalidFileNameChars())
+                char[] invalids = Path.GetInvalidFileNameChars();
+                foreach (char c in invalids)
                     VideoTitle = VideoTitle.Replace(c, '_');
                 VideoTitle = VideoTitle.Replace('.', '_');
 
@@ -692,15 +703,15 @@ namespace MusicPlayer
 
                 if (PlayState == PlaybackState.Paused || PlayState == PlaybackState.Stopped)
                     Assets.PlayPause();
-
-                BackgroundOperationRunning = false;
+                
+                ConsoleBackgroundOperationRunning = false;
                 PauseConsoleInputThread = false;
 
                 ReHookGlobalKeyHooks();
             }
             catch (Exception e)
             {
-                BackgroundOperationRunning = false;
+                ConsoleBackgroundOperationRunning = false;
                 PauseConsoleInputThread = false;
                 
                 MessageBox.Show(e.ToString());
@@ -710,7 +721,7 @@ namespace MusicPlayer
         }
         public bool DownloadAsVideo(string youtubepath)
         {
-            if (BackgroundOperationRunning)
+            if (BackgroundOperationRunning || ConsoleBackgroundOperationRunning)
             {
                 MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
                 return false;
@@ -730,7 +741,7 @@ namespace MusicPlayer
 
             try
             {
-                BackgroundOperationRunning = true;
+                ConsoleBackgroundOperationRunning = true;
                 PauseConsoleInputThread = true;
                 Values.ShowConsole();
 
@@ -790,7 +801,7 @@ namespace MusicPlayer
 
                 originY = Console.CursorTop;
 
-                BackgroundOperationRunning = false;
+                ConsoleBackgroundOperationRunning = false;
                 PauseConsoleInputThread = false;
 
                 ReHookGlobalKeyHooks();
@@ -800,7 +811,7 @@ namespace MusicPlayer
             }
             catch (Exception e)
             {
-                BackgroundOperationRunning = false;
+                ConsoleBackgroundOperationRunning = false;
                 PauseConsoleInputThread = false;
 
                 MessageBox.Show(e.ToString());
