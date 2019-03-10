@@ -118,6 +118,7 @@ namespace MusicPlayer
         string Title;
         float X1;
         float X2;
+        int ScrollWheelCooldown = 0;
 
         public OptionsMenu optionsMenu;
         public Statistics statistics;
@@ -827,11 +828,20 @@ namespace MusicPlayer
             Control.Update();
             if (gameWindowForm.Focused)
                 ComputeControls();
-            // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
-            if (Control.ScrollWheelWentDown())
-                Assets.GetPreviousSong();
-            if (Control.ScrollWheelWentUp())
-                Assets.GetNextSong(false, true);
+            if (ScrollWheelCooldown < 0)
+            {
+                // Next / Previous Song [MouseWheel] ((On Win10 mouseWheel input is send to the process even if its not focused))
+                if (Control.ScrollWheelWentDown())
+                {
+                    Assets.GetPreviousSong();
+                    ScrollWheelCooldown = 60;
+                }
+                if (Control.ScrollWheelWentUp())
+                {
+                    Assets.GetNextSong(false, true);
+                    ScrollWheelCooldown = 60;
+                }
+            }
 
             if (Assets.IsCurrentSongUpvoted) {
                 if (UpvoteIconAlpha < 1)
@@ -843,6 +853,7 @@ namespace MusicPlayer
             Values.Timer++;
             SecondRowMessageAlpha -= 0.004f;
             UpvoteSavedAlpha -= 0.01f;
+            ScrollWheelCooldown--;
 
             Values.LastOutputVolume = Values.OutputVolume;
             if (Assets.output != null && Assets.output.PlaybackState == PlaybackState.Playing)

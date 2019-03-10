@@ -734,7 +734,7 @@ namespace MusicPlayer
                             Math.Round(LDistances[NonWorkingIndexes + i].SongDifference, 2));
                     }
                 }
-
+                
                 PlayerHistory.Add(sPath);
                 PlayerHistoryIndex = PlayerHistory.Count - 1;
 
@@ -765,6 +765,7 @@ namespace MusicPlayer
                 if (Playlist[i].Split('\\').Last() == SongNameWithFileEnd)
                 {
                     SaveUserSettings(true);
+                    
                     PlayerHistory.Add(Playlist[i]);
                     PlayerHistoryIndex = PlayerHistory.Count - 1;
                     PlaySongByPath(Playlist[i]);
@@ -778,7 +779,8 @@ namespace MusicPlayer
             if (config.Default.MultiThreading || forced ||
                 Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
-                DownvoteCurrentSongIfNeccesary(DownVoteCurrentSongForUserSkip);
+                if (PlayerHistory.Count > 0)
+                    DownvoteCurrentSongIfNeccesary(DownVoteCurrentSongForUserSkip);
 
                 SaveUserSettings(true);
 
@@ -875,7 +877,7 @@ namespace MusicPlayer
             do
                 SongChoosingListIndex = Values.RDM.Next(SongChoosingList.Count);
             while (PlayerHistory.Count != 0 && SongChoosingList[SongChoosingListIndex] == PlayerHistory[PlayerHistoryIndex - 1] && Playlist.Count > 1);
-
+            
             PlayerHistory.Add(SongChoosingList[SongChoosingListIndex]);
             PlayerHistoryIndex = PlayerHistory.Count - 1;
             PlaySongByPath(PlayerHistory[PlayerHistoryIndex]);
@@ -885,6 +887,10 @@ namespace MusicPlayer
             if (!File.Exists(PathString))
             {
                 Playlist.Remove(PathString);
+                PlayerHistory.RemoveAt(PlayerHistoryIndex);
+                PlayerHistoryIndex--;
+                if (PlayerHistoryIndex < 0)
+                    PlayerHistoryIndex = 0;
                 GetNextSong(true, false);
                 return;
             }
@@ -1252,6 +1258,8 @@ namespace MusicPlayer
                 return;
 
             HistorySongData.Insert(0, new HistorySong(Path.GetFileNameWithoutExtension(currentlyPlayingSongName), ScoreChange, DateTime.Now.ToBinary()));
+
+            //HistorySongData = HistorySongData.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
         }
         private static void TestChoosingListIntegrity()
         {
