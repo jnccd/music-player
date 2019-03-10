@@ -464,9 +464,8 @@ namespace MusicPlayer
                                             queue = Path.Remove(0, "/queue".Length + 1);
                                         else
                                             queue = Path.Remove(0, "/q".Length + 1);
-                                        Path = "";
-
                                         Assets.QueueNewSong(Path, true);
+                                        Path = "";
                                     }
                                     catch (Exception ex)
                                     {
