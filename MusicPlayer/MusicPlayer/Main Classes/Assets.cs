@@ -1082,8 +1082,7 @@ namespace MusicPlayer
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine(">Queued one matching song: \"" + Path.GetFileNameWithoutExtension(Song) + "\" with a difference of " +
                         Math.Round(LDistances[NonWorkingIndexes].SongDifference, 2));
-
-
+                    
                     for (int i = 1; i <= 5; i++)
                     {
                         if (LDistances[NonWorkingIndexes + i].SongDifference > 2)
