@@ -1,2 +1,3 @@
 c:\users\one\documents\visual studio 2015\Projects\MusicPlayer\MusicPlayer\MusicPlayerContent\obj\x86\Debug\MusicPlayerContent.contentprojResolveAssemblyReference.cache
-C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayerContent\obj\x86\Debug\MusicPlayerContent.contentprojResolveAssemblyReference.cache
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayerContent\obj\x86\Debug\MusicPlayerContent.contentprojAssemblyReference.cache
+C:\Users\One\Documents\Visual Studio 2015\Projects\MusicPlayer using NAudio\MusicPlayer\MusicPlayerContent\obj\x86\Debug\MusicPlayerContent.contentproj.CoreCompileInputs.cache
