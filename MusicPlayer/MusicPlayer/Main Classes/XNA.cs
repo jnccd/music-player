@@ -384,6 +384,19 @@ namespace MusicPlayer
                                     Path = "";
                                     originY = Console.CursorTop + 1;
                                 }
+                                else if (Path.StartsWith("/updateYoutubeDL"))
+                                {
+                                    Process process = new Process();
+                                    ProcessStartInfo startInfo = new ProcessStartInfo
+                                    {
+                                        WindowStyle = ProcessWindowStyle.Hidden,
+                                        FileName = "cmd.exe",
+                                        Arguments = "/C youtube-dl -U"
+                                    };
+                                    process.StartInfo = startInfo;
+                                    process.Start();
+                                    Path = "";
+                                }
                                 else if (Path == "/showinweb" || Path == "/showinnet" || Path == "/net" || Path == "/web")
                                 {
                                     LastConsoleInput.Add(Path);
