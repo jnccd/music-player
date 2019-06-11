@@ -62,6 +62,9 @@ if (check.length == 0) {
 	container.children[3].appendChild(b2);
 	updateButtonSize();
 	window.addEventListener('resize', updateButtonSize);
+    
+    document.getElementsByClassName('cutom-music-player-download-button')[0].getElementsByClassName('style-scope ytd-subscribe-button-renderer')[1].remove()
+    document.getElementsByClassName('cutom-music-player-download-button')[1].getElementsByClassName('style-scope ytd-subscribe-button-renderer')[1].remove()
 	
 	console.log('MusicPlayer buttons added!');
 	}
