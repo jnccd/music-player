@@ -384,18 +384,9 @@ namespace MusicPlayer
                                     Path = "";
                                     originY = Console.CursorTop + 1;
                                 }
-                                else if (Path.StartsWith("/updateYoutubeDL"))
+                                else if (Path.StartsWith("youtube-dl -U"))
                                 {
-                                    Process process = new Process();
-                                    ProcessStartInfo startInfo = new ProcessStartInfo
-                                    {
-                                        WindowStyle = ProcessWindowStyle.Hidden,
-                                        FileName = "cmd.exe",
-                                        Arguments = "/C youtube-dl -U"
-                                    };
-                                    process.StartInfo = startInfo;
-                                    process.Start();
-                                    Path = "";
+                                    "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string err) => { Console.Write(o + e); });
                                 }
                                 else if (Path == "/showinweb" || Path == "/showinnet" || Path == "/net" || Path == "/web")
                                 {
@@ -539,7 +530,7 @@ namespace MusicPlayer
                 HttpWebRequest req;
                 WebResponse W;
 
-                if (download.StartsWith("https://www.youtube.com/watch?v="))
+                if (download.StartsWith("https://www.youtube.com/"))
                     ResultURL = download;
                 else
                 {
