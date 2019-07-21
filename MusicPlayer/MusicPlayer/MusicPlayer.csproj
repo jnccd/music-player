@@ -51,6 +51,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -65,6 +66,7 @@
     <XnaCompressContent>true</XnaCompressContent>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>MusicPlayer.Program</StartupObject>
@@ -138,6 +140,7 @@
     <Compile Include="HelperClasses\GigaList.cs" />
     <Compile Include="DynamicGrid\GridPoint.cs" />
     <Compile Include="DynamicGrid\GridSpring.cs" />
+    <Compile Include="Main Classes\Extensions.cs" />
     <Compile Include="Windows\ExportsChooser.cs">
       <SubType>Form</SubType>
     </Compile>
