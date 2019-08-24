@@ -1,10 +1,11 @@
 var b, b2;
 window.ontransitionend = function () { 
-var check = document.getElementsByClassName('cutom-music-player-download-button');
+var check = document.getElementsByClassName('custom-music-player-download-button');
 if (check.length == 0) {
+    
 	/// aesthetic song download button
 	b = document.createElement('ytd-subscribe-button-renderer');
-	b.className = 'cutom-music-player-download-button';
+	b.className = 'custom-music-player-download-button';
 	b.setAttribute('is-icon-button', '');
 	b.addEventListener("click", function(){
 		var video = document.querySelector( 'video' );
@@ -22,13 +23,10 @@ if (check.length == 0) {
 	bs.id = 'text';
 	bs.className = 'style-scope ytd-subscribe-button-renderer';
 	bp.append(bs);
-	var bt = document.createTextNode('Song Download');
-	bs.append(bt);
-	b.removeChild(b.children[0]);
 	
 	/// aesthetic video download button
 	b2 = document.createElement('ytd-subscribe-button-renderer');
-	b2.className = 'cutom-music-player-download-button';
+	b2.className = 'custom-music-player-download-button';
 	b2.setAttribute('is-icon-button', '');
 	b2.addEventListener("click", function(){
 		var video = document.querySelector( 'video' );
@@ -46,15 +44,7 @@ if (check.length == 0) {
 	bs2.id = 'text';
 	bs2.className = 'style-scope ytd-subscribe-button-renderer';
 	bp2.append(bs2);
-	var bt2 = document.createTextNode('Video Download');
-	bs2.append(bt2);
-	b2.removeChild(b2.children[0]);
-	
-	b.children[1].style.height = '35px';
-	b2.children[1].style.height = b.children[1].style.height;
-	b.children[1].setAttribute("subscribed", "");
-	b2.children[1].setAttribute("subscribed", "");
-	
+    
 	/// add buttons to document
 	var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
 	container.appendChild(container.children[1].cloneNode());
@@ -63,8 +53,11 @@ if (check.length == 0) {
 	updateButtonSize();
 	window.addEventListener('resize', updateButtonSize);
     
-    document.getElementsByClassName('cutom-music-player-download-button')[0].getElementsByClassName('style-scope ytd-subscribe-button-renderer')[1].remove()
-    document.getElementsByClassName('cutom-music-player-download-button')[1].getElementsByClassName('style-scope ytd-subscribe-button-renderer')[1].remove()
+    /// post add adjustments
+    b.children[0].style.height = '35px';
+	b2.children[0].style.height = b.children[0].style.height;
+    b.children[0].append(document.createTextNode("Song Download"));
+    b2.children[0].append(document.createTextNode("Video Download"));
 	
 	console.log('MusicPlayer buttons added!');
 	}
