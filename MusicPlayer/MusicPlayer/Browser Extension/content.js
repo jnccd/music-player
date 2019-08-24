@@ -1,13 +1,11 @@
-var b, b2;
+var buttons = [];
+
 window.ontransitionend = function () { 
-var check = document.getElementsByClassName('custom-music-player-download-button');
-if (check.length == 0) {
+  var check = document.getElementsByClassName('custom-music-player-download-button');
+  if (check.length == 0) {
     
-	/// aesthetic song download button
-	b = document.createElement('ytd-subscribe-button-renderer');
-	b.className = 'custom-music-player-download-button';
-	b.setAttribute('is-icon-button', '');
-	b.addEventListener("click", function(){
+	/// song download button
+    addButton("Song Download", function(){
 		var video = document.querySelector( 'video' );
 		if (video) 
 		{
@@ -16,20 +14,10 @@ if (check.length == 0) {
 			download('MusicPlayer.PlayRequest', downloadstring);
 		}
 	});
-	var bp = document.createElement('paper-button');
-	bp.className = 'style-scope ytd-subscribe-button-renderer';
-	b.append(bp);
-	var bs = document.createElement('yt-formatted-string');
-	bs.id = 'text';
-	bs.className = 'style-scope ytd-subscribe-button-renderer';
-	bp.append(bs);
 	
-	/// aesthetic video download button
-	b2 = document.createElement('ytd-subscribe-button-renderer');
-	b2.className = 'custom-music-player-download-button';
-	b2.setAttribute('is-icon-button', '');
-	b2.addEventListener("click", function(){
-		var video = document.querySelector( 'video' );
+	/// video download button
+    addButton("Video Download", function(){
+		var video = document.querySelector('video');
 		if (video) 
 		{
 			video.pause();
@@ -37,36 +25,57 @@ if (check.length == 0) {
 			download('MusicPlayer.VideoDownloadRequest', downloadstring);
 		}
 	});
-	var bp2 = document.createElement('paper-button');
-	bp2.className = 'style-scope ytd-subscribe-button-renderer';
-	b2.append(bp2);
-	var bs2 = document.createElement('yt-formatted-string');
-	bs2.id = 'text';
-	bs2.className = 'style-scope ytd-subscribe-button-renderer';
-	bp2.append(bs2);
     
-	/// add buttons to document
-	var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
+    /// view thumbnail button
+    addButton("View Thumbnail", function(){
+        var videoID = window.location.search.split('v=')[1].split('&')[0];
+		window.open(`https://img.youtube.com/vi/${videoID}/maxresdefault.jpg`);
+	});
+	
+    /// properly resize ma bois
+    updateButtonSize();
+	window.addEventListener('resize', updateButtonSize);
+    
+	console.log('MusicPlayer buttons added!');
+  }
+}
+
+function addButton(text, clickEvent)
+{
+    /// prepare button object
+    var b = document.createElement('ytd-subscribe-button-renderer');
+	b.className = 'custom-music-player-download-button';
+	b.setAttribute('is-icon-button', '');
+	b.addEventListener("click", function() {
+      clickEvent();
+    });
+	var bp = document.createElement('paper-button');
+	bp.className = 'style-scope ytd-subscribe-button-renderer';
+	b.append(bp);
+	var bs = document.createElement('yt-formatted-string');
+	bs.id = 'text';
+	bs.className = 'style-scope ytd-subscribe-button-renderer';
+	bp.append(bs);
+    
+    /// add button to document
+    var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
 	container.appendChild(container.children[1].cloneNode());
 	container.children[3].appendChild(b);
-	container.children[3].appendChild(b2);
-	updateButtonSize();
-	window.addEventListener('resize', updateButtonSize);
     
     /// post add adjustments
     b.children[0].style.height = '35px';
-	b2.children[0].style.height = b.children[0].style.height;
-    b.children[0].append(document.createTextNode("Song Download"));
-    b2.children[0].append(document.createTextNode("Video Download"));
-	
-	console.log('MusicPlayer buttons added!');
-	}
+    b.children[0].append(document.createTextNode(text));
+    
+    buttons[buttons.length] = b;
 }
 
 function updateButtonSize() {
     var p = document.getElementById('primary-inner');
-	b.children[1].style.width = (p.offsetWidth/2 - 8)+'px';
-	b2.children[1].style.width = b.children[1].style.width;
+    
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].style.width = (p.offsetWidth/buttons.length - 8)+'px';
+        buttons[i].children[0].style.width = (p.offsetWidth/buttons.length - 8)+'px';
+    }
 }
 
 function download(filename, text) {
