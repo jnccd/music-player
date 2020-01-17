@@ -779,6 +779,10 @@ namespace MusicPlayer
             if (config.Default.MultiThreading || forced ||
                 Values.Timer > SongChangedTickTime + 5 && !config.Default.MultiThreading)
             {
+                try {
+                    output.Pause();
+                } catch { }
+
                 if (PlayerHistory.Count > 0)
                     DownvoteCurrentSongIfNeccesary(DownVoteCurrentSongForUserSkip);
 

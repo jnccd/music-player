@@ -530,7 +530,7 @@ namespace MusicPlayer
                 HttpWebRequest req;
                 WebResponse W;
 
-                if (download.StartsWith("https://www.youtube.com/"))
+                if (download.StartsWith("https://"))
                     ResultURL = download;
                 else
                 {
@@ -1549,7 +1549,7 @@ namespace MusicPlayer
                 state = state.TrimStart(' ');
             }
 
-            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "github.com/Taskkill2187/XNA-MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
+            DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "https://github.com/niklasCarstensen/MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
 
         // Draw
