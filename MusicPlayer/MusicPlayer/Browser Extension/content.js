@@ -59,7 +59,8 @@ function addButton(text, clickEvent)
     
     /// add button to document
     var container = document.getElementsByClassName('style-scope ytd-video-secondary-info-renderer')[0];
-	container.appendChild(container.children[1].cloneNode());
+    if (container.children.length < 4)
+        container.appendChild(container.children[1].cloneNode());
 	container.children[3].appendChild(b);
     
     /// post add adjustments
