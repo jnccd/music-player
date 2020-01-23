@@ -228,8 +228,12 @@ namespace MusicPlayer
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Preload = config.Default.Preload;
-
+            
             Assets.LoadLoadingScreen(Content, GraphicsDevice);
+
+            Console.WriteLine("Updating youtube-dl...");
+            "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string err) => { Console.Write(o + err); });
+
             Assets.Load(Content, GraphicsDevice);
 
             BlurredTex = new RenderTarget2D(GraphicsDevice, Values.WindowSize.X + 100, Values.WindowSize.Y + 100);
@@ -238,7 +242,7 @@ namespace MusicPlayer
             //InactiveSleepTime = new TimeSpan(0);
 
             DG = new DynamicGrid(new Rectangle(35, (int)(Values.WindowSize.Y / 1.25f) - 60, Values.WindowSize.X - 70, 70), 4, 0.96f, 2.5f);
-
+            
             Console.WriteLine("Finished Loading!");
             StartSongInputLoop();
 
