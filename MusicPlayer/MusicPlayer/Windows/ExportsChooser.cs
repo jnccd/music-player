@@ -66,8 +66,10 @@ namespace MusicPlayer
             for (int i = 0; i < SongsToChooseFrom.Count; i++)
             {
                 UpvotedSong s = SongsToChooseFrom[i];
-                if (s.Score >= tScore.Value && s.Streak >= tTrend.Value && 
-                    (s.TotalDislikes == 0 ? int.MaxValue : s.TotalLikes / s.TotalDislikes) >= tRatio.Value &&
+                int ratio = s.TotalDislikes == 0 ? int.MaxValue : s.TotalLikes / s.TotalDislikes;
+                if (s.Score >= tScore.Value && 
+                    s.Streak >= tTrend.Value && 
+                    (ratio) >= tRatio.Value &&
                     ChanceAmounts[i] > tChance.Value / 1000f)
                     SelectedSongs.Add(s);
             }
