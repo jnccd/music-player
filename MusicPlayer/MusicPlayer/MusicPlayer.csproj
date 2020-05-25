@@ -207,6 +207,9 @@
     </Content>
     <Content Include="Browser Extension\content.js" />
     <Content Include="Browser Extension\styles.css" />
+    <Content Include="discord-rpc-w32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
