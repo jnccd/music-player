@@ -1552,7 +1552,7 @@ namespace MusicPlayer
                 state += time;
                 state = state.TrimStart(' ');
             }
-
+            
             DiscordRPCWrapper.UpdatePresence(details, state, startTime, endTime, bigimagekey, "https://github.com/niklasCarstensen/MusicPlayer", smolimagekey, smolimagetext, ElapsedTime);
         }
 
