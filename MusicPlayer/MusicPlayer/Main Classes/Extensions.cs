@@ -87,5 +87,10 @@ namespace MusicPlayer
                 TimeoutEvent();
             }
         }
+
+        public static Microsoft.Xna.Framework.Color ToXNAColor(this System.Drawing.Color c)
+        {
+            return Microsoft.Xna.Framework.Color.FromNonPremultiplied(c.R, c.G, c.B, c.A);
+        }
     }
 }

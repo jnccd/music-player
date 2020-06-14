@@ -402,5 +402,28 @@ namespace MusicPlayer
                 catch (Exception ex) { MessageBox.Show("Can't restart.\n\nException: " + ex.ToString()); }
             });
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (Program.game.backgroundColor == Microsoft.Xna.Framework.Color.White)
+            {
+                Program.game.backgroundColor = Microsoft.Xna.Framework.Color.FromNonPremultiplied(51, 51, 51, 255);
+                Program.game.secondaryColor = Microsoft.Xna.Framework.Color.Lerp(Program.game.primaryColor, Program.game.backgroundColor, 0.4f);
+            }
+            else
+            {
+                Program.game.backgroundColor = Microsoft.Xna.Framework.Color.White;
+                Program.game.secondaryColor = Microsoft.Xna.Framework.Color.Lerp(Program.game.primaryColor, Program.game.backgroundColor, 0.4f);
+            }
+            config.Default.BackgroundColor = Color.FromArgb(Program.game.backgroundColor.R, Program.game.backgroundColor.G, Program.game.backgroundColor.B, Program.game.backgroundColor.A);
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            config.Default.ShadowDistance = trackBar2.Value;
+            Program.game.UpdateRectangles();
+            Program.game.ForceTitleRedraw();
+            Program.game.UpdateShadowRects();
+        }
     }
 }

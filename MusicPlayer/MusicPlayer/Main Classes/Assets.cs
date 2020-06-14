@@ -307,13 +307,13 @@ namespace MusicPlayer
             if (config.Default.Col != System.Drawing.Color.Transparent)
             {
                 Program.game.primaryColor = Color.FromNonPremultiplied(config.Default.Col.R, config.Default.Col.G, config.Default.Col.B, config.Default.Col.A);
-                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, Color.White, 0.4f);
+                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, config.Default.BackgroundColor.ToXNAColor(), 0.4f);
             }
             else
             {
                 Program.game.primaryColor = SystemDefaultColor;
                 if (Program.game.primaryColor.A != 255) Program.game.primaryColor.A = 255;
-                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, Color.White, 0.4f);
+                Program.game.secondaryColor = Color.Lerp(Program.game.primaryColor, Program.game.backgroundColor, 0.4f);
             }
 
             Console.WriteLine("Starting first Song...");

@@ -83,5 +83,11 @@
     <Setting Name="HistoryDate" Type="System.Int64[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="ShadowDistance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="BackgroundColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">White</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
