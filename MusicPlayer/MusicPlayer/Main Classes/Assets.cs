@@ -1206,7 +1206,7 @@ namespace MusicPlayer
                 return;
             }
             int i = index;
-            while (SongChoosingList[i] == SongPath)
+            while (SongChoosingList[i] == SongPath && i < SongChoosingList.Count)
                 i++;
             int count = i - index;
 
