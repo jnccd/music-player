@@ -422,7 +422,7 @@ namespace MusicPlayer
         {
             config.Default.ShadowDistance = trackBar2.Value;
             Program.game.UpdateRectangles();
-            Program.game.ForceTitleRedraw();
+            Program.game.ForceTitleRedraw(false);
             Program.game.UpdateShadowRects();
         }
     }

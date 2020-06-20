@@ -2086,10 +2086,11 @@ namespace MusicPlayer
 
             //Debug.WriteLine("Draw: " + (Stopwatch.GetTimestamp() - CurrentDebugTime).ToString());
         }
-        public void ForceTitleRedraw()
+        public void ForceTitleRedraw(bool clearTarget)
         {
             ForcedTitleRedraw = true;
-            //TitleTarget = null;
+            if (clearTarget)
+                TitleTarget = null;
         }
         public void ForceBackgroundRedraw()
         {

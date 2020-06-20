@@ -919,7 +919,7 @@ namespace MusicPlayer
 
             Program.game.SongTimeSkipped = 0;
             Program.game.ForcedCoverBackgroundRedraw = true;
-            Program.game.ForceTitleRedraw();
+            Program.game.ForceTitleRedraw(true);
             if (Program.game.DG != null)
                 Program.game.DG.Clear();
 
