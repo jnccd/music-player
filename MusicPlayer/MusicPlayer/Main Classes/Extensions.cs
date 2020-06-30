@@ -67,11 +67,14 @@ namespace MusicPlayer
                 Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
                 compiler.WaitForExit();
 
-                string o = compiler.StandardOutput.ReadToEnd();
-                string e = compiler.StandardError.ReadToEnd();
+                string o = "";
+                string e = "";
 
-                exited = true;
+                try { o = compiler.StandardOutput.ReadToEnd(); } catch { }
+                try { e = compiler.StandardError.ReadToEnd(); } catch { }
+                
                 ExecutedEvent(o, e);
+                exited = true;
             });
 
             while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
@@ -86,6 +89,26 @@ namespace MusicPlayer
                 catch { }
                 TimeoutEvent();
             }
+        }
+        public static string getProgramOutput(this string command)
+        {
+            string[] split = command.Split(' ');
+            if (split.Length == 0)
+                return "";
+
+            Process compiler = new Process();
+            compiler.StartInfo.FileName = split.First();
+            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
+            compiler.StartInfo.CreateNoWindow = true;
+            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            compiler.StartInfo.UseShellExecute = false;
+            compiler.StartInfo.RedirectStandardInput = true;
+            compiler.StartInfo.RedirectStandardOutput = true;
+            compiler.StartInfo.RedirectStandardError = true;
+            compiler.Start();
+            compiler.WaitForExit();
+
+            return compiler.StandardOutput.ReadToEnd();
         }
 
         public static Microsoft.Xna.Framework.Color ToXNAColor(this System.Drawing.Color c)

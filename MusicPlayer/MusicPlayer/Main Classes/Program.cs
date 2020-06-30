@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -335,6 +335,7 @@ start MusicPlayer.exe");
                 });
             }
         }
+        static object crackLock = new object();
         public static void CrackOpen(object source, FileSystemEventArgs ev)
         {
             Thread.Sleep(50);
@@ -342,42 +343,34 @@ start MusicPlayer.exe");
             for (int i = 0; i < bois.Length; i++)
             {
                 string fileName = Path.GetFileName(bois[i]);
-                if (fileName == "MusicPlayer.PlayRequest")
+
+                if (fileName == "MusicPlayer.PlayRequest" || fileName == "MusicPlayer.VideoDownloadRequest")
                 {
-                    string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.PlayRequest";
-                    string crackedOpenBoi = File.ReadAllText(boi);
-                    game.PauseConsoleInputThread = true;
-                    Task.Factory.StartNew(() => {
-                        string down = crackedOpenBoi;
-                        string[] split = down.Split('�');
-                        if (game.Download(split[0]) && split.Length > 1)
+                    string crackedOpenBoi = File.ReadAllText(bois[i]);
+                    Task.Factory.StartNew(() =>
+                    {
+                        lock (crackLock)
                         {
-                            long secondspassed = Convert.ToInt64(split[1].Split('.')[0]);
-                            Assets.Channel32.Position = secondspassed * Assets.Channel32.WaveFormat.AverageBytesPerSecond;
+                            while (game.BackgroundOperationRunning || game.ConsoleBackgroundOperationRunning)
+                                Thread.Sleep(250);
+                            
+                            if (fileName == "MusicPlayer.PlayRequest")
+                            {
+                                string[] split = crackedOpenBoi.Split('±');
+                                if (game.Download(split[0]) && split.Length > 1)
+                                {
+                                    long secondspassed = Convert.ToInt64(split[1].Split('.')[0]);
+                                    Assets.Channel32.Position = secondspassed * Assets.Channel32.WaveFormat.AverageBytesPerSecond;
+                                }
+                            }
+                            if (fileName == "MusicPlayer.VideoDownloadRequest")
+                                game.DownloadAsVideo(crackedOpenBoi);
                         }
                     });
-                    Thread.Sleep(200);
-                    File.Delete(boi);
+                    File.Delete(bois[i]);
                     Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
                     Values.SetForegroundWindow(Values.GetConsoleWindow());
-                    SendKeys.SendWait("SUCCCCC");
-                    break;
-                }
-                if (fileName == "MusicPlayer.VideoDownloadRequest")
-                {
-                    string boi = config.Default.BrowserDownloadFolderPath + "\\MusicPlayer.VideoDownloadRequest";
-                    string crackedOpenBoi = File.ReadAllText(boi);
-                    game.PauseConsoleInputThread = true;
-                    Task.Factory.StartNew(() => {
-                        string down = crackedOpenBoi;
-                        game.DownloadAsVideo(down);
-                    });
-                    Thread.Sleep(200);
-                    File.Delete(boi);
-                    Values.ShowWindow(Values.GetConsoleWindow(), 0x09);
-                    Values.SetForegroundWindow(Values.GetConsoleWindow());
-                    SendKeys.SendWait("SUCCCCC");
-                    break;
+                    SendKeys.SendWait("Ԫ");
                 }
             }
         }
