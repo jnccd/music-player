@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -262,8 +262,7 @@ namespace MusicPlayer
                     originY = Console.CursorTop;
                     while (!Path.Contains(".mp3\""))
                     {
-                        if (Path == "SUCCCCC")
-                            Path = "";
+                        Path = Path.Replace("Ԫ", "");
 
                         Thread.Sleep(5);
                         Console.SetCursorPosition(0, originY);
@@ -281,7 +280,7 @@ namespace MusicPlayer
                             break;
 
                         if (PauseConsoleInputThread) { Console.CursorLeft = 0; }
-                        while (PauseConsoleInputThread) { }
+                        while (PauseConsoleInputThread) { Thread.Sleep(50); }
 
                         if (e.Key == ConsoleKey.UpArrow)
                         {
@@ -524,184 +523,30 @@ namespace MusicPlayer
                 Values.ShowConsole();
 
                 PlaybackState PlayState = Assets.output.PlaybackState;
+                
+                string downloadTargetFolder = Values.CurrentExecutablePath + "\\Downloads\\";
+                if (!download.StartsWith("https://"))
+                    download = $"\"ytsearch: {download}\"";
 
-                string url, ResultURL;
-                HttpWebRequest req;
-                WebResponse W;
-
-                if (download.StartsWith("https://"))
-                    ResultURL = download;
-                else
-                {
-                    if (download.StartsWith("-"))
-                        download = "\"" + download + "\"";
-
-                    // Get fitting youtube video
-                    url = string.Format("https://www.youtube.com/results?search_query=" + download);
-                    req = (HttpWebRequest)HttpWebRequest.Create(url);
-                    req.KeepAlive = false;
-                    W = req.GetResponse();
-                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                    {
-                        string html = sr.ReadToEnd();
-                        int index = html.IndexOf("href=\"/watch?");
-                        string startcuthtml = html.Remove(0, index + 6);
-                        index = startcuthtml.IndexOf('"');
-                        string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                        ResultURL = "https://www.youtube.com" + cuthtml;
-                    }
-                }
-
-                // Get video title
-                req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
-                req.KeepAlive = false;
-                W = req.GetResponse();
-                string VideoTitle;
-                string VideoThumbnailURL;
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                {
-                    // Extract info from HTML string
-                    string html = sr.ReadToEnd();
-                    int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
-                    string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
-                    index = startcuthtml.IndexOf('"');
-                    VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
-
-                    index = html.IndexOf("<link itemprop=\"thumbnailUrl\" href=\"");
-                    startcuthtml = html.Remove(0, index + "<link itemprop=\"thumbnailUrl\" href=\"".Length);
-                    index = startcuthtml.IndexOf('"');
-                    VideoThumbnailURL = startcuthtml.Remove(index, startcuthtml.Length - index);
-
-                    // Decode the encoded string.
-                    StringWriter myWriter = new StringWriter();
-                    System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
-                    VideoTitle = myWriter.ToString();
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("Found matching song at ");
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write(ResultURL);
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("\nnamed: ");
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(VideoTitle);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                }
-
-                // Delete File if there still is one for some reason? The thread crashes otherwise so better do it.
-                string videofile = Values.CurrentExecutablePath + "\\Downloads\\File.mp4";
-                if (File.Exists(videofile))
-                    File.Delete(videofile);
+                Console.ForegroundColor = ConsoleColor.Yellow;
 
                 // Download Video File
                 Process P = new Process();
-                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f 137+140 -o \"/Downloads/File.mp4\" " + ResultURL);
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", download + $" -x --audio-format mp3 -o \"{downloadTargetFolder}%(title)s.%(ext)s\" --add-metadata");
                 P.StartInfo.UseShellExecute = false;
-
                 P.Start();
-
-                char[] invalids = Path.GetInvalidFileNameChars();
-                foreach (char c in invalids)
-                    VideoTitle = VideoTitle.Replace(c, '_');
-                VideoTitle = VideoTitle.Replace('.', '_');
-
                 P.WaitForExit();
 
-                if (!File.Exists(videofile))
-                {
-                    P = new Process();
-                    P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f mp4 -o \"/Downloads/File.mp4\" " + ResultURL);
-                    P.StartInfo.UseShellExecute = false;
+                // move file to lib
+                string musicFile = Path.GetFileName(Directory.GetFiles(downloadTargetFolder).Where(x => x.EndsWith(".mp3")).First());
+                string targetPath = config.Default.MusicPath + "\\" + musicFile;
+                if (File.Exists(targetPath))
+                    File.Delete(targetPath);
+                File.Move(downloadTargetFolder + musicFile, targetPath);
 
-                    P.Start();
-                    P.WaitForExit();
-
-                    if (!File.Exists(videofile))
-                        return false;
-                }
-
-                // Convert Video File to mp3 and put it into the default folder
-                Console.WriteLine("Converting to mp3...");
-
-                string input = videofile;
-                string output = config.Default.MusicPath + "\\" + VideoTitle + ".mp3";
-
-                if (File.Exists(output))
-                {
-                    if (MessageBox.Show("File already exists! Override?", "Override?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    {
-                        if (output == Assets.currentlyPlayingSongPath)
-                        {
-                            MessageBox.Show("I can't override it while you are playing it!");
-                            return false;
-                        }
-
-                        File.Delete(output);
-                    }
-                }
-
-                MediaFile inM = new MediaFile { Filename = input };
-                MediaFile outM = new MediaFile { Filename = output };
-
-                using (var engine = new Engine())
-                {
-                    engine.GetMetadata(inM);
-                    engine.Convert(inM, outM);
-                }
-
-                if (!File.Exists(output))
-                {
-                    MessageBox.Show("Couldn't convert to mp3!");
-                    return false;
-                }
-
-                // edit mp3 metadata using taglib
-                HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
-                HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                Stream stream = httpWebReponse.GetResponseStream();
-                System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
-                TagLib.File file = TagLib.File.Create(output);
-                TagLib.Picture pic = new TagLib.Picture();
-                pic.Type = TagLib.PictureType.FrontCover;
-                pic.Description = "Cover";
-                pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
-                MemoryStream ms = new MemoryStream();
-                im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                ms.Position = 0;
-                pic.Data = TagLib.ByteVector.FromStream(ms);
-                file.Tag.Pictures = new TagLib.IPicture[] { pic };
-                //stringDialog Question = new stringDialog("Who is the artist of " + VideoTitle + "?", VideoTitle.Split('-').First().Trim());
-                //Question.ShowDialog();
-                //lastQuestionResult = Question.result;
-                file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
-                file.Tag.Comment = "Downloaded using MusicPlayer";
-                file.Tag.Album = "MusicPlayer Songs";
-                file.Tag.AlbumArtists = new string[] { VideoTitle.Split('-').First().Trim() };
-                file.Tag.Performers = new string[] { VideoTitle.Split('-').First().Trim() };
-                file.Tag.AmazonId = "AmazonIsShit";
-                file.Tag.Composers = new string[] { VideoTitle.Split('-').First().Trim() };
-                file.Tag.Copyright = "None";
-                file.Tag.Disc = 0;
-                file.Tag.DiscCount = 0;
-                file.Tag.Genres = new string[] { "good music" };
-                file.Tag.Grouping = "None";
-                file.Tag.Lyrics = "You expected lyrics, but it was me dio";
-                file.Tag.MusicIpId = "wubbel";
-                file.Tag.Title = VideoTitle;
-                file.Tag.Track = 0;
-                file.Tag.TrackCount = 0;
-                file.Tag.Year = 1982;
-
-                file.Save();
-                ms.Close();
-
-                // finishing touches
-                File.Delete(videofile);
-                Assets.AddSongToListIfNotDoneSoFar(config.Default.MusicPath + "\\" + VideoTitle + ".mp3");
-                Assets.PlayNewSong(outM.Filename);
+                // Play it
+                Assets.AddSongToListIfNotDoneSoFar(targetPath);
+                Assets.PlayNewSong(targetPath);
                 originY = Console.CursorTop;
 
                 if (PlayState == PlaybackState.Paused || PlayState == PlaybackState.Stopped)
@@ -722,17 +567,11 @@ namespace MusicPlayer
             }
             return true;
         }
-        public bool DownloadAsVideo(string youtubepath)
+        public bool DownloadAsVideo(string url)
         {
             if (BackgroundOperationRunning || ConsoleBackgroundOperationRunning)
             {
                 MessageBox.Show("Multiple BackgroundOperations can not run at the same time!\nWait until the other operation is finished");
-                return false;
-            }
-
-            if (!youtubepath.StartsWith("https://www.youtube.com/watch?"))
-            {
-                MessageBox.Show("This doesn't look like a youtube video path to me");
                 return false;
             }
 
@@ -748,59 +587,14 @@ namespace MusicPlayer
                 PauseConsoleInputThread = true;
                 Values.ShowConsole();
 
-                // Get video title
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(youtubepath);
-                req.KeepAlive = false;
-                WebResponse W = req.GetResponse();
-                string VideoTitle;
-                string VideoThumbnailURL;
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                {
-                    // Extract info from HTML string
-                    string html = sr.ReadToEnd();
-                    int index = html.IndexOf("<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"");
-                    string startcuthtml = html.Remove(0, index + "<span id=\"eow-title\" class=\"watch-title\" dir=\"ltr\" title=\"".Length);
-                    index = startcuthtml.IndexOf('"');
-                    VideoTitle = startcuthtml.Remove(index, startcuthtml.Length - index);
+                Console.ForegroundColor = ConsoleColor.Yellow;
 
-                    index = html.IndexOf("<link itemprop=\"thumbnailUrl\" href=\"");
-                    startcuthtml = html.Remove(0, index + "<link itemprop=\"thumbnailUrl\" href=\"".Length);
-                    index = startcuthtml.IndexOf('"');
-                    VideoThumbnailURL = startcuthtml.Remove(index, startcuthtml.Length - index);
-
-                    // Decode the encoded string.
-                    StringWriter myWriter = new StringWriter();
-                    System.Web.HttpUtility.HtmlDecode(VideoTitle, myWriter);
-                    VideoTitle = myWriter.ToString();
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("Found video named: ");
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(VideoTitle);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                }
-
-                // Download Video File
                 Process P = new Process();
-                string b = Values.CurrentExecutablePath;
-                foreach (char c in Path.GetInvalidFileNameChars())
-                    VideoTitle = VideoTitle.Replace(c, '_');
-                VideoTitle = VideoTitle.Replace('.', '_');
-                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f 137+140 -o \"" + config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4" + "\" " + youtubepath);
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", $"-f mp4 -o \"{config.Default.BrowserDownloadFolderPath}\\%(title)s.%(ext)s\" {url}");
                 P.StartInfo.UseShellExecute = false;
 
                 P.Start();
                 P.WaitForExit();
-
-                if (!File.Exists(config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4"))
-                {
-                    P = new Process();
-                    P.StartInfo = new ProcessStartInfo("youtube-dl.exe", "-f mp4 -o \"" + config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4" + "\" " + youtubepath);
-                    P.StartInfo.UseShellExecute = false;
-
-                    P.Start();
-                    P.WaitForExit();
-                }
 
                 originY = Console.CursorTop;
 
@@ -808,9 +602,6 @@ namespace MusicPlayer
                 PauseConsoleInputThread = false;
 
                 ReHookGlobalKeyHooks();
-
-                if (!File.Exists(config.Default.BrowserDownloadFolderPath + "\\" + VideoTitle + ".mp4"))
-                    return false;
             }
             catch (Exception e)
             {
