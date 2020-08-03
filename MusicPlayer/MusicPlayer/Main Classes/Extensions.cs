@@ -111,6 +111,19 @@ namespace MusicPlayer
             return compiler.StandardOutput.ReadToEnd();
         }
 
+        public static string GetYoutubeVideoID(this string search)
+        {
+            string id = "";
+            $"youtube-dl \"ytsearch:{search}\" --get-id".RunAsConsoleCommand(10, () => { }, (string o, string err) => {
+                id = o.Trim('\n');
+            });
+            return id;
+        }
+        public static string GetYoutubeVideoURL(this string search)
+        {
+            return "https://www.youtube.com/watch?v=" + GetYoutubeVideoID(search);
+        }
+
         public static Microsoft.Xna.Framework.Color ToXNAColor(this System.Drawing.Color c)
         {
             return Microsoft.Xna.Framework.Color.FromNonPremultiplied(c.R, c.G, c.B, c.A);
