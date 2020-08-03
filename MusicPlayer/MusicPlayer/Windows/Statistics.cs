@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -239,23 +240,7 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        // Get fitting youtube video
-                        string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                        HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                        req.KeepAlive = false;
-                        WebResponse W = req.GetResponse();
-                        string ResultURL;
-                        using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                        {
-                            string html = sr.ReadToEnd();
-                            int index = html.IndexOf("href=\"/watch?");
-                            string startcuthtml = html.Remove(0, index + 6);
-                            index = startcuthtml.IndexOf('"');
-                            string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                            ResultURL = "https://www.youtube.com" + cuthtml;
-                        }
-
-                        Clipboard.SetText(ResultURL);
+                        Clipboard.SetText(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString().GetYoutubeVideoURL());
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
@@ -263,27 +248,7 @@ namespace MusicPlayer
                 {
                     try
                     {
-                        Task.Factory.StartNew(() =>
-                        {
-                            // Get fitting youtube video
-                            string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                            req.KeepAlive = false;
-                            WebResponse W = req.GetResponse();
-                            string ResultURL;
-                            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                            {
-                                string html = sr.ReadToEnd();
-                                int index = html.IndexOf("href=\"/watch?");
-                                string startcuthtml = html.Remove(0, index + 6);
-                                index = startcuthtml.IndexOf('"');
-                                string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                                ResultURL = "https://www.youtube.com" + cuthtml;
-                            }
-
-                            Uri U = new Uri(ResultURL);
-                            Process.Start(U.ToString());
-                        });
+                        Process.Start(new Uri(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString().GetYoutubeVideoURL()).ToString());
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
@@ -294,24 +259,8 @@ namespace MusicPlayer
                         {
                             Task.Factory.StartNew(() =>
                             {
-                                // Get fitting youtube video
-                                string url = string.Format("https://www.youtube.com/results?search_query=" + dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString());
-                                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                                req.KeepAlive = false;
-                                WebResponse W = req.GetResponse();
-                                string ResultURL;
-                                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                                {
-                                    string html = sr.ReadToEnd();
-                                    int index = html.IndexOf("href=\"/watch?");
-                                    string startcuthtml = html.Remove(0, index + 6);
-                                    index = startcuthtml.IndexOf('"');
-                                    string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                                    ResultURL = "https://www.youtube.com" + cuthtml;
-                                }
-
                                 int seconds = (int)(Assets.Channel32.Position / (double)Assets.Channel32.Length * Assets.Channel32.TotalTime.TotalSeconds);
-                                Uri U = new Uri(ResultURL + "&t=" + seconds + "s");
+                                Uri U = new Uri(dataGridView1.Rows[currentMouseOverRow].Cells[0].Value.ToString().GetYoutubeVideoURL() + "&t=" + seconds + "s");
                                 Process.Start(U.ToString());
 
                                 if (Assets.IsPlaying())
@@ -463,19 +412,18 @@ namespace MusicPlayer
                     }
                     catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
                 })));
-                if (dataGridView1.Rows[e.RowIndex].Cells[dataGridView1.ColumnCount - 2].Value == null)
-                    m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
+                m.MenuItems.Add(new MenuItem("Delete Entry", ((object s, EventArgs ev) =>
+                {
+                    try
                     {
-                        try
-                        {
-                            int index = Assets.UpvotedSongData.FindIndex(x => x.Name == dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3");
-                            if (index >= 0)
-                                Assets.UpvotedSongData.RemoveAt(index);
+                        int index = Assets.UpvotedSongData.FindIndex(x => x.Name == dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + ".mp3");
+                        if (index >= 0)
+                            Assets.UpvotedSongData.RemoveAt(index);
 
-                            bRefresh_Click(null, EventArgs.Empty);
-                        }
-                        catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
-                    })));
+                        bRefresh_Click(null, EventArgs.Empty);
+                    }
+                    catch { MessageBox.Show("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!!"); }
+                })));
 
                 currentMouseOverRow = e.RowIndex;
                 m.Show(dataGridView1, new Point(e.X + dataGridView1.GetColumnDisplayRectangle(e.ColumnIndex, true).X, e.Y + dataGridView1.GetRowDisplayRectangle(e.RowIndex, true).Y));

@@ -532,7 +532,7 @@ namespace MusicPlayer
 
                 // Download Video File
                 Process P = new Process();
-                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", download + $" -x --audio-format mp3 -o \"{downloadTargetFolder}%(title)s.%(ext)s\" --add-metadata");
+                P.StartInfo = new ProcessStartInfo("youtube-dl.exe", download + $" -x --audio-format mp3 -o \"{downloadTargetFolder}%(title)s.%(ext)s\" --add-metadata --embed-thumbnail");
                 P.StartInfo.UseShellExecute = false;
                 P.Start();
                 P.WaitForExit();

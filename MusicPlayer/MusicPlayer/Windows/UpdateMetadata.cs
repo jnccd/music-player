@@ -42,21 +42,10 @@ namespace MusicPlayer
                 string name = Path.GetFileNameWithoutExtension(SongPaths[i]);
                 try
                 {
-                    // Get fitting youtube video
-                    string url = string.Format("https://www.youtube.com/results?search_query=" + name);
-                    HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                    req.KeepAlive = false;
-                    WebResponse W = req.GetResponse();
-                    string ResultURL;
-                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                    {
-                        string html = sr.ReadToEnd();
-                        int index = html.IndexOf("href=\"/watch?");
-                        string startcuthtml = html.Remove(0, index + 6);
-                        index = startcuthtml.IndexOf('"');
-                        string cuthtml = startcuthtml.Remove(index, startcuthtml.Length - index);
-                        ResultURL = "https://www.youtube.com" + cuthtml;
-                    }
+                    HttpWebRequest req = null;
+                    WebResponse W = null;
+                    
+                    string ResultURL = name.GetYoutubeVideoURL();
 
                     // Get VideoThumbnailURL
                     req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
@@ -81,7 +70,7 @@ namespace MusicPlayer
                     HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
                     HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
                     Stream stream = httpWebReponse.GetResponseStream();
-                    System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
+                    Image im = Image.FromStream(stream);
                     TagLib.File file = TagLib.File.Create(SongPaths[i]);
                     TagLib.Picture pic = new TagLib.Picture();
                     pic.Type = TagLib.PictureType.FrontCover;
