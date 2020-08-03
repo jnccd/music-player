@@ -44,30 +44,14 @@ namespace MusicPlayer
                 {
                     HttpWebRequest req = null;
                     WebResponse W = null;
-                    
-                    string ResultURL = name.GetYoutubeVideoURL();
 
-                    // Get VideoThumbnailURL
-                    req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
-                    req.KeepAlive = false;
-                    W = req.GetResponse();
-                    string VideoThumbnailURL;
-                    using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                    {
-                        // Extract info from HTMP string
-                        string html = sr.ReadToEnd();
-                        int index;
-                        string startcuthtml;
-
-                        index = html.IndexOf("<link itemprop=\"thumbnailUrl\" href=\"");
-                        startcuthtml = html.Remove(0, index + "<link itemprop=\"thumbnailUrl\" href=\"".Length);
-                        index = startcuthtml.IndexOf('"');
-                        VideoThumbnailURL = startcuthtml.Remove(index, startcuthtml.Length - index);
-                    }
+                    string videoID = name.GetYoutubeVideoID();
+                    string ResultURL = videoID.GetYoutubeVideoURLFromID();
+                    string thumbURL = videoID.GetYoutubeThumbnail();
                     string artist = name.Split('-').First().Trim();
 
                     // edit mp3 metadata using taglib
-                    HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(VideoThumbnailURL);
+                    HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(thumbURL);
                     HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
                     Stream stream = httpWebReponse.GetResponseStream();
                     Image im = Image.FromStream(stream);

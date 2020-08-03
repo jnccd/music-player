@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,14 +116,52 @@ namespace MusicPlayer
         public static string GetYoutubeVideoID(this string search)
         {
             string id = "";
-            $"youtube-dl \"ytsearch:{search}\" --get-id".RunAsConsoleCommand(10, () => { }, (string o, string err) => {
+            $"youtube-dl \"ytsearch:{search}\" --get-id --skip-download --no-playlist".RunAsConsoleCommand(10, () => { }, (string o, string err) => {
                 id = o.Trim('\n');
             });
             return id;
         }
+        public static string GetYoutubeVideoURLFromID(this string id)
+        {
+            return "https://www.youtube.com/watch?v=" + id;
+        }
         public static string GetYoutubeVideoURL(this string search)
         {
             return "https://www.youtube.com/watch?v=" + GetYoutubeVideoID(search);
+        }
+        public static string GetYoutubeThumbnail(this string videoID)
+        {
+            string max = $"https://img.youtube.com/vi/{videoID}/maxresdefault.jpg";
+            string hq = $"https://i.ytimg.com/vi/{videoID}/hqdefault.jpg";
+
+            if (max.isPictureLink())
+                return max;
+
+            if (hq.isPictureLink())
+                return hq;
+
+            return "";
+        }
+        public static bool isPictureLink(this string l)
+        {
+            try
+            {
+                Uri uriResult;
+                Uri.TryCreate(l, UriKind.Absolute, out uriResult);
+                if (uriResult != null && uriResult.Scheme == Uri.UriSchemeHttps ||
+                    uriResult != null && uriResult.Scheme == Uri.UriSchemeHttp)
+                {
+                    var req = (HttpWebRequest)HttpWebRequest.Create(l);
+                    req.Method = "GET";
+                    req.AllowAutoRedirect = true;
+                    req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.142 Safari/537.36";
+                    using (var resp = req.GetResponse())
+                        if (resp.ContentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/") && resp.ContentLength > 2000)
+                            return true;
+                }
+            } catch { }
+
+            return false;
         }
 
         public static Microsoft.Xna.Framework.Color ToXNAColor(this System.Drawing.Color c)
