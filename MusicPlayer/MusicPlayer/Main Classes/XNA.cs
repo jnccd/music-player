@@ -544,6 +544,30 @@ namespace MusicPlayer
                     File.Delete(targetPath);
                 File.Move(downloadTargetFolder + musicFile, targetPath);
 
+                // write thumbnail
+                try
+                {
+                    string videoID = musicFile.GetYoutubeVideoID();
+                    string thumbURL = videoID.GetYoutubeThumbnail();
+                    HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(thumbURL);
+                    HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                    Stream stream = httpWebReponse.GetResponseStream();
+                    System.Drawing.Image im = System.Drawing.Image.FromStream(stream);
+                    TagLib.File file = TagLib.File.Create(targetPath);
+                    TagLib.Picture pic = new TagLib.Picture();
+                    pic.Type = TagLib.PictureType.FrontCover;
+                    pic.Description = "Cover";
+                    pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+                    MemoryStream ms = new MemoryStream();
+                    im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    ms.Position = 0;
+                    pic.Data = TagLib.ByteVector.FromStream(ms);
+                    file.Tag.Pictures = new TagLib.IPicture[] { pic };
+                    file.Save();
+                    ms.Close();
+                }
+                catch { Console.WriteLine("Failed to write yt thumbnail"); }
+
                 // Play it
                 Assets.AddSongToListIfNotDoneSoFar(targetPath);
                 Assets.PlayNewSong(targetPath);
