@@ -544,6 +544,9 @@ namespace MusicPlayer
                     File.Delete(targetPath);
                 File.Move(downloadTargetFolder + musicFile, targetPath);
 
+                foreach (var file in Directory.GetFiles(downloadTargetFolder))
+                    File.Delete(file);
+
                 // write thumbnail
                 try
                 {

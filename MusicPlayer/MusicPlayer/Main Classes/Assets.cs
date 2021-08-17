@@ -655,7 +655,10 @@ namespace MusicPlayer
             float sn = Approximate.Sqrt(n);
 
             float mult = Values.BaseVolume / sn;
-            Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+            if (mult < 999)
+                Program.game.ShowSecondRowMessage("Applied Volume multiplier of: " + Math.Round(mult, 2), 1);
+            else
+                Program.game.ShowSecondRowMessage("Applied Volume multiplier of: very large", 1);
 
             int index = UpvotedSongData.FindIndex(x => x.Name == currentlyPlayingSongName);
             Values.VolumeMultiplier = mult;

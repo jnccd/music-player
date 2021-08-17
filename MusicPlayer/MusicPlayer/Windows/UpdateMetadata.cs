@@ -40,56 +40,65 @@ namespace MusicPlayer
             {
                 backgroundWorker1.ReportProgress(i);
                 string name = Path.GetFileNameWithoutExtension(SongPaths[i]);
-                try
+
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                for (int j = 0; j < 3; j++)
                 {
-                    HttpWebRequest req = null;
-                    WebResponse W = null;
+                    try
+                    {
+                        HttpWebRequest req = null;
+                        WebResponse W = null;
 
-                    string videoID = name.GetYoutubeVideoID();
-                    string ResultURL = videoID.GetYoutubeVideoURLFromID();
-                    string thumbURL = videoID.GetYoutubeThumbnail();
-                    string artist = name.Split('-').First().Trim();
+                        string videoID = name.GetYoutubeVideoID();
+                        string ResultURL = videoID.GetYoutubeVideoURLFromID();
+                        string thumbURL = videoID.GetYoutubeThumbnail();
+                        string artist = name.Contains("-") ? name.Split('-').First().Trim() : "Unknown";
 
-                    // edit mp3 metadata using taglib
-                    HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(thumbURL);
-                    HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    Stream stream = httpWebReponse.GetResponseStream();
-                    Image im = Image.FromStream(stream);
-                    TagLib.File file = TagLib.File.Create(SongPaths[i]);
-                    TagLib.Picture pic = new TagLib.Picture();
-                    pic.Type = TagLib.PictureType.FrontCover;
-                    pic.Description = "Cover";
-                    pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
-                    MemoryStream ms = new MemoryStream();
-                    im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    ms.Position = 0;
-                    pic.Data = TagLib.ByteVector.FromStream(ms);
-                    file.Tag.Pictures = new TagLib.IPicture[] { pic };
-                    file.Tag.Performers = new string[] { artist };
-                    file.Tag.Comment = "Downloaded using MusicPlayer";
-                    file.Tag.Album = "MusicPlayer Songs";
-                    file.Tag.AlbumArtists = new string[] { artist };
-                    file.Tag.Artists = new string[] { artist };
-                    file.Tag.AmazonId = "AmazonIsShit";
-                    file.Tag.Composers = new string[] { artist };
-                    file.Tag.Copyright = "None";
-                    file.Tag.Disc = 0;
-                    file.Tag.DiscCount = 0;
-                    file.Tag.Genres = new string[] { "good music" };
-                    file.Tag.Grouping = "None";
-                    file.Tag.Lyrics = "You expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\n";
-                    file.Tag.MusicIpId = "wubbel";
-                    file.Tag.Title = name;
-                    file.Tag.Track = 0;
-                    file.Tag.TrackCount = 0;
-                    file.Tag.Year = 1982;
+                        // edit mp3 metadata using taglib
+                        HttpWebRequest httpWebRequest = (HttpWebRequest)HttpWebRequest.Create(thumbURL);
+                        HttpWebResponse httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                        Stream stream = httpWebReponse.GetResponseStream();
+                        Image im = Image.FromStream(stream);
+                        TagLib.File file = TagLib.File.Create(SongPaths[i]);
+                        TagLib.Picture pic = new TagLib.Picture();
+                        pic.Type = TagLib.PictureType.FrontCover;
+                        pic.Description = "Cover";
+                        pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+                        MemoryStream ms = new MemoryStream();
+                        im.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        ms.Position = 0;
+                        pic.Data = TagLib.ByteVector.FromStream(ms);
+                        file.Tag.Pictures = new TagLib.IPicture[] { pic };
+                        file.Tag.Performers = new string[] { artist };
+                        file.Tag.Comment = "Downloaded using MusicPlayer";
+                        file.Tag.Album = name;
+                        file.Tag.AlbumArtists = new string[] { artist };
+                        file.Tag.Artists = new string[] { artist };
+                        file.Tag.AmazonId = "AmazonIsShit";
+                        file.Tag.Composers = new string[] { artist };
+                        file.Tag.Copyright = "None";
+                        file.Tag.Disc = 1;
+                        file.Tag.DiscCount = 1;
+                        file.Tag.Genres = new string[] { "good music" };
+                        file.Tag.Grouping = "None";
+                        file.Tag.Lyrics = "You expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\nYou expected lyrics, but it was me, dio.\n";
+                        file.Tag.MusicIpId = "wubbel";
+                        file.Tag.Title = name;
+                        file.Tag.Track = 1;
+                        file.Tag.TrackCount = 1;
+                        file.Tag.Year = 1982;
 
-                    file.Save();
-                    ms.Close();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error processing: " + name + "\nError Message: " + ex.Message);
+                        file.Save();
+                        ms.Close();
+
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error processing: " + name + "\nError Message: " + ex.Message);
+                    }
                 }
             }
         }
