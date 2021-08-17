@@ -67,10 +67,11 @@
             this.Chance,
             this.Surreal});
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dataGridView1.Location = new System.Drawing.Point(13, 41);
+            this.dataGridView1.Location = new System.Drawing.Point(17, 50);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(923, 556);
+            this.dataGridView1.Size = new System.Drawing.Size(1231, 684);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseDoubleClick);
@@ -127,9 +128,10 @@
             // 
             // bRefresh
             // 
-            this.bRefresh.Location = new System.Drawing.Point(13, 12);
+            this.bRefresh.Location = new System.Drawing.Point(17, 15);
+            this.bRefresh.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.bRefresh.Name = "bRefresh";
-            this.bRefresh.Size = new System.Drawing.Size(73, 23);
+            this.bRefresh.Size = new System.Drawing.Size(97, 28);
             this.bRefresh.TabIndex = 1;
             this.bRefresh.Text = "Refresh";
             this.bRefresh.UseVisualStyleBackColor = true;
@@ -139,18 +141,20 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(171, 14);
+            this.textBox1.Location = new System.Drawing.Point(228, 17);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(686, 20);
+            this.textBox1.Size = new System.Drawing.Size(913, 22);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
             // bSearch
             // 
             this.bSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bSearch.Location = new System.Drawing.Point(863, 12);
+            this.bSearch.Location = new System.Drawing.Point(1151, 15);
+            this.bSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.bSearch.Name = "bSearch";
-            this.bSearch.Size = new System.Drawing.Size(73, 23);
+            this.bSearch.Size = new System.Drawing.Size(97, 28);
             this.bSearch.TabIndex = 3;
             this.bSearch.Text = "Search";
             this.bSearch.UseVisualStyleBackColor = true;
@@ -158,9 +162,10 @@
             // 
             // toPlaying
             // 
-            this.toPlaying.Location = new System.Drawing.Point(92, 12);
+            this.toPlaying.Location = new System.Drawing.Point(123, 15);
+            this.toPlaying.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.toPlaying.Name = "toPlaying";
-            this.toPlaying.Size = new System.Drawing.Size(73, 23);
+            this.toPlaying.Size = new System.Drawing.Size(97, 28);
             this.toPlaying.TabIndex = 4;
             this.toPlaying.Text = "To Playing";
             this.toPlaying.UseVisualStyleBackColor = true;
@@ -172,15 +177,16 @@
             // 
             // Statistics
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(948, 609);
+            this.ClientSize = new System.Drawing.Size(1264, 750);
             this.Controls.Add(this.toPlaying);
             this.Controls.Add(this.bSearch);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.bRefresh);
             this.Controls.Add(this.dataGridView1);
-            this.MinimumSize = new System.Drawing.Size(684, 127);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MinimumSize = new System.Drawing.Size(906, 145);
             this.Name = "Statistics";
             this.Text = "Statistics";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Statistics_FormClosed);
