@@ -7,4 +7,4 @@ Like this (Click on it to see the video)
 
 ## Why is not updated anymore?
 
-I started building this in 2018 on top of XNA which is now deprecated but I [ported it to monogame](https://github.com/jnccd/music-player-dxmg-port) to continue development.
+I started building this in 2017 on top of XNA which is now deprecated but I [ported it to monogame](https://github.com/jnccd/music-player-dxmg-port) to continue development.
